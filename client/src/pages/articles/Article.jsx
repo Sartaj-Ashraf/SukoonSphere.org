@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import HTMLFlipBook from 'react-pageflip';
 import customFetch from "@/utils/customFetch";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const Article = () => {
   const [article, setArticle] = useState(null);
