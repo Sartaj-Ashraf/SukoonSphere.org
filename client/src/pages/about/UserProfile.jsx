@@ -31,12 +31,21 @@ const UserProfile = () => {
     ];
     return (
         <>
-            <div className='relative grid grid-cols-1 md:grid-cols-12 max-w-7xl mx-auto p-4'>
-                <div className="lg:sticky top-[1%] md:h-screen col-span-1 md:col-span-3 mb-4 md:mb-0">
-                    <ProfileCard />
-                </div>
-                <div className='col-span-1 md:col-span-8 px-2 md:px-4 flex flex-col gap-2 bg-white'>
-                    <ProfileDetails />
+            <div className='relative max-w-7xl mx-auto p-4 lg:p-8'>
+                <div className='grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8'>
+                    {/* Profile Card Section */}
+                    <div className="md:col-span-3">
+                        <div className="lg:sticky top-[80px] transition-all duration-300 hover:shadow-lg rounded-2xl">
+                            <ProfileCard />
+                        </div>
+                    </div>
+
+                    {/* Main Content Section */} 
+                    <div className='md:col-span-9'>
+                        <div className='bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-4 lg:p-6'>
+                            <ProfileDetails />
+                        </div>
+                    </div>
                 </div>
             </div>
         </>

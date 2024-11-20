@@ -30,18 +30,18 @@ const RepliesSection = ({ addReply, replies, fetchReplies, deleteReply, likeRepl
         />
         <button
           type="submit"
-          className="absolute bottom-5 right-4 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1">
+          className="absolute bottom-5 right-3 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4"
+            className="w-3 h-3 md:w-3.5 md:h-3.5"
           >
             <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
           </svg>
         </button>
       </Form>
-      <div className="space-y-4 mt-6 px-4 pb-4 max-h-[400px] overflow-y-auto no-scrollbar">
+      <div className="space-y-4 mt-3 px-4  max-h-[400px] overflow-y-auto no-scrollbar">
         {replies &&
           replies.map((reply) => (
             <Reply
