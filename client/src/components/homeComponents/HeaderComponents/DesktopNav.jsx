@@ -6,7 +6,7 @@ import { BsFillTriangleFill } from 'react-icons/bs';
 function DesktopNav({ links }) {
   return (
     <div className="hidden lg:flex justify-center flex-grow">
-      <ul className="flex mt-6 h-12 gap-5 items-center">
+      <ul className="flex mt-[.8rem] h-10 gap-5 items-center">
         {links.map((link, index) => (
           <NavItem key={link.name} link={link} index={index} />
         ))}

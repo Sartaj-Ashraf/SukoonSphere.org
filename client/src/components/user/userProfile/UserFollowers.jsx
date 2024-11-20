@@ -33,7 +33,7 @@ const UserFollowers = () => {
     return (
         <div className="bg-white shadow rounded-lg p-4">
             <h2 className="text-xl font-bold mb-4 text-[var(--black-color)] text-center">Followers</h2>
-            <div className="divide-y divide-gray-200">
+            {/* <div className="divide-y divide-gray-200">
                 {followers.length === 0 ? (
                     <p className="text-center text-gray-500 py-4">No followers yet</p>
                 ) : (
@@ -57,17 +57,17 @@ const UserFollowers = () => {
                                     <p className="font-semibold text-base text-[var(--primary)]">{follower.name}</p>
                                     <p className="text-sm text-gray-600">{follower.email}</p>
                                 </div>
-                            </div>
+                            </div> */}
                             {/* <button
                                 className="action-button btn-sm"
                                 onClick={() => handleFollowBack(follower._id)}
                             >
                                 {user?.following?.includes(follower._id) ? 'Unfollow' : 'Follow Back'}
                             </button> */}
-                        </div>
+                        {/* </div>
                     ))
                 )}
-            </div>
+            </div> */}
         </div>
     );
 };

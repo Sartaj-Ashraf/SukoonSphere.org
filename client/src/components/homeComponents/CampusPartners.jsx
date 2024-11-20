@@ -29,7 +29,7 @@ function CampusPartners() {
             <div className='sm:mb-20 h-3/5 '>
                 <SectionTitle title={"Our Partners"} />
                 <div className="carousel-wrapper bg-[var(--primary)] p-2">
-                    <p className="text-lg uppercase tracking-wide text-[var(--grey--500)] text-center pb-2">With
+                    <p className="text-sm md:text-lg uppercase tracking-wide text-[var(--grey--500)] text-center pb-2">With
                         10+
                         top institutes to empower
                         2,00,000+
@@ -37,7 +37,7 @@ function CampusPartners() {
 
                     <div className="carousel-content pb-2 sm:pb-4">
                         {duplicatedPartnersData.map((logo, index) => (
-                            <img key={`${logo.name}-${index}`} src={logo.url} alt={logo.name} className="logo" />
+                            <img key={`${logo.name}-${index}`} src={logo.url} alt={logo.name} className="logo " />
                         ))}
                     </div>
                 </div>

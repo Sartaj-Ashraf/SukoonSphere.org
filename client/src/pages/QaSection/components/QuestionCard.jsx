@@ -53,10 +53,10 @@ const QuestionCard = ({ question }) => {
       </div>
 
       <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-3 text-gray-800 hover:text-blue-600 transition-colors duration-200">
+        <h2 className="text-2xl font-bold mb-2 text-gray-800 hover:text-blue-600 transition-colors duration-200">
           {questionText}
         </h2>
-        <p className="text-gray-600 mb-4 leading-relaxed">{context}</p>
+        <p className="text-gray-600 mb-2 leading-relaxed">{context}</p>
         <div className="flex flex-wrap gap-2 mb-4">
           {tags?.map((tag, index) => (
             <span
@@ -70,7 +70,7 @@ const QuestionCard = ({ question }) => {
       </div>
 
       {mostLikedAnswer && (
-        <div className="border-t border-gray-100 pt-4">
+        <div className="border-t border-gray-100">
           <Answer answer={mostLikedAnswer} user={user} mostLikedAnswer={true} />
         </div>
       )}

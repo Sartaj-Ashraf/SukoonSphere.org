@@ -39,14 +39,14 @@ const UserAnswers = () => {
     }, [])
 
     return (
-        <div className='bg-white shadow rounded-lg p-4 space-y-4'>
+        <div className='bg-white rounded-lg p-4 space-y-4'>
             <h2 className="text-xl font-bold mb-4 text-black text-center">Answers Given</h2>
             <div className="divide-y divide-gray-200 space-y-4">
                 {answers?.length === 0 ? (
                     <p className="text-[var(--primary)] text-center py-4">No answers given yet!</p>
                 ) : (
                     answers.map((answer) => (
-                        <div key={answer._id} className="mb-8 p-6 rounded-lg bg-white transition duration-300 shadow-1 hover:shadow-2">
+                        <div key={answer._id} className="mb-8 p-6 rounded-xl bg-white transition duration-300 shadow-1 hover:shadow-2">
                             <div className="flex items-center mb-4 justify-between">
                                 <div className="flex items-center">
                                     <img

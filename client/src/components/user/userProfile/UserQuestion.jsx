@@ -39,14 +39,14 @@ const UserQuestions = () => {
     }, [])
 
     return (
-        <div className='bg-white shadow rounded-lg p-4 space-y-4'>
+        <div className='bg-white  rounded-lg p-4 space-y-4'>
             <h2 className="text-xl font-bold mb-4 text-black text-center">Questions Posted</h2>
-            <div className="divide-y divide-gray-200 space-y-4">
+            <div className="divide-y divide-gray-200 space-y-4 ">
                 {questions?.length === 0 ? (
                     <p className="text-[var(--primary)] text-center py-4">No questions asked yet!</p>
                 ) : (
                     questions.map((question) => (
-                        <div key={question._id} className="mb-8 p-6 rounded-lg bg-white transition duration-300 shadow-1 hover:shadow-2">
+                        <div key={question._id} className="mb-4 p-6 rounded-xl bg-white transition duration-300 shadow-1 hover:shadow-2">
                             <div className="flex items-center mb-4 justify-between">
                                 <div className="flex items-center">
                                     <img
@@ -92,7 +92,7 @@ const UserQuestions = () => {
                             </h2>
                             <p className="text-gray-700 mb-4">{question.context}</p>
 
-                            <div className="flex flex-wrap mb-4">
+                            <div className="flex flex-wrap mb-4 gap-y-1">
                                 {question.tags?.map((tag, index) => (
                                     <span
                                         key={index}
