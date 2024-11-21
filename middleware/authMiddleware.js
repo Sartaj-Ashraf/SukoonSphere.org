@@ -1,14 +1,44 @@
 import { UnauthenticatedError } from "../errors/customErors.js";
-import { verifyJWT } from "../utils/tokenUtils.js";
-
+import { attachCookiesToResponse, verifyJWT } from "../utils/tokenUtils.js";
+import RefreshToken from "../models/token/token.js";
 export const authenticateUser = async (req, res, next) => {
-  const { token } = req.cookies;
-  if (!token) throw new UnauthenticatedError("authentication invalid");
+  const { accessToken, refreshToken } = req.signedCookies;
   try {
-    const { userId, role, username, email, avatar } = verifyJWT(token);
-    req.user = { userId, username, role, email, avatar };
+    if (accessToken) {
+      const payload = verifyJWT(accessToken);
+      req.user = payload.user;
+      req.user.userId = payload.user._id;
+      return next();
+    }
+    const payload = verifyJWT(refreshToken);
+    const existingToken = await RefreshToken.findOne({
+      user: payload.user._id,
+      refreshToken: payload.refreshToken,
+    });
+    if (!existingToken || !existingToken?.isValid) {
+      throw new UnauthenticatedError("authentication invalid");
+    }
+    attachCookiesToResponse({
+      res,
+      user: payload.user,
+      refreshToken: existingToken.refreshToken,
+    });
+    req.user = payload.user;
+    req.user.userId = payload.user._id;
     next();
   } catch {
     throw new UnauthenticatedError("authentication invalid");
   }
 };
+
+// export const authenticateUser = async (req, res, next) => {
+//   const { token } = req.cookies;
+//   if (!token) throw new UnauthenticatedError("authentication invalid");
+//   try {
+//     const { userId, role, username, email, avatar } = verifyJWT(token);
+//     req.user = { userId, username, role, email, avatar };
+//     next();
+//   } catch {
+//     throw new UnauthenticatedError("authentication invalid");
+//   }
+// };

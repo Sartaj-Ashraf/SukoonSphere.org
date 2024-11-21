@@ -66,7 +66,7 @@ export const getAllQuestions = async (req, res) => {
   res.status(StatusCodes.OK).json({ questions: questionsWithCounts });
 };
 export const getUserQuestions = async (req, res) => {
-  const { userId } = req.user;
+  const { id: userId } = req.params;
   const questions = await Question.find({ "author.userId": userId }).lean();
 
   const questionsWithCounts = questions.map((question) => ({
@@ -247,7 +247,7 @@ export const getAnswersByQuestionId = async (req, res) => {
   });
 };
 export const getUserAnswers = async (req, res) => {
-  const { userId } = req.user;
+  const { id: userId } = req.params;
   const answers = await Answer.aggregate([
     { $match: { "author.userId": new mongoose.Types.ObjectId(userId) } },
     {

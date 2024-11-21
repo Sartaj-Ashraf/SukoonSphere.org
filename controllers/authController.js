@@ -1,12 +1,13 @@
 import { StatusCodes } from "http-status-codes";
 import User from "../models/userModel.js";
+import RefreshToken from "../models/token/token.js";
 import {
   comparePassword,
   hashpasword,
   hashString,
 } from "../utils/passwordUtils.js";
 import { UnauthenticatedError } from "../errors/customErors.js";
-import { createJWT } from "../utils/tokenUtils.js";
+import { createJWT, attachCookiesToResponse } from "../utils/tokenUtils.js";
 import crypto from "crypto";
 import sendVerificationEmail from "../utils/sendVerificationEmail.js";
 import sendResetPasswordEmail from "../utils/sendResetPasswordEmail.js";
@@ -59,23 +60,38 @@ export const login = async (req, res) => {
     throw new UnauthenticatedError(
       "please verify your email, you have already recieved verification link, check your mail"
     );
-  const token = createJWT({
-    userId: user._id,
-    role: user.role,
-    email: user.email,
-    username: user.name,
-    avatar: user.avatar,
+  // from here
+  // create refresh token
+  let refreshToken = "";
+  // check if refresh token already exists
+  const existingToken = await RefreshToken.findOne({ user: user._id });
+  if (existingToken) {
+    const { isValid } = existingToken;
+    if (!isValid) {
+      throw new UnauthenticatedError("invalid credentials");
+    }
+    // if refresh token is valid
+    refreshToken = existingToken.refreshToken;
+    attachCookiesToResponse({
+      res,
+      user,
+      refreshToken,
+    });
+    res.status(StatusCodes.OK).json({ msg: "user logged in", user });
+    return;
+  }
+  // if refresh token does not exist
+  refreshToken = crypto.randomBytes(50).toString("hex");
+  const userAgent = req.headers["user-agent"];
+  const ipAddress = req.ip;
+  const userToken = { refreshToken, ipAddress, userAgent, user: user._id };
+  await RefreshToken.create(userToken);
+  attachCookiesToResponse({
+    res,
+    user,
+    refreshToken,
   });
-  const oneDay = 1000 * 60 * 60 * 24;
-  res.cookie("token", token, {
-    httpOnly: true,
-    expires: new Date(Date.now() + oneDay),
-    secure: process.env.NODE_ENV == "production",
-  });
-  const _user = await User.findOne({ email: req.body.email });
-
-  res.status(StatusCodes.OK).json({ msg: "user logged in", user: _user });
-  console.log(res.cookie);
+  res.status(StatusCodes.OK).json({ msg: "user logged in", user });
 };
 
 export const changePassword = async (req, res) => {
@@ -149,10 +165,17 @@ export const resetPassword = async (req, res) => {
 };
 
 // logout
-export const logout = (req, res) => {
-  res.cookie("token", "logout", {
+export const logout = async (req, res) => {
+  await RefreshToken.findOneAndDelete({ user: req.user.userId });
+
+  res.cookie("accessToken", "logout", {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  });
+  res.cookie("refreshToken", "logout", {
     httpOnly: true,
     expires: new Date(Date.now()),
   });
   res.status(StatusCodes.OK).json({ msg: "user logged out!" });
 };
+  

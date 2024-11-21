@@ -23,7 +23,7 @@ import upload from "../middleware/multer.js";
 
 router.post("/register", validateRegisterInput, register);
 router.post("/login", validateLoginInput, login);
-router.get("/logout", logout);
+router.delete("/logout", authenticateUser, logout);
 router.post("/verify-email", verifyEmail);
 router.post(
   "/change-password",

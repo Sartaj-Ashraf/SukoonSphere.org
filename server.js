@@ -45,7 +45,7 @@ const corsOptions = {
   origin: "http://localhost:5173",
   credentials: true,
 };
-app.use(cookieParser());
+app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(cors(corsOptions));
 app.use("/api/v1/user", UserRouter);
 app.use("/api/v1/auth", AuthRouter);
@@ -55,7 +55,7 @@ app.use("/api/v1/articles", ArticleRouter);
 
 app.use("/public", express.static(path.resolve(__dirname, "./public")));
 
-//not found
+//not founds
 app.use("*", (req, res) => {
   res.status(404).json({ msg: "route not found " });
 });

@@ -126,7 +126,7 @@ export const getAllCommentsByPostId = async (req, res) => {
   res.status(StatusCodes.OK).json({ comments: commentsWithReplies });
 };
 export const getAllPostsByUserId = async (req, res) => {
-  const { userId } = req.user;
+  const { id: userId } = req.params;
   const posts = await postModel
     .find({ createdBy: userId })
     .select("-__v")

@@ -3,6 +3,17 @@ import User from "../models/userModel.js";
 import cloudinary from "cloudinary";
 import { formatImage } from "../middleware/multer.js";
 
+export const getUserProfile = async (req, res) => {
+  const user = await User.findById(req.user.userId).select(
+    "name email avatar _id"
+  );
+  res.status(StatusCodes.OK).json(user);
+};
+export const getUserDetailsById = async (req, res) => {
+  const { id: userId } = req.params;
+  const user = await User.findById(userId).select("-password");
+  res.status(StatusCodes.OK).json(user);
+};
 export const changeUserProfile = async (req, res) => {
   const user = await User.findById(req.user.userId);
   if (req.file) {
@@ -34,7 +45,8 @@ export const followOrUnfollowUser = async (req, res) => {
 };
 
 export const getAllFollowers = async (req, res) => {
-  const user = await User.findById(req.user.userId);
+  const { id: userId } = req.params;
+  const user = await User.findById(userId);
   const followers = await User.find(
     { _id: { $in: user.followers } },
     "name email avatar followers following"
@@ -50,7 +62,8 @@ export const getAllFollowers = async (req, res) => {
 };
 
 export const getAllFollowing = async (req, res) => {
-  const user = await User.findById(req.user.userId);
+      const { id: userId } = req.params;
+  const user = await User.findById(userId);
   const following = await User.find({ _id: { $in: user.following } });
   const followingWithCounts = following.map((following) => ({
     name: following.name,
