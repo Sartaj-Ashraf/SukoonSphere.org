@@ -1,37 +1,34 @@
 import mongoose from "mongoose";
 
-const ArticleSchema = new mongoose.Schema({
+const ArticleSchema = new mongoose.Schema(
+  {
     title: {
-        type: String,
+      type: String,
     },
     views: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
     deleted: {
-        default: false,
-        type: Boolean,
-    },
-    timestamp: {
-        type: Date,
-        default: Date.now,
-    },
-    pages: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "ArticlePage",
+      default: false,
+      type: Boolean,
     },
     author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    pdfPath: {
+      type: String,
     },
     status: {
-        type: String,
-        default: "pending",
-        enum: ["pending", "approved", "rejected"],
+      type: String,
+      default: "pending",
+      enum: ["pending", "published"],
     },
-    coverPage: {
-        type: String,
-    }
-});
+  },
+  {
+    timestamps: true,
+  }
+);
 
 export default mongoose.model("Article", ArticleSchema);

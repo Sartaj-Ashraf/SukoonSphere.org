@@ -10,6 +10,7 @@ import morgan from "morgan";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cloudinary from "cloudinary";
+import cors from "cors";
 
 //routers
 import AuthRouter from "./routes/authRouter.js";
@@ -37,16 +38,22 @@ if (process.env.NODE_ENV === "devlopment") {
   app.use(morgan("dev"));
 }
 app.use(express.static(path.resolve(__dirname, "./public")));
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ limit: "10mb", extended: true }));
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ limit: "20mb", extended: true }));
 
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+};
 app.use(cookieParser());
-
+app.use(cors(corsOptions));
 app.use("/api/v1/user", UserRouter);
 app.use("/api/v1/auth", AuthRouter);
 app.use("/api/v1/posts", PostRouter);
 app.use("/api/v1/qa-section", QaSectionRouter);
 app.use("/api/v1/articles", ArticleRouter);
+
+app.use("/public", express.static(path.resolve(__dirname, "./public")));
 
 //not found
 app.use("*", (req, res) => {

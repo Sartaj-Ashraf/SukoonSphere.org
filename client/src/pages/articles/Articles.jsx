@@ -41,8 +41,8 @@ const Articles = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {articles.map((article) => (
           <Link
-            to={`/articles/article/${article._id}`}
-            key={article._id}
+            to={`/articles/article/${article?._id}`}
+            key={article?._id}
             className="block"
           >
             <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
@@ -50,15 +50,15 @@ const Articles = () => {
                 <div className="article-cover-preview h-48 overflow-hidden mb-4">
                   <div
                     className="prose max-w-none scale-50 origin-top"
-                    dangerouslySetInnerHTML={{ __html: article.coverPage }}
+                    dangerouslySetInnerHTML={{ __html: article?.coverPage }}
                   />
                 </div>
                 <h2 className="text-xl font-semibold mb-2">
-                  {article.title || 'Untitled Article'}
+                  {article?.title || 'Untitled Article'}
                 </h2>
                 <div className="flex justify-between items-center text-sm text-gray-600">
-                  <span>By {article.author.name}</span>
-                  <span>{new Date(article.timestamp).toLocaleDateString()}</span>
+                  <span>By {article?.author?.name}</span>
+                  <span>{new Date(article?.timestamp).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
