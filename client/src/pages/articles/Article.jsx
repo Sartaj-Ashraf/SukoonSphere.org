@@ -1,50 +1,66 @@
-import React, { useEffect, useState } from "react";
-import HTMLFlipBook from 'react-pageflip';
+import React, { useEffect } from "react";
+import HTMLFlipBook from "react-pageflip";
+import { useState } from "react";
+import { Document, Page, pdfjs } from "react-pdf";
+import pdf from "../../../src/assets/testing.pdf";
 import customFetch from "@/utils/customFetch";
 import { useParams } from "react-router-dom";
 
-const Article = () => {
-  const [article, setArticle] = useState(null);
-  const { id: paramId } = useParams();
-  const fetchArticles = async () => {
-    try {
-      const { data } = await customFetch(
-        `articles/get-article-with-pages/${paramId}`
-      );
-      setArticle(data.article);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  useEffect(() => {
-    fetchArticles();
-  }, [])
-
-  if (!article) {
-    return <div>Loading...</div>;
-  }
-
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+const Pages = React.forwardRef((props, ref) => {
   return (
-    <div className="my-8 md:mx-8 sm:mx-0 sm:my-0">
-      <HTMLFlipBook
-        width={window.innerWidth < 640 ? window.innerWidth - 32 : window.innerWidth - 128}
-        height={window.innerWidth < 640 ? window.innerHeight - 64 : window.innerHeight}
-        className="w-full h-full mx-auto my-4 sm:my-0"
-      >
-        <div className="demoPage p-4 sm:p-8 bg-white shadow-lg overflow-auto">
-          <div dangerouslySetInnerHTML={{ __html: article.coverPage }} />
-        </div>
-
-        {article.pages.map((page) => (
-          <div key={page._id} className="demoPage p-4 sm:p-8 bg-white shadow-lg overflow-auto">
-            <div dangerouslySetInnerHTML={{ __html: page.pageContent }} />
-          </div>
-        ))}
-
-      </HTMLFlipBook>
+    <div className="demoPage" ref={ref}>
+      <p>{props.children}</p>
     </div>
   );
-};
+});
 
-export default Article;
+Pages.displayName = "Pages";
+
+function Flipbook() {
+  const [numPages, setNumPages] = useState();
+  const { id: paramId } = useParams();
+
+  function onDocumentLoadSuccess({ numPages }) {
+    setNumPages(numPages);
+  }
+  const [article, setArticle] = useState(null);
+  const fetchArticle = async () => {
+    const response = await customFetch.get(
+      `/articles/get-article-with-pages/${paramId}`
+    );
+    setArticle(response.data.article);
+  };
+  useEffect(() => {
+    fetchArticle();
+  }, [paramId]);
+  console.log({ article });
+  return (
+    <>
+      <div className="h-screen w-screen flex flex-col gap-5 justify-center items-center bg-gray-900 overflow-hidden">
+        <HTMLFlipBook width={500} height={600}>
+          {[...Array(numPages).keys()].map((pNum) => (
+            <Pages key={pNum} number={pNum + 1}>
+              <Document
+                file={article?.pdfPath}
+                onLoadSuccess={onDocumentLoadSuccess}
+              >
+                <Page
+                  pageNumber={pNum}
+                  width={500}
+                  renderAnnotationLayer={false}
+                  renderTextLayer={false}
+                />
+              </Document>
+              <p>
+                Page {pNum} of {numPages}
+              </p>
+            </Pages>
+          ))}
+        </HTMLFlipBook>
+      </div>
+    </>
+  );
+}
+
+export default Flipbook;

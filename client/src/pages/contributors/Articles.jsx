@@ -104,7 +104,10 @@ const PageItem = ({
   hoveredPage,
   setHoveredPage,
 }) => (
-  <div key={page._id} className={`relative group ${hoveredPage === page._id ? 'z-50' : 'z-0'}`}>
+  <div
+    key={page._id}
+    className={`relative group ${hoveredPage === page._id ? "z-50" : "z-0"}`}
+  >
     <div
       onMouseEnter={() => setHoveredPage(page._id)}
       onMouseLeave={() => setHoveredPage(null)}
@@ -166,8 +169,8 @@ const Articles = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   if (isMobile) {
@@ -175,9 +178,12 @@ const Articles = () => {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center space-y-4">
           <FiMonitor className="w-16 h-16 mx-auto text-gray-400" />
-          <h2 className="text-2xl font-bold text-gray-800">Desktop View Required</h2>
+          <h2 className="text-2xl font-bold text-gray-800">
+            Desktop View Required
+          </h2>
           <p className="text-gray-600">
-            Please view this page on a laptop or desktop for the best experience.
+            Please view this page on a laptop or desktop for the best
+            experience.
           </p>
         </div>
       </div>
@@ -210,7 +216,6 @@ const Articles = () => {
       await articleService.publishArticle(articleId);
       toast.success("Article published successfully");
       fetchArticles();
-
     } catch (error) {
       toast.error("Failed to publish article");
     }
@@ -374,18 +379,14 @@ const Articles = () => {
       )}
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50  backdrop-blur-sm flex justify-center items-center z-50">
-          <div className="bg-white p-2 rounded-2xl w-[95vw] h-[95vh]  shadow-2xl transform transition-all duration-300">
-            <CreateArticleModel
-              createArticlePage={createArticlePage}
-              articleId={articleId}
-              type={type}
-              showModal={showModal}
-              setShowModal={setShowModal}
-              fetchArticles={fetchArticles}
-            />
-          </div>
-        </div>
+        <CreateArticleModel
+          createArticlePage={createArticlePage}
+          articleId={articleId}
+          type={type}
+          showModal={showModal}
+          setShowModal={setShowModal}
+          fetchArticles={fetchArticles}
+        />
       )}
 
       <DeleteModal
@@ -414,7 +415,10 @@ const Articles = () => {
       )}
       {showEditPageModal && (
         <EditArticlePageModel
-          onClose={() => setShowEditPageModal(false)}
+          onClose={() => {
+            console.log("close");
+            setShowEditPageModal(false);
+          }}
           pageId={pageId}
           content={pageContent}
           handleEditPage={handleEditPage}

@@ -17,7 +17,7 @@ export const createPost = async (req, res) => {
     userAvatar: req.user.avatar,
     ...req.body,
   };
-  console.log({req})
+  console.log({ req });
   if (req.file) {
     const file = formatImage(req.file);
     const response = await cloudinary.v2.uploader.upload(file);
@@ -38,7 +38,7 @@ export const createPost = async (req, res) => {
 export const getAllPosts = async (req, res) => {
   const posts = await Post.aggregate([
     {
-      $sort: { createdAt: -1 }
+      $sort: { createdAt: -1 },
     },
     {
       $addFields: {
@@ -53,10 +53,10 @@ export const getPostById = async (req, res) => {
   const { id: postId } = req.params;
   const post = await Post.aggregate([
     {
-      $match: { _id: new mongoose.Types.ObjectId(postId) }
+      $match: { _id: new mongoose.Types.ObjectId(postId) },
     },
     {
-      $sort: { createdAt: -1 }
+      $sort: { createdAt: -1 },
     },
     {
       $addFields: {
@@ -189,13 +189,13 @@ export const getAllRepliesByCommentId = async (req, res) => {
     .sort({ createdAt: -1 })
     .lean();
 
-  const repliesWithCounts = replies.map(reply => ({
+  const repliesWithCounts = replies.map((reply) => ({
     ...reply,
-    totalLikes: (reply.likes || []).length
+    totalLikes: (reply.likes || []).length,
   }));
 
   res.status(StatusCodes.OK).json({
-    replies: repliesWithCounts
+    replies: repliesWithCounts,
   });
 };
 
@@ -203,17 +203,13 @@ export const deletePost = async (req, res) => {
   const { id: postId } = req.params;
   const session = await mongoose.startSession();
   session.startTransaction();
-  
+
   const post = await Post.findById(postId).session(session);
   if (!post) {
     throw new BadRequestError("Post not found");
   }
-  
-  console.log({askjdf:post.createdBy , req:req.user.userId})
-  if (
-    post.createdBy.toString() !== req.user.userId ||
-    req.user.role !== "admin"
-  ) {
+
+  if (post.createdBy.toString() !== req.user.userId) {
     throw new UnauthorizedError("You are not authorized to delete this post");
   }
 
@@ -309,7 +305,7 @@ export const likePostComment = async (req, res) => {
   const userId = req.user.userId;
 
   const comment = await PostComments.findById(commentId);
-  
+
   if (!comment) {
     throw new BadRequestError("Comment not found");
   }
@@ -325,13 +321,15 @@ export const likePostComment = async (req, res) => {
     { new: true }
   );
 
-  const message = isLiked ? "Comment unliked successfully" : "Comment liked successfully";
+  const message = isLiked
+    ? "Comment unliked successfully"
+    : "Comment liked successfully";
 
   res.status(StatusCodes.OK).json({
     message,
-    comment: updatedComment
+    comment: updatedComment,
   });
-}
+};
 export const likePostCommentReply = async (req, res) => {
   const { id: replyId } = req.params;
   const userId = req.user.userId;
@@ -344,16 +342,15 @@ export const likePostCommentReply = async (req, res) => {
     ? { $pull: { likes: userId } }
     : { $push: { likes: userId } };
 
-  const updatedReply = await PostReplies.findByIdAndUpdate(
-    replyId,
-    update,
-    { new: true }
-  );
-  const message = isLiked ? "Reply unliked successfully" : "Reply liked successfully";
+  const updatedReply = await PostReplies.findByIdAndUpdate(replyId, update, {
+    new: true,
+  });
+  const message = isLiked
+    ? "Reply unliked successfully"
+    : "Reply liked successfully";
 
   res.status(StatusCodes.OK).json({
     message,
-    reply: updatedReply
+    reply: updatedReply,
   });
-}
-
+};

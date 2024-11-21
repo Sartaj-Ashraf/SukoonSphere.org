@@ -15,9 +15,12 @@ import {
   deleteArticlePage,
   editArticlePage,
   getPublishedArticles,
+  deleteImage,
+  createPdfArticle,
 } from "../controllers/articleControllers.js";
 import { authenticateUser } from "../middleware/authMiddleware.js";
 import upload from "../middleware/multer.js";
+import uploadPDF from "../middleware/pdfMulter.js";
 // to create article
 router.post("/create-article", authenticateUser, createArticle);
 // to get pending articles
@@ -26,6 +29,15 @@ router.get("/get-pending-articles", authenticateUser, getPendingArticles);
 router.get("/get-published-articles", getPublishedArticles);
 // to upload image
 router.post("/upload-image", upload.single("image"), uploadImage);
+// to delete image
+router.delete("/delete-image", deleteImage);
+// to upload pdf
+router.post(
+  "/upload-pdf",
+  uploadPDF.single("pdf"),
+  authenticateUser,
+  createPdfArticle
+);
 // to create article page
 router.post("/create-article-page/:id", authenticateUser, createArticlePage);
 // to get article with pages
@@ -33,7 +45,7 @@ router.get("/get-article-with-pages/:id", getArticleWithPages);
 // to publish article
 router.patch("/publish-article/:id", authenticateUser, publishArticle);
 // to delete article
-router.delete("/delete-article/:id", authenticateUser, deleteArticle);
+router.delete("/delete-article", authenticateUser, deleteArticle);
 // to edit article
 router.patch("/edit-article/:id", authenticateUser, editArticle);
 // to get article cover page
