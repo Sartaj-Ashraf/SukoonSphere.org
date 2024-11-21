@@ -37,35 +37,41 @@ const Articles = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">Articles</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {articles.map((article) => (
-          <Link
-            to={`/articles/article/${article?._id}`}
-            key={article?._id}
-            className="block"
-          >
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-              <div className="p-6">
-                <div className="article-cover-preview h-48 overflow-hidden mb-4">
-                  <div
-                    className="prose max-w-none scale-50 origin-top"
-                    dangerouslySetInnerHTML={{ __html: article?.coverPage }}
-                  />
-                </div>
-                <h2 className="text-xl font-semibold mb-2">
-                  {article?.title || 'Untitled Article'}
-                </h2>
-                <div className="flex justify-between items-center text-sm text-gray-600">
-                  <span>By {article?.author?.name}</span>
-                  <span>{new Date(article?.timestamp).toLocaleDateString()}</span>
-                </div>
+    <h1 className="text-5xl font-extrabold font-[Recoleta] mb-8 text-center lg:text-start bg-gradient-to-r from-gray-900 to-gray-400 bg-clip-text text-transparent">
+      Articles
+    </h1>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {articles.map((article) => (
+        <Link
+          to={`/articles/article/${article?._id}`}
+          key={article?._id}
+          className="block group"
+        >
+          <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+            <div className="p-6">
+              <div className="article-cover-preview h-56 overflow-hidden mb-6 rounded-xl border border-gray-100">
+                <div
+                  className="prose max-w-none scale-50 origin-top"
+                  dangerouslySetInnerHTML={{ __html: article?.coverPage }}
+                />
+              </div>
+              <h2 className="text-xl font-bold mb-3 text-gray-800 group-hover:text-[var(--secondary-hover)] transition-colors">
+                {article?.title || 'Untitled Article'}
+              </h2>
+              <div className="flex justify-between items-center text-sm text-gray-500">
+                <span className="font-medium">
+                  By {article?.author?.name}
+                </span>
+                <span className="text-gray-400">
+                  {new Date(article?.timestamp).toLocaleDateString()}
+                </span>
               </div>
             </div>
-          </Link>
-        ))}
-      </div>
+          </div>
+        </Link>
+      ))}
     </div>
+  </div>
   );
 };
 
