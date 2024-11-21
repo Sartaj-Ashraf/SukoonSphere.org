@@ -10,10 +10,11 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 const Pages = React.forwardRef((props, ref) => {
   return (
     <div className="demoPage" ref={ref}>
-      <p>{props.children}</p>
+      {props.children}
     </div>
   );
 });
+
 
 Pages.displayName = "Pages";
 
@@ -34,14 +35,17 @@ function Flipbook() {
   useEffect(() => {
     fetchArticle();
   }, [paramId]);
-  console.log({ article });
+  console.log({ article: article?.pdfPath });
   return (
     <>
       <div className="h-screen w-screen flex flex-col gap-5 justify-center items-center bg-gray-900 overflow-hidden">
         <HTMLFlipBook width={500} height={600}>
           {[...Array(numPages).keys()].map((pNum) => (
             <Pages key={pNum} number={pNum + 1}>
-              <Document file={article?.pdfPath} onLoadSuccess={onDocumentLoadSuccess}>
+              <Document
+                file={article?.pdfPath}
+                onLoadSuccess={onDocumentLoadSuccess}
+              >
                 <Page
                   pageNumber={pNum}
                   width={500}
