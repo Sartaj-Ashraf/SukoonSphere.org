@@ -35,7 +35,7 @@ const QuestionCard = ({ question }) => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow-sm hover:shadow-xl transition-shadow duration-300 mb-6 border border-gray-100">
+    <div className="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-100">
       <div className="flex items-center justify-between mb-5">
         <UserAvatar
           username={author?.username}
@@ -70,7 +70,7 @@ const QuestionCard = ({ question }) => {
       </div>
 
       {mostLikedAnswer && (
-        <div className="border-t border-gray-100">
+        <div className=" mt-1">
           <Answer answer={mostLikedAnswer} user={user} mostLikedAnswer={true} />
         </div>
       )}

@@ -3,6 +3,7 @@ import { Form, useParams } from "react-router-dom";
 import { Reply } from "../Comments";
 import { toast } from "react-toastify";
 import { useUser } from "@/context/UserContext";
+import { FaReply } from "react-icons/fa";
 const RepliesSection = ({ addReply, replies, fetchReplies, deleteReply, likeReply }) => {
   const { user } = useUser();
   const { commentId } = useParams();
@@ -20,25 +21,19 @@ const RepliesSection = ({ addReply, replies, fetchReplies, deleteReply, likeRepl
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-4">
+    <div className="bg-white rounded-xl shadow-sm p-4">
       <Form onSubmit={handleSubmit} className="relative">
+        <p className="font-md px-4 text-[var(--grey--700)] ">Replies</p>
         <textarea
           name="content"
           placeholder="Write a reply..."
           className="w-full p-3 pr-14 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none   text-gray-700"
-          rows='2'
+          rows='1'
         />
         <button
           type="submit"
-          className="absolute bottom-5 right-3 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-3 h-3 md:w-3.5 md:h-3.5"
-          >
-            <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
-          </svg>
+          className="absolute bottom-4 right-3 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1">
+          <FaReply className="w-2 h-2 md:w-3 md:h-3" />
         </button>
       </Form>
       <div className="space-y-4 mt-3 px-4  max-h-[400px] overflow-y-auto no-scrollbar">

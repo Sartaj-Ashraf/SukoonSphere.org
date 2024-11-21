@@ -137,7 +137,7 @@ const Answer = () => {
               allQuestions?.map((question) => (
                 <div
                   key={question._id}
-                  className="flex flex-col gap-3 p-4 md:p-6 bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 mb-4 border border-gray-100"
+                  className="flex flex-col gap-3 p-4 md:p-6 bg-white rounded-xl shadow-sm mb-4 border border-gray-100"
                 >
                   <div className="flex items-center mb-3">
                     <img
