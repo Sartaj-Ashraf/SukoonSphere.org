@@ -17,7 +17,6 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
     try {
       await handleDeleteReply(reply._id);
       setShowDeleteModal(false);
-      toast.success("Reply deleted successfully!");
     } catch (error) {
       console.log(error);
     }
@@ -71,10 +70,10 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
 
         <div className="flex items-center gap-4 mt-2">
           <button
-          className={`flex items-center gap-2 px-2 py-1 rounded-full transition-all duration-200 ${isLiked
-            ? "text-red-500 bg-red-50 hover:bg-red-100"
-            : "text-gray-500 hover:bg-gray-100"
-            }`}
+            className={`flex items-center gap-2 px-2 py-1 rounded-full transition-all duration-200 ${isLiked
+              ? "text-red-500 bg-red-50 hover:bg-red-100"
+              : "text-gray-500 hover:bg-gray-100"
+              }`}
             onClick={likeReply}
           >
             <FaRegHeart className="w-3 h-3 md:w-4 md:h-4" />
@@ -104,14 +103,7 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
             <button
               className="absolute bottom-3 right-2 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-2 h-2 md:w-3 md:h-3"
-              >
-                <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
-              </svg>
+              <FaReply className="w-2 h-2 md:w-3 md:h-3" />
             </button>
           </Form>
         )}
