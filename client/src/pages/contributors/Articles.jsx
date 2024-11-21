@@ -15,7 +15,7 @@ import {
   FiAlertCircle,
   FiMonitor,
 } from "react-icons/fi";
-import { EditArticlePageModel } from "./models/EditArticlePageModel";
+// import { EditArticlePageModel } from "./models/EditArticlePageModel";
 
 // Separate API service
 const articleService = {
@@ -413,7 +413,7 @@ const Articles = () => {
           type={previewType}
         />
       )}
-      {showEditPageModal && (
+      {/* {showEditPageModal && (
         <EditArticlePageModel
           onClose={() => {
             console.log("close");
@@ -423,7 +423,7 @@ const Articles = () => {
           content={pageContent}
           handleEditPage={handleEditPage}
         />
-      )}
+      )} */}
     </div>
   );
 };

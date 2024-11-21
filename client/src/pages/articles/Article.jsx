@@ -41,10 +41,7 @@ function Flipbook() {
         <HTMLFlipBook width={500} height={600}>
           {[...Array(numPages).keys()].map((pNum) => (
             <Pages key={pNum} number={pNum + 1}>
-              <Document
-                file={article?.pdfPath}
-                onLoadSuccess={onDocumentLoadSuccess}
-              >
+              <Document file={article?.pdfPath} onLoadSuccess={onDocumentLoadSuccess}>
                 <Page
                   pageNumber={pNum}
                   width={500}
