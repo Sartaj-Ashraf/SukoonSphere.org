@@ -38,8 +38,8 @@ function Flipbook() {
   console.log({ article: article?.pdfPath });
   return (
     <>
-      <div className="h-screen w-screen flex flex-col gap-5 justify-center items-center bg-gray-900 overflow-hidden">
-        <HTMLFlipBook width={500} height={600}>
+      <div className="h-screen w-screen flex flex-col gap-5 justify-center items-center overflow-hidden px-4 my-4 ">
+        <HTMLFlipBook width={500} height={650}>
           {[...Array(numPages).keys()].map((pNum) => (
             <Pages key={pNum} number={pNum + 1}>
               <Document
@@ -49,6 +49,7 @@ function Flipbook() {
                 <Page
                   pageNumber={pNum}
                   width={500}
+                  height={650}
                   renderAnnotationLayer={false}
                   renderTextLayer={false}
                 />
