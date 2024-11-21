@@ -75,7 +75,7 @@ const PostCard = ({
   };
 
   return (
-    <div className="bg-white rounded-[10px] shadow-sm mb-6 p-4">
+    <div className="bg-white rounded-[10px] shadow-sm mb-2  p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <UserAvatar

@@ -64,20 +64,20 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
       </div>
 
       <div className="ml-13">
-        <div className="bg-gray-50 p-3 rounded-lg">
+        <div className="bg-gray-50 p-1 rounded-[10px]">
           <Link className="text-blue-500" to={`/profile/${reply.createdBy}`}>@{reply.commentUsername}</Link>
           <span className="text-gray-800">&nbsp; &nbsp;{reply.content}</span>
         </div>
 
         <div className="flex items-center gap-4 mt-2">
           <button
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-200 ${isLiked
-              ? "text-red-500 bg-red-50 hover:bg-red-100"
-              : "text-gray-500 hover:bg-gray-100"
-              }`}
+          className={`flex items-center gap-2 px-2 py-1 rounded-full transition-all duration-200 ${isLiked
+            ? "text-red-500 bg-red-50 hover:bg-red-100"
+            : "text-gray-500 hover:bg-gray-100"
+            }`}
             onClick={likeReply}
           >
-            <FaRegHeart className="w-4 h-4" />
+            <FaRegHeart className="w-3 h-3 md:w-4 md:h-4" />
             <span className="text-sm">{likesCount}</span>
           </button>
 
@@ -85,7 +85,7 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
             onClick={handleReplyClick}
             className="flex items-center gap-1 text-gray-500 hover:text-blue-500"
           >
-            <FaReply className="w-4 h-4" />
+            <FaReply className="w-3 h-3 md:w-4 md:h-4" />
           </button>
         </div>
 
@@ -94,7 +94,7 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
             handleSubmit(e)
             window.scrollTo({ top: 700, behavior: 'smooth' });
 
-          }} className="mt-3 relative reply-form">
+          }} className="mt-2 relative reply-form">
             <textarea
               name="content"
               placeholder="Write a reply..."
@@ -108,7 +108,7 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                className="w-3 h-3"
+                className="w-2 h-2 md:w-3 md:h-3"
               >
                 <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
               </svg>

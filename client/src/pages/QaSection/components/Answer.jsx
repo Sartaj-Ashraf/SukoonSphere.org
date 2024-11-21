@@ -40,7 +40,7 @@ const Answer = ({ answer, user, answerCount }) => {
   };
 
   return (
-    <div className="mt-4 p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
+    <div className=" p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
       <div className="flex items-center justify-between mb-2">
         <UserAvatar
           username={answer.author?.username}

@@ -50,6 +50,30 @@ const Answer = () => {
     }
   }, [actionData]);
 
+
+  const handleAnswerButtonClick = (questionId) => {
+    if (!user) {
+      toast.error("Please login to answer questions");
+      return;
+    }
+    setSelectedQuestionId((prev) => (prev === questionId ? null : questionId));
+    setNewAnswer("");
+  };
+
+  if (loadError) {
+    return (
+      <div className="text-center p-4 lg:p-8">
+        <p className="text-red-500 text-lg md:text-xl">{loadError}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+  console.log({ allQuestions })
   const groups = [
     {
       id: 1,
@@ -78,46 +102,28 @@ const Answer = () => {
     },
   ];
 
-  const handleAnswerButtonClick = (questionId) => {
-    if (!user) {
-      toast.error("Please login to answer questions");
-      return;
-    }
-    setSelectedQuestionId((prev) => (prev === questionId ? null : questionId));
-    setNewAnswer("");
-  };
-
-  if (loadError) {
-    return (
-      <div className="text-center p-4 lg:p-8">
-        <p className="text-red-500 text-lg md:text-xl">{loadError}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-        >
-          Try Again
-        </button>
-      </div>
-    );
-  }
-
   return (
     <>
       <div className="relative max-w-7xl mx-auto p-2 md:p-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Profile Sidebar - Hidden on mobile, visible on md+ screens */}
           <div className="hidden lg:block md:col-span-3 sticky top-[10%] h-screen overflow-y-auto">
-            <ProfileSidebar
-              username={user?.name || "Anonymous"}
-              userTag="Mental Health Advocate"
-              questionsPosted={33}
-              answersPosted={44}
-              savedItems={["Mindfulness Techniques", "Stress Reduction"]}
-              recentItems={["Mental Health", "Mindfulness Practices"]}
-              groups={["Mindfulness and Meditation", "Therapy Techniques"]}
-              followedHashtags={["#mentalhealth", "#mindfulness", "#selfcare"]}
-              events={["Mental Wellness Workshop", "Mindfulness Session"]}
-            />
+            <div className="bg-white p-4 rounded-[10px]">
+              <h3 className="text-lg font-semibold mb-4">Coming Soon</h3>
+              <div className="space-y-4">
+                {groups.map((group) => (
+                  <div key={group.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                      {group.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm text-gray-900">{group.name}</p>
+                      <p className="text-xs text-gray-500">Starting soon</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Main Content */}
@@ -135,13 +141,13 @@ const Answer = () => {
                 >
                   <div className="flex items-center mb-3">
                     <img
-                      src={question.author.picture || "default-avatar-url"}
-                      alt={question.author.name}
+                      src={question.author?.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(question?.author?.username || 'Anonymous')}&background=random`}
+                      alt={question.author?.username}
                       className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-blue-100"
                     />
                     <div>
                       <p className="font-semibold text-[var(--primary)] hover:text-blue-700 transition-colors">
-                        {question.author.username}
+                        {question?.author?.username}
                       </p>
                       <p className="text-xs md:text-sm text-gray-500">
                         {new Date(question.createdAt).toLocaleDateString()}
@@ -150,12 +156,12 @@ const Answer = () => {
                   </div>
 
                   <h3 className="text-lg md:text-xl font-semibold text-gray-800 hover:text-blue-600 transition-colors">
-                    {question.questionText}
+                    {question?.questionText}
                   </h3>
                   <p className="text-gray-600 mb-3 leading-relaxed text-sm md:text-base">{question.context}</p>
 
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {question.tags.map((tag, index) => (
+                    {question?.tags?.map((tag, index) => (
                       <span
                         key={index}
                         className="bg-blue-50 text-blue-700 text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-full hover:bg-blue-100 transition-colors cursor-pointer"
@@ -250,9 +256,9 @@ const Answer = () => {
           </div>
 
           {/* Groups Sidebar - Hidden on mobile, visible on md+ screens */}
-          <div className="hidden lg:block md:col-span-3 sticky top-[10%] h-screen overflow-y-auto">
+          {/* <div className="hidden lg:block md:col-span-3 sticky top-[10%] h-screen overflow-y-auto">
             <GroupsSidebar groups={groups} />
-          </div>
+          </div> */}
         </div>
       </div>
     </>

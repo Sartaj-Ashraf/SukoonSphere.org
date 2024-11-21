@@ -28,7 +28,7 @@ const UserFollowing = () => {
     };
 
     return (
-        <div className="bg-white shadow rounded-lg p-4">
+        <div className="bg-white p-4">
             <h2 className="text-xl font-bold mb-4 text-[var(--black-color)] text-center">Following</h2>
             <div className="divide-y divide-gray-200">
                 {following.length === 0 ? (

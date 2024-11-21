@@ -10,7 +10,7 @@ const PostActions = ({ handleDelete }) => {
           onClick={() => setShowDropdown(!showDropdown)}
           className="text-gray-500 hover:text-gray-700"
         >
-          <FaEllipsisV size={20} />
+          <FaEllipsisV size={15} />
         </button>
         {showDropdown && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-[10px] shadow-xl py-2 z-10 border border-gray-100">

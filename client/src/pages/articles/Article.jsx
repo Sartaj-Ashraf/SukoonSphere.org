@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import pdf from "../../../src/assets/testing.pdf";
 import customFetch from "@/utils/customFetch";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 const Pages = React.forwardRef((props, ref) => {

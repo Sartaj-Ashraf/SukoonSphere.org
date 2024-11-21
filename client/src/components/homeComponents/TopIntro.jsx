@@ -37,7 +37,7 @@ const TopIntro = () => {
           </h2>
 
           {/* Subtext */}
-          <p className="text-[var(--grey--800)] text-lg mb-8 text-b text-justify sm:hero-para">
+          <p className="text-[var(--grey--800)] text-lg lg:mb-8 text-b text-justify sm:hero-para">
             Through personalized resources, expert guidance, and a compassionate
             community, we provide the tools you need to overcome challenges,
             foster personal growth, and lead a fulfilling, balanced life.
@@ -62,7 +62,7 @@ const TopIntro = () => {
 
         {/* Right Section - Image */}
         <div
-          className="flex justify-center lg:justify-end bg-contain md:bg-center object-bottom"
+          className="lg:flex hidden justify-center lg:justify-end bg-contain md:bg-center object-bottom"
           style={{
             backgroundImage: `url(${bgImg}) `,
             width: "500px",
@@ -71,7 +71,7 @@ const TopIntro = () => {
           <img
             src={bg_hero}
             alt="Healthcare Illustration"
-            className="w-full hidden lg:block sm:max-w-full h-auto"
+            className="w-full  sm:max-w-full h-auto"
           />
         </div>
       </div>

@@ -72,7 +72,7 @@ const QaSection = () => {
       <div className="relative w-full max-w-7xl mx-auto p-2 sm:p-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Left sidebar */}
-          <div className="rounded-[10px] shadow-sm hidden lg:block lg:col-span-3 h-screen overflow-y-auto">
+          <div className="rounded-[10px] shadow-sm hidden lg:block lg:col-span-3 h-screen sticky top-20">
             <div className="bg-white p-4 rounded-[10px]">
               <h3 className="text-lg font-semibold mb-4">Coming Soon</h3>
               <div className="space-y-4">
@@ -121,9 +121,8 @@ const QaSection = () => {
             </div>
 
             {/* Questions List */}
-            <div className="overflow-y-auto max-h-screen no-scrollbar rounded-[10px]">
+          
               <Outlet context={{ questions }} />
-            </div>
           </div>
         </div>
 

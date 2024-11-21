@@ -9,10 +9,10 @@ import links from "@/utils/SharedComp/PageLinks";
 import DesktopNav from "./DesktopNav";
 import UserMenu from "./UserMenu";
 import { MdOutlinePassword } from "react-icons/md";
-import { CgProfile } from "react-icons/cg";
 import { BiLogIn } from "react-icons/bi";
 import { FiUserPlus } from "react-icons/fi";
-
+import { BiMessageSquareAdd } from "react-icons/bi";
+import { BiUser } from "react-icons/bi";
 function NavMenu() {
   const [activeSublink, setActiveSublink] = useState(null);
   const [miniMenu, setMiniMenu] = useState(false);
@@ -46,34 +46,29 @@ function NavMenu() {
 
   const settingsLinks = user
     ? [
-      {
-        name: "Profile",
-        address: "about/user",
-        icon: <CgProfile />,
-      },
-      {
-        name: "Change Password",
-        address: "/user/change-passowrd",
-        icon: <MdOutlinePassword />,
-      },
-      {
-        name: "Logout",
-        icon: <RxCross2 />,
-        onClick: handleLogout,
-      },
-    ]
+        {
+          name: "Change Password",
+          address: "/user/change-passowrd",
+          icon: <MdOutlinePassword />,
+        },
+        {
+          name: "Logout",
+          icon: <RxCross2 />,
+          onClick: handleLogout,
+        },
+      ]
     : [
-      {
-        name: "Sign Up",
-        address: "/auth/sign-up",
-        icon: <FiUserPlus />,
-      },
-      {
-        name: "Login",
-        address: "/auth/sign-in",
-        icon: <BiLogIn />,
-      },
-    ];
+        {
+          name: "Sign Up",
+          address: "/auth/sign-up",
+          icon: <FiUserPlus />,
+        },
+        {
+          name: "Login",
+          address: "/auth/sign-in",
+          icon: <BiLogIn />,
+        },
+      ];
 
   return (
     <>
@@ -98,7 +93,45 @@ function NavMenu() {
           )}
         </div>
       </nav>
-
+      {/* New Mobile Top Header */}
+      <header className="lg:hidden  left-0 right-0 bg-[var(--white-color)] h-14 z-50">
+        <div className="flex items-center justify-between h-full px-4">
+          <div className="flex items-center gap-3">
+           
+            <Link to="/">
+              <img
+                src={CompanyLogo}
+                className="object-contain h-8 w-auto"
+                alt="Logo"
+              />
+            </Link>
+        
+          </div>
+          <div className="flex items-center gap-4">
+            {user && (
+              <Link to="/Posts">
+                <BiMessageSquareAdd className="text-2xl" />
+              </Link>
+            )}
+            {user ? (
+              <Link to="/about/user">
+                <img
+                  src={
+                    user?.avatar ||
+                    "https://cdn-icons-png.flaticon.com/512/147/147142.png"
+                  }
+                  alt="User"
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              </Link>
+            ) : (
+              <Link to="/auth/sign-in">
+                <BiUser className="text-2xl text-gray-600" />
+              </Link>
+            )}
+          </div>
+        </div>
+      </header>
       {/* Mobile Bottom Nav */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-[var(--white-color)] shadow-[0_-2px_10px_rgba(0,0,0,0.1)] z-50">
         <div className="flex justify-around items-center h-16">
@@ -114,24 +147,34 @@ function NavMenu() {
                 >
                   {link.icon}
                   <div
-                    className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[var(--white-color)] rounded-2xl shadow-xl p-2 w-fit border border-[var(--grey--400)] transition-all duration-200 ease-out ${activeSublink === index
-                      ? "opacity-100 translate-y-0"
-                      : "opacity-0 translate-y-4 pointer-events-none"
-                      }`}
+                    className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[var(--white-color)] rounded-2xl shadow-xl p-2 w-fit border border-[var(--grey--400)] transition-all duration-200 ease-out ${
+                      activeSublink === index
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-4 pointer-events-none"
+                    }`}
                   >
                     <div className="flex flex-col space-y-3">
                       {link.sublinks.map((sublink) => {
                         // Check if the sublink is for videos or podcasts
-                        if (sublink.name === "Videos" || sublink.name === "Podcasts") {
+                        if (
+                          sublink.name === "Videos" ||
+                          sublink.name === "Podcasts"
+                        ) {
                           return (
                             <div
                               key={sublink.name}
                               className="flex items-center gap-3 p-2 rounded-xl whitespace-nowrap opacity-50 cursor-not-allowed"
                             >
-                              <div className="text-xl text-gray-400">{sublink.icon}</div>
+                              <div className="text-xl text-gray-400">
+                                {sublink.icon}
+                              </div>
                               <div>
-                                <span className="text-sm text-gray-400">{sublink.name}</span>
-                                <span className="block text-xs text-gray-400">Coming Soon! 🎬</span>
+                                <span className="text-sm text-gray-400">
+                                  {sublink.name}
+                                </span>
+                                <span className="block text-xs text-gray-400">
+                                  Coming Soon! 🎬
+                                </span>
                               </div>
                             </div>
                           );
@@ -141,9 +184,10 @@ function NavMenu() {
                             key={sublink.name}
                             to={sublink.address}
                             className={({ isActive }) =>
-                              `flex items-center gap-3 p-2 rounded-xl whitespace-nowrap transform transition-all duration-150 hover:scale-105 active:scale-95 ${isActive
-                                ? "bg-[var(--blue--100)] text-[var(--ternery)] shadow-sm"
-                                : "hover:bg-[var(--grey--200)] text-[var(--grey--800)]"
+                              `flex items-center gap-3 p-2 rounded-xl whitespace-nowrap transform transition-all duration-150 hover:scale-105 active:scale-95 ${
+                                isActive
+                                  ? "bg-[var(--blue--100)] text-[var(--ternery)] shadow-sm"
+                                  : "hover:bg-[var(--grey--200)] text-[var(--grey--800)]"
                               }`
                             }
                             onClick={() => setActiveSublink(null)}
@@ -161,9 +205,10 @@ function NavMenu() {
                 <NavLink
                   to={link.address}
                   className={({ isActive }) =>
-                    `p-2 text-2xl transform transition-all duration-150 hover:scale-110 active:scale-95 ${isActive
-                      ? "text-[var(--ternery)]"
-                      : "text-[var(--grey--800)] hover:text-[var(--ternery)]"
+                    `p-2 text-2xl transform transition-all duration-150 hover:scale-110 active:scale-95 ${
+                      isActive
+                        ? "text-[var(--ternery)]"
+                        : "text-[var(--grey--800)] hover:text-[var(--ternery)]"
                     }`
                   }
                 >
@@ -184,10 +229,11 @@ function NavMenu() {
               <BsThreeDotsVertical />
             </div>
             <div
-              className={`absolute bottom-full right-2 mb-2 bg-[var(--white-color)] rounded-2xl shadow-xl p-2 w-fit border border-[var(--grey--400)] transition-all duration-200 ease-out ${activeSublink === "settings"
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-4 pointer-events-none"
-                }`}
+              className={`absolute bottom-full right-2 mb-2 bg-[var(--white-color)] rounded-2xl shadow-xl p-2 w-fit border border-[var(--grey--400)] transition-all duration-200 ease-out ${
+                activeSublink === "settings"
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-4 pointer-events-none"
+              }`}
             >
               <div className="flex flex-col space-y-3">
                 {settingsLinks.map((link) =>

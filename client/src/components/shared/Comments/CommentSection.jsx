@@ -12,7 +12,7 @@ const CommentSection = ({
 }) => {
   return (
     <div className="bg-white rounded-xl border border-gray-200  my-2">
-      <Form onSubmit={addComment} className="relative p-4 border-b-2 border-gray-100">
+      <Form onSubmit={addComment} className="relative px-4 py-2 border-b-2 border-gray-100">
         <textarea
           name="content"
           placeholder="Add a comment..."
@@ -21,7 +21,7 @@ const CommentSection = ({
         />
         <button
           type="submit"
-          className="absolute bottom-9 right-8 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1"
+          className="absolute bottom-8 right-8 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -34,12 +34,12 @@ const CommentSection = ({
         </button>
       </Form>
 
-      <div className="px-3">
-        <span className="text-sm font-medium text-gray-500 py-2 inline-block shadow-sm">Comments</span>
+      <div className="px-2">
+        <span className="text-sm font-medium text-gray-500 p-2 inline-block">Comments</span>
         <div className="max-h-[400px] overflow-y-auto no-scrollbar py-2">
           {comments &&
             comments.map((comment) => (
-              <div key={comment._id} className="py-3 border-b border-gray-100 last:border-b-0">
+              <div key={comment._id} className="p-2 border-b  border-gray-100 last:border-b-0">
                 <Comment {...{comment, handleDeleteComment, handleLikeComment, toggleReply}} />
               </div>
             ))}
