@@ -3,15 +3,15 @@ import customFetch from '@/utils/customFetch';
 import React, { useEffect, useState } from 'react'
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import DeleteModal from '@/components/shared/DeleteModal';
+import { useOutletContext } from 'react-router-dom';
 
 const UserQuestions = () => {
-    const { user } = useUser();
+    const user = useOutletContext();
     const [questions, setQuestions] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showActionModal, setShowActionModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [selectedQuestionId, setSelectedQuestionId] = useState(null);
-
     const fetchUserQuestions = async () => {
         try {
             const { data } = await customFetch.get(`/qa-section/user-questions/${user._id}`);
@@ -42,7 +42,7 @@ const UserQuestions = () => {
         <div className='bg-white  rounded-lg p-4 space-y-4'>
             <h2 className="text-xl font-bold mb-4 text-black text-center">Questions Posted</h2>
             <div className="divide-y divide-gray-200 space-y-4 ">
-                {questions?.length === 0 ? (
+                {questions && questions?.length === 0 ? (
                     <p className="text-[var(--primary)] text-center py-4">No questions asked yet!</p>
                 ) : (
                     questions.map((question) => (

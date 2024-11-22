@@ -79,6 +79,7 @@ const PostCard = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <UserAvatar
+          createdBy={post.createdBy}
           username={post?.username}
           userAvatar={post?.userAvatar}
           createdAt={post?.createdAt}

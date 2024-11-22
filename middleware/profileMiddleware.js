@@ -1,6 +1,7 @@
 import { UnauthenticatedError } from "../errors/customErors.js";
 import { attachCookiesToResponse, verifyJWT } from "../utils/tokenUtils.js";
 import RefreshToken from "../models/token/token.js";
+import { StatusCodes } from "http-status-codes";
 export const profileMiddleware = async (req, res, next) => {
   const { accessToken, refreshToken } = req.signedCookies;
   try {
@@ -26,7 +27,8 @@ export const profileMiddleware = async (req, res, next) => {
     });
     req.user = payload.user;
     req.user.userId = payload.user._id;
+    return next()
   } catch {
-    throw new UnauthenticatedError("authentication invalid");
+    res.status(StatusCodes.OK).json(null)
   }
 };

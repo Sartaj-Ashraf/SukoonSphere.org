@@ -19,7 +19,6 @@ const AllQuestionAnswers = () => {
   const fetchAnswers = async () => {
     try {
       const { data } = await customFetch.get(`qa-section/question/${id}/answers`);
-      console.log({ data });
       setAnswers(data.answers);
       setQuestion(data.question);
     } catch (error) {
@@ -39,14 +38,13 @@ const AllQuestionAnswers = () => {
   };
   useEffect(() => {
     fetchAnswers()
-
   }, [id]);
-  console.log({ answers });
   return (
     <div className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 mb-3 border border-gray-100">
       {/* question  */}
       <div className="flex items-center justify-between mb-3">
         <UserAvatar
+          createdBy={question?.author?.userId}
           username={question?.author?.username}
           userAvatar={question?.author?.userAvatar}
           createdAt={question?.createdAt}

@@ -73,7 +73,6 @@ const Answer = () => {
       </div>
     );
   }
-  console.log({ allQuestions })
   const groups = [
     {
       id: 1,

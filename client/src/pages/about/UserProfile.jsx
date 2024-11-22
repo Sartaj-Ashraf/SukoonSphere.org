@@ -1,5 +1,7 @@
-import { GroupsSidebar, ProfileCard, ProfileDetails } from '@/components'
-import React from 'react'
+import { ProfileCard, ProfileDetails } from '@/components'
+import customFetch from '@/utils/customFetch';
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom';
 
 const UserProfile = () => {
     const groups = [
@@ -29,6 +31,19 @@ const UserProfile = () => {
             image: 'https://example.com/image_stress.jpg',
         }
     ];
+    const { id: paramId } = useParams()
+    const [user, setUser] = useState({})
+    const fetchUserById = async () => {
+        try {
+            const { data } = await customFetch.get(`user/user-details/${paramId}`);
+            setUser(data)
+        } catch (error) {
+            console.log({ error });
+        }
+    }
+    useEffect(() => {
+        fetchUserById()
+    }, [])
     return (
         <>
             <div className='relative max-w-7xl mx-auto p-4 lg:p-8'>
@@ -36,14 +51,14 @@ const UserProfile = () => {
                     {/* Profile Card Section */}
                     <div className="md:col-span-3">
                         <div className="lg:sticky top-[80px] transition-all duration-300 hover:shadow-lg rounded-2xl">
-                            <ProfileCard />
+                            <ProfileCard user={user} />
                         </div>
                     </div>
 
-                    {/* Main Content Section */} 
+                    {/* Main Content Section */}
                     <div className='md:col-span-9'>
                         <div className='bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-4 lg:p-6'>
-                            <ProfileDetails />
+                            <ProfileDetails user={user} />
                         </div>
                     </div>
                 </div>

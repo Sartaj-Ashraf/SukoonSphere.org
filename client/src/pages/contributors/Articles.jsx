@@ -190,7 +190,6 @@ const Articles = () => {
     );
   }
 
-  console.log({ articles });
   const fetchArticles = async () => {
     try {
       const articles = await articleService.getPendingArticles();
@@ -269,7 +268,7 @@ const Articles = () => {
   return (
     <div className="p-6 bg-gradient-to-br from-white to-gray-50 rounded-3xl ">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-[var(--primary)] to-[var(--ternery)] bg-clip-text text-transparent mb-3">
+        <h1 className="h2 sm:text-lg md:text-2xl lg:text-4xl font-bold text-[var(--primary)] mb-3">
           Your Articles
         </h1>
         <p className="text-gray-600 text-lg">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import customFetch from '@/utils/customFetch';
 import { useUser } from '@/context/UserContext';
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData, useOutletContext } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 export const userFollowersLoader = async () => {
@@ -14,41 +14,48 @@ export const userFollowersLoader = async () => {
 };
 
 const UserFollowers = () => {
-    const { user, setUser } = useUser();
-    const followers = useLoaderData();
-    const [updatedFollowers, setUpdatedFollowers] = useState(followers);
+    const user = useOutletContext();
+    const [updatedFollowers, setUpdatedFollowers] = useState([]);
+    const [followers, setFollowers] = useState([])
 
-    if (!followers) {
-        return <div className="text-center text-red-500 p-4">Error loading followers</div>;
-    }
 
-    const handleFollowBack = async (followerId) => {
+    const fetUserFollowers = async () => {
         try {
-            await customFetch.post(`/user/follow/${followerId}`);
-            setUser((prevUser) => ({
-                ...prevUser,
-                following: [...prevUser.following, followerId],
-            }));
-            toast.success("Followed successfully");
+            const { data } = await customFetch.get(`/user/followers${user._id}`);
+            setFollowing(data.followers);
+            setUpdatedFollowers(data.followers)
         } catch (error) {
-            console.error('Error following user:', error);
-            if (error.response?.status === 404) {
-                toast.error("User not found. Please try again.");
-            } else {
-                toast.error("An unexpected error occurred.");
-            }
+            console.log(error)
         }
-    };
+    }
+    useEffect(() => {
+        fetUserFollowers()
+    }, [])
+
+
+    // const handleFollowBack = async (followerId) => {
+    //     try {
+    //         await customFetch.post(`/user/follow/${followerId}`);
+    //         toast.success("Followed successfully");
+    //     } catch (error) {
+    //         console.error('Error following user:', error);
+    //         if (error.response?.status === 404) {
+    //             toast.error("User not found. Please try again.");
+    //         } else {
+    //             toast.error("An unexpected error occurred.");
+    //         }
+    //     }
+    // };
 
 
     return (
         <div className="bg-white shadow rounded-lg p-4">
             <h2 className="text-xl font-bold mb-4 text-[var(--black-color)] text-center">Followers</h2>
             <div className="divide-y divide-gray-200">
-                {updatedFollowers.length === 0 ? (
+                {followers && followers.length === 0 ? (
                     <p className="text-center text-gray-500 py-4">No followers yet</p>
                 ) : (
-                    updatedFollowers.map((follower) => (
+                    followers.map((follower) => (
                         <div key={follower._id} className="py-2 flex justify-between items-center">
                             <div className="flex items-center space-x-3">
                                 <div className="bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center text-lg">

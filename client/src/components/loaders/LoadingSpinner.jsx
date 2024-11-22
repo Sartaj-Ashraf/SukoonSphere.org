@@ -2,7 +2,7 @@ import React from 'react';
 
 const LoadingSpinner = () => {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center glossy-effect-bar">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center ">
             <div className="relative">
                 {/* Main circle with pulsing effect */}
                 <div className="w-24 h-24 rounded-full bg-blue-400/20 absolute animate-ping " />
@@ -11,7 +11,7 @@ const LoadingSpinner = () => {
                 {/* Orbiting circles */}
                 <div className="absolute inset-0">
                     {/* Inner orbiting circle */}
-                    <div className="w-full h-full animate-spin-slow relative glossy-effect-bar">
+                    <div className="w-full h-full animate-spin-slow relative ">
                         <div className="absolute w-4 h-4 bg-purple-400 rounded-full 
                           top-0 left-1/2 transform -translate-x-1/2
                           shadow-lg shadow-purple-200">

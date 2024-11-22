@@ -1,8 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import LoadingSpinner from '@/components/loaders/LoadingSpinner';
 import { UserAnswers } from '@/components';
-import { userFollowersLoader } from '@/components/user/userProfile/UserFollowers';
-import { userFollowingLoader } from '@/components/user/userProfile/UserFollowing';
 import Articles from '@/pages/contributors/Articles';
 const ProfessionalsProfile = lazy(() => import('../pages/professionalProfile/ProfessionalsProfile'));
 const UserProfile = lazy(() => import('../pages/about/UserProfile'));
@@ -22,7 +20,7 @@ export const userRoutes = [
     },
     // Users Routes
     {
-        path: 'about/user',
+        path: 'about/user/:id',
         element: (
             <Suspense fallback={<LoadingSpinner />}>
                 <UserProfile />
@@ -38,7 +36,7 @@ export const userRoutes = [
                 ),
             },
             {
-                path: 'questions',
+                path: '/about/user/:id/questions',
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
                         <UserQuestions />
@@ -46,7 +44,7 @@ export const userRoutes = [
                 ),
             },
             {
-                path: 'answers',
+                path: '/about/user/:id/answers',
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
                         <UserAnswers />
@@ -54,22 +52,20 @@ export const userRoutes = [
                 ),
             },
             {
-                path: 'followers',
+                path: '/about/user/:id/followers',
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
                         <UserFollowers />
                     </Suspense>
                 ),
-                loader: userFollowersLoader
             },
             {
-                path: 'following',
+                path: '/about/user/:id/following',
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
                         <UserFollowing />
                     </Suspense>
                 ),
-                loader: userFollowingLoader
             },
         ],
     },

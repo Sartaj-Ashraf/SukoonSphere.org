@@ -35,7 +35,6 @@ function Flipbook() {
   useEffect(() => {
     fetchArticle();
   }, [paramId]);
-  console.log({ article: article?.pdfPath });
   return (
     <>
       <div className="h-screen w-screen flex flex-col gap-5 justify-center items-center overflow-hidden px-4 my-4 ">

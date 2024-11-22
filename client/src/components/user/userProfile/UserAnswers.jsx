@@ -3,9 +3,10 @@ import customFetch from '@/utils/customFetch';
 import React, { useEffect, useState } from 'react'
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import DeleteModal from '@/components/shared/DeleteModal';
+import { useOutletContext } from 'react-router-dom';
 
 const UserAnswers = () => {
-    const { user } = useUser();
+    const user = useOutletContext();
     const [answers, setAnswers] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showActionModal, setShowActionModal] = useState(false);

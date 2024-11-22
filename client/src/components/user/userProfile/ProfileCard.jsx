@@ -1,13 +1,9 @@
-import { useUser } from '@/context/UserContext';
 import UserProfileModel from '../modals/UserProfileModel';
 import { useState } from 'react';
-import { FaEdit, FaHeart, FaComment, FaBookmark, FaQuestion } from 'react-icons/fa';
+import { FaBookmark, FaQuestion } from 'react-icons/fa';
 import { FcAnswers } from "react-icons/fc";
-const ProfileCard = () => {
-    const [showModal, setShowModal] = useState(false);
-    const { user, updateUser } = useUser();
-    console.log({ user });
-
+const ProfileCard = ({ user }) => {
+    const [showModal, setShowModal] = useState(false)
     const handleProfileUpdate = async (formData) => {
         try {
             const reponse = await updateUser(formData);
@@ -77,7 +73,7 @@ const ProfileCard = () => {
                         <div className="text-sm font-semibold group-hover:text-[var(--ternery)]">{user?.answers?.length || 0}</div>
                         <div className="text-xs text-gray-500 group-hover:text-gray-700">Answers Posted</div>
                     </div>
-                    {user?.role === "contributor" && (
+                    {user?.role == "contributor" && (
                         <div className="flex flex-col items-center justify-center text-center group cursor-pointer transform hover:scale-105 transition-all duration-300">
                             <FaBookmark className="text-purple-500 text-xl mb-1 group-hover:text-purple-600" />
                             <div className="text-sm font-semibold group-hover:text-[var(--ternery)]">{user?.articles?.length || 0}</div>
@@ -87,7 +83,7 @@ const ProfileCard = () => {
                 </div>
 
             </div>
-            {/* {showModal && <UserProfileModel onClose={() => setShowModal(false)} user={user} handleProfileUpdate={handleProfileUpdate} />} */}
+            {showModal && <UserProfileModel onClose={() => setShowModal(false)} user={user} handleProfileUpdate={handleProfileUpdate} />}
         </div>
     );
 };

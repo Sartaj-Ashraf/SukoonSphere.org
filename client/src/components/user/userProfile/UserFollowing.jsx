@@ -1,22 +1,21 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import customFetch from '@/utils/customFetch';
-import { useLoaderData } from 'react-router-dom';
-
-export const userFollowingLoader = async () => {
-    try {
-        const { data } = await customFetch.get('/user/following');
-        return data.following;
-    } catch (error) {
-        return error.response?.data?.msg || 'Error fetching following';
-    }
-}
-
+import { useOutletContext } from 'react-router-dom';
 const UserFollowing = () => {
-    const following = useLoaderData();
+    const user = useOutletContext();
+    const [following, setFollowing] = useState([])
 
-    if (!following) {
-        return <div className="text-center text-red-500 p-4">Error loading following</div>;
+    const fetUserFollowing = async () => {
+        try {
+            const { data } = await customFetch.get(`/user/following/${user._id}`);
+            setFollowing(data.following);
+        } catch (error) {
+            console.log(error)
+        }
     }
+    useEffect(() => {
+        fetUserFollowing()
+    }, [])
 
     const handleUnfollow = async (userId) => {
         try {
@@ -31,11 +30,11 @@ const UserFollowing = () => {
         <div className="bg-white p-4">
             <h2 className="text-xl font-bold mb-4 text-[var(--black-color)] text-center">Following</h2>
             <div className="divide-y divide-gray-200">
-                {following.length === 0 ? (
+                {following.length == 0 ? (
                     <p className="text-center text-gray-500 py-4">Not following anyone yet</p>
                 ) : (
                     following?.map((user) => (
-                        <div key={user._id} className="py-2 flex justify-between items-center">
+                        <div key={user.name} className="py-2 flex justify-between items-center">
                             <div className="flex items-center space-x-3">
                                 <div className="bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center text-lg">
                                     {user.avatar ? (

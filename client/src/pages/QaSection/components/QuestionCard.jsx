@@ -9,8 +9,6 @@ import Answer from "./Answer";
 import { Link } from "react-router-dom";
 
 const QuestionCard = ({ question }) => {
-  console.log({ question });
-
   const { user } = useUser();
   const {
     _id,
@@ -38,6 +36,7 @@ const QuestionCard = ({ question }) => {
     <div className="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-100">
       <div className="flex items-center justify-between mb-5">
         <UserAvatar
+          createdBy={author?.userId}
           username={author?.username}
           userAvatar={author?.userAvatar}
           createdAt={createdAt}
