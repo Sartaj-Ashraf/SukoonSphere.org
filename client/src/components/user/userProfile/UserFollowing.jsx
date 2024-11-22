@@ -55,12 +55,12 @@ const UserFollowing = () => {
                                     <p className="text-sm text-gray-600">{user.email}</p>
                                 </div>
                             </div>
-                            <button
+                            {/* <button
                                 className="action-button btn-sm"
                                 onClick={() => handleUnfollow(user._id)}
                             >
                                 Unfollow
-                            </button>
+                            </button> */}
                         </div>
                     ))
                 )}
