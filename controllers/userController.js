@@ -74,3 +74,39 @@ export const getAllFollowing = async (req, res) => {
   }));
   res.status(StatusCodes.OK).json({ following: followingWithCounts });
 };
+
+export const requestContributor = async (req, res) => {
+  const { userId } = req.user; 
+  const { secret } = req.body;
+
+  try {
+    if (secret !== process.env.REQUEST_CONTRIBUTER_SECRET) {
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .json({ error: "Invalid secret. Access denied." });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: "User not found." });
+    }
+
+    if (user.role === "contributor") {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ error: "You are already a contributor." });
+    }
+
+    user.role = "contributor";
+    await user.save();
+
+    res.status(StatusCodes.OK).json({ msg: "You are now a contributor." });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "Something went wrong. Please try again later." });
+  }
+};
