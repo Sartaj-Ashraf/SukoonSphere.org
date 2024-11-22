@@ -8,6 +8,7 @@ export const authenticateUser = async (req, res, next) => {
       const payload = verifyJWT(accessToken);
       req.user = payload.user;
       req.user.userId = payload.user._id;
+      req.user.username = payload.user.name
       return next();
     }
     const payload = verifyJWT(refreshToken);
@@ -25,6 +26,7 @@ export const authenticateUser = async (req, res, next) => {
     });
     req.user = payload.user;
     req.user.userId = payload.user._id;
+      req.user.username = payload.user.name;
     next();
   } catch {
     throw new UnauthenticatedError("authentication invalid");
