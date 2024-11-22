@@ -8,7 +8,7 @@ import {
   getAllFollowing,
   getUserDetailsById,
   getUserProfile,
-
+  requestContributor,
 } from "../controllers/userController.js";
 import upload from "../middleware/multer.js";
 const router = Router();
@@ -24,4 +24,5 @@ router.get("/followers/:id", authenticateUser, getAllFollowers);
 router.get("/following/:id", authenticateUser, getAllFollowing);
 router.get("/profile", profileMiddleware, getUserProfile);
 router.get("/user-details/:id", getUserDetailsById);
+router.patch("/request-to-contribute",authenticateUser, requestContributor)
 export default router;
