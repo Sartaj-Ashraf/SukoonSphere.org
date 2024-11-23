@@ -17,6 +17,7 @@ import {
   getPublishedArticles,
   deleteImage,
   createPdfArticle,
+  getPublishedArticlesByUser
 } from "../controllers/articleControllers.js";
 import { authenticateUser } from "../middleware/authMiddleware.js";
 import upload from "../middleware/multer.js";
@@ -27,6 +28,8 @@ router.post("/create-article", authenticateUser, createArticle);
 router.get("/get-pending-articles", authenticateUser, getPendingArticles);
 // to get published articles
 router.get("/get-published-articles", getPublishedArticles);
+// to get published articles by user
+router.get("/get-published-articles-by-user", authenticateUser, getPublishedArticlesByUser);
 // to upload image
 router.post("/upload-image", upload.single("image"), uploadImage);
 // to delete image

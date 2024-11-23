@@ -6,18 +6,10 @@ const Answer = new mongoose.Schema(
       type: String,
       required: true,
     },
-    author: {
-      userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-      username: {
-        type: String,
-        required: true,
-      },
-      avatar: {
-        type: String,
-      },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
     },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     comments: [

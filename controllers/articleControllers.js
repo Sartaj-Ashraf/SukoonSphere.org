@@ -154,6 +154,20 @@ export const getPublishedArticles = async (req, res) => {
   );
   res.status(StatusCodes.OK).json({ articles: articlesWithAuthorAndPages });
 };
+export const getPublishedArticlesByUser = async (req, res) => {
+  const { userId } = req.user;
+  const articles = await ArticleModel.find({ status: "published", author: userId });
+  const articlesWithAuthor = await Promise.all(
+    articles.map(async (article) => {
+      const author = await UserModel.findById(
+        article.author,
+        "name avatar _id "
+      );
+      return { ...article._doc, author };
+    })
+  );
+  res.status(StatusCodes.OK).json({ articles: articlesWithAuthor });
+};
 
 export const createArticlePage = async (req, res) => {
   const { id: articleId } = req.params;
@@ -272,7 +286,7 @@ export const editArticle = async (req, res) => {
 
 export const getArticleWithPages = async (req, res) => {
   const { id: articleId } = req.params;
-  const article = await ArticleModel.findById(articleId);
+  const article = await ArticleModel.findById(articleId).populate('author', 'name avatar _id');
   if (!article) {
     throw new BadRequestError("Article not found");
   }

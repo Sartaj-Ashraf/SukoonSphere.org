@@ -13,7 +13,7 @@ const Comment = ({ comment, handleDeleteComment, handleLikeComment, toggleReply 
   const [isLiked, setIsLiked] = useState(comment.likes.includes(user?._id));
   const [likesCount, setLikesCount] = useState(comment.totalLikes || 0);
   const replyLink = toggleReply
-    ? `/QA-section/question/answer/${comment.postId}/comments/${comment._id}/reply`
+    ? `/QA-section/question/answer/${comment.answerId}/comments/${comment._id}/reply`
     : `/posts/${comment.postId}/comment-id/${comment._id}`;
   const likeCommnet = async () => {
     if (!user) {

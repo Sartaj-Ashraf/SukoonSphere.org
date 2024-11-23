@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom'
 const RenderProfileLinks = ({ name, link }) => {
     return (
         <NavLink
+            end
             key={name}
             to={link}
             className={({ isActive }) =>

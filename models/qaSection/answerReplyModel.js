@@ -4,37 +4,26 @@ const AnswerReplySchema = new mongoose.Schema(
   {
     commentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Comment",
+      ref: "QaComment",
+      required: true
     },
     parentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "AnswerReply",
+      ref: "AnswerReply"
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-    },
-    username: {
-      type: String,
-    },
-    userAvatar: {
-      type: String,
+      required: true
     },
     content: {
       type: String,
       required: true,
     },
-    commentUserId: {
+    replyTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
-    },
-    commentUsername: {
-      type: String,
-      required: true,
-    },
-    commentUserAvatar: {
-      type: String,
+      required: true
     },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     deleted: {

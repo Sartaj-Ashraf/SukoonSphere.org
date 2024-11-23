@@ -24,10 +24,6 @@ const PostCard = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [likesCount, setLikesCount] = useState(post?.totalLikes || 0);
   const [isLoading, setIsLoading] = useState(false);
-  const [follow, setFollow] = useState({
-    isLoading: false,
-    isFollowing: post?.likes?.includes(user?._id),
-  });
 
   const handleDelete = () => {
     setShowDeleteModal(true);
@@ -58,22 +54,8 @@ const PostCard = ({
       setIsLoading(false);
     }
   };
-  const handleFollow = async () => {
-    if (!user) {
-      toast.error("Please login to follow this user!");
-      return;
-    }
-    setFollow((prev) => ({ ...prev, isLoading: true }));
-    try {
-      await customFetch.patch(`/user/follow/${post.createdBy}`);
-      setFollow((prev) => ({ ...prev, isFollowing: !prev.isFollowing }));
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setFollow((prev) => ({ ...prev, isLoading: false }));
-    }
-  };
 
+  console.log({post})
   return (
     <div className="bg-white rounded-[10px] shadow-sm mb-2  p-4">
       {/* Header */}
@@ -84,29 +66,8 @@ const PostCard = ({
           userAvatar={post?.userAvatar}
           createdAt={post?.createdAt}
         />
-        {post?.createdBy === user?._id ? (
+        {user && post?.createdBy && user._id && post.createdBy.toString() === user._id.toString() && (
           <PostActions handleDelete={handleDelete} />
-        ) : (
-          <button
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-200 ${follow.isFollowing
-              ? "text-red-500 bg-red-50 hover:bg-red-100"
-              : "text-blue-500 bg-blue-50 hover:bg-blue-100"
-              }`}
-            onClick={handleFollow}
-            disabled={follow.isLoading}
-          >
-            {follow.isFollowing ? (
-              <>
-                <span className="text-sm font-medium">Unfollow</span>
-                <FaUserMinus size={16} />
-              </>
-            ) : (
-              <>
-                <span className="text-sm font-medium">Follow</span>
-                <FaUserPlus size={16} />
-              </>
-            )}
-          </button>
         )}
       </div>
 

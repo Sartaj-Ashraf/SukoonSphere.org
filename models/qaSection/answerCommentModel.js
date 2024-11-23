@@ -2,22 +2,15 @@ import mongoose from "mongoose";
 
 const QaCommentSchema = new mongoose.Schema(
   {
-    postId: {
+    answerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Post",
+      ref: "Answer",
       required: true,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    },
-    username: {
-      type: String,
-      required: true,
-    },
-    userAvatar: {
-      type: String,
     },
     content: {
       type: String,
@@ -26,7 +19,7 @@ const QaCommentSchema = new mongoose.Schema(
     replies: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "QaComment",
+        ref: "AnswerReply",
       },
     ],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

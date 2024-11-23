@@ -3,24 +3,13 @@ import Answer from "../models/qaSection/answerModel.js";
 import Comment from "../models/qaSection/answerCommentModel.js";
 import Replies from "../models/qaSection/answerReplyModel.js";
 import { StatusCodes } from "http-status-codes";
-import { BadRequestError } from "../errors/customErors.js";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "../errors/customErors.js";
 import mongoose from "mongoose";
 import User from "../models/userModel.js";
 // question controllers
 export const addQuestion = async (req, res) => {
   const { questionText, context, tags } = req.body;
-  const { userId, username, avatar } = req.user;
-
-  const similarQuestions = await Question.find({
-    $text: { $search: questionText },
-  }).select("-answers");
-
-  if (similarQuestions.length > 0) {
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      msg: "Similar questions already exist.",
-      similarQuestions,
-    });
-  }
+  const { userId } = req.user;
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -30,11 +19,7 @@ export const addQuestion = async (req, res) => {
       {
         questionText,
         context,
-        author: {
-          userId,
-          username,
-          avatar,
-        },
+        createdBy: userId,  // Only store user ID
         tags,
       },
     ],
@@ -47,252 +32,645 @@ export const addQuestion = async (req, res) => {
     { session }
   );
 
+  // Fetch question with user details for response
+  const questionWithUser = await Question.aggregate([
+    {
+      $match: { _id: newQuestion[0]._id }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $addFields: {
+        username: { $arrayElemAt: ["$userDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+      }
+    },
+    {
+      $project: {
+        userDetails: 0
+      }
+    }
+  ]);
+
   await session.commitTransaction();
   session.endSession();
 
   res.status(StatusCodes.CREATED).json({
     msg: "Question added successfully",
-    question: newQuestion[0],
+    question: questionWithUser[0],
   });
 };
+
 export const getAllQuestions = async (req, res) => {
-  const questions = await Question.find({}).lean();
+  const questions = await Question.aggregate([
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $addFields: {
+        author: {
+          userId: "$createdBy",
+          username: { $arrayElemAt: ["$userDetails.name", 0] },
+          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+        },
+        totalAnswers: { $size: { $ifNull: ["$answers", []] } }
+      }
+    },
+    {
+      $project: {
+        userDetails: 0
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
+  ]);
 
-  const questionsWithCounts = questions.map((question) => ({
-    ...question,
-    totalAnswers: (question.answers || []).length,
-  }));
-
-  res.status(StatusCodes.OK).json({ questions: questionsWithCounts });
+  res.status(StatusCodes.OK).json({ questions });
 };
+
+
 export const getUserQuestions = async (req, res) => {
   const { id: userId } = req.params;
-  const questions = await Question.find({ "author.userId": userId }).lean();
+  const questions = await Question.aggregate([
+    {
+      $match: { createdBy: new mongoose.Types.ObjectId(userId) }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $addFields: {
+        username: { $arrayElemAt: ["$userDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
+        totalAnswers: { $size: { $ifNull: ["$answers", []] } }
+      }
+    },
+    {
+      $project: {
+        userDetails: 0
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
+  ]);
 
-  const questionsWithCounts = questions.map((question) => ({
-    ...question,
-    totalAnswers: (question.answers || []).length,
-  }));
-
-  res.status(StatusCodes.OK).json({ questions: questionsWithCounts });
+  res.status(StatusCodes.OK).json({ questions });
 };
 
 export const getAllQuestionsWithAnswer = async (req, res) => {
-  // Find questions with answers and populate the answers field
-  const questions = await Question.find({
-    answers: { $exists: true, $not: { $size: 0 } },
-  })
-    .populate("answers")
-    .lean();
+  const questions = await Question.aggregate([
+    {
+      $match: {
+        answers: { $exists: true, $not: { $size: 0 } }
+      }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $lookup: {
+        from: "answers",
+        localField: "answers",
+        foreignField: "_id",
+        as: "answers"
+      }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "answers.createdBy",
+        foreignField: "_id",
+        as: "answerUserDetails"
+      }
+    },
+    {
+      $addFields: {
+        author: {
+          userId: "$createdBy",
+          username: { $arrayElemAt: ["$userDetails.name", 0] },
+          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+        },
+        totalAnswers: { $size: "$answers" },
+        answers: {
+          $map: {
+            input: "$answers",
+            as: "answer",
+            in: {
+              _id: "$$answer._id",
+              context: "$$answer.context",
+              createdBy: "$$answer.createdBy",
+              likes: "$$answer.likes",
+              comments: "$$answer.comments",
+              createdAt: "$$answer.createdAt",
+              updatedAt: "$$answer.updatedAt",
+              author: {
+                userId: "$$answer.createdBy",
+                username: {
+                  $let: {
+                    vars: {
+                      user: {
+                        $arrayElemAt: [
+                          {
+                            $filter: {
+                              input: "$answerUserDetails",
+                              cond: { $eq: ["$$this._id", "$$answer.createdBy"] }
+                            }
+                          },
+                          0
+                        ]
+                      }
+                    },
+                    in: "$$user.name"
+                  }
+                },
+                userAvatar: {
+                  $let: {
+                    vars: {
+                      user: {
+                        $arrayElemAt: [
+                          {
+                            $filter: {
+                              input: "$answerUserDetails",
+                              cond: { $eq: ["$$this._id", "$$answer.createdBy"] }
+                            }
+                          },
+                          0
+                        ]
+                      }
+                    },
+                    in: "$$user.avatar"
+                  }
+                }
+              },
+              totalLikes: { $size: { $ifNull: ["$$answer.likes", []] } },
+              totalComments: { $size: { $ifNull: ["$$answer.comments", []] } }
+            }
+          }
+        }
+      }
+    },
+    {
+      $addFields: {
+        mostLikedAnswer: {
+          $reduce: {
+            input: "$answers",
+            initialValue: { totalLikes: -1 },
+            in: {
+              $cond: [
+                { $gt: ["$$this.totalLikes", "$$value.totalLikes"] },
+                "$$this",
+                "$$value"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      $project: {
+        userDetails: 0,
+        answerUserDetails: 0
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
+  ]);
 
-  const questionsWithAnswerDetails = questions?.map((question) => {
-    // Find the most liked answer by comparing likes array lengths
-    const mostLikedAnswer = question.answers.reduce((prev, curr) => {
-      const prevLikes = prev.likes?.length || 0;
-      const currLikes = curr.likes?.length || 0;
-      return prevLikes > currLikes ? prev : curr;
-    }, question.answers[0]);
-
-    // Add totalLikes and totalComments to each answer
-    const answersWithCounts = question.answers.map((answer) => ({
-      ...answer,
-      totalLikes: answer.likes?.length || 0,
-      totalComments: answer.comments?.length || 0,
-    }));
-
-    return {
-      ...question,
-      answers: answersWithCounts,
-      totalAnswers: question.answers.length,
-      mostLikedAnswer: {
-        ...mostLikedAnswer,
-        totalLikes: mostLikedAnswer.likes?.length || 0,
-        totalComments: mostLikedAnswer.comments?.length || 0,
-      },
-    };
-  });
-
-  if (!questionsWithAnswerDetails.length) {
-    return res.status(StatusCodes.OK).json({ questions: [] });
-  }
-
-  res.status(StatusCodes.OK).json({ questions: questionsWithAnswerDetails });
+  res.status(StatusCodes.OK).json({ questions });
 };
 
 // answer controllers
 export const createAnswer = async (req, res) => {
-  const { userId, username, avatar } = req.user;
-  const { id: questionId } = req.params;
+  const { userId } = req.user;
+  const { id: questionId } = req.params;  
+  const { context } = req.body;
 
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    const question = await Question.findById(questionId).session(session);
+    // First verify the question exists
+    const question = await Question.findById(questionId);
     if (!question) {
-      throw new BadRequestError("Question not found");
+      throw new NotFoundError("Question not found");
     }
 
     const newAnswer = await Answer.create(
       [
         {
-          context: req.body.context,
-          author: {
-            userId,
-            username,
-            avatar,
-          },
+          context,
+          createdBy: userId,
           answeredTo: questionId,
         },
       ],
       { session }
     );
 
-    // Add the answer to the question's 'answers' array
-    question.answers.push(newAnswer[0]._id);
-    await question.save({ session });
+    await Question.findByIdAndUpdate(
+      questionId,
+      { $push: { answers: newAnswer[0]._id } },
+      { session }
+    );
 
-    // Update user's answers array
-    const user = await User.findById(userId).session(session);
-    user.answers.push(newAnswer[0]._id);
-    await user.save({ session });
+    await User.findByIdAndUpdate(
+      userId,
+      { $push: { answers: newAnswer[0]._id } },
+      { session }
+    );
+
+    // Fetch answer with user details
+    const answerWithUser = await Answer.aggregate([
+      {
+        $match: { _id: newAnswer[0]._id }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      {
+        $addFields: {
+          username: { $arrayElemAt: ["$userDetails.name", 0] },
+          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
+          totalLikes: { $size: { $ifNull: ["$likes", []] } },
+          totalComments: { $size: { $ifNull: ["$comments", []] } }
+        }
+      },
+      {
+        $project: {
+          userDetails: 0
+        }
+      }
+    ]);
 
     await session.commitTransaction();
+    session.endSession();
 
-    // Send success response
     res.status(StatusCodes.CREATED).json({
-      msg: "Answer added successfully",
-      answer: newAnswer[0],
+      msg: "Answer created successfully",
+      answer: answerWithUser[0],
     });
   } catch (error) {
     await session.abortTransaction();
-    throw error;
-  } finally {
     session.endSession();
+    throw error;
   }
 };
 export const getAnswerById = async (req, res) => {
   const { id: answerId } = req.params;
+
+  // First get the answer with user details and comment count
   const answer = await Answer.aggregate([
-    { $match: { _id: new mongoose.Types.ObjectId(answerId) } },
+    {
+      $match: { _id: new mongoose.Types.ObjectId(answerId) }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $lookup: {
+        from: "qacomments",
+        localField: "comments",
+        foreignField: "_id",
+        as: "commentDetails"
+      }
+    },
     {
       $addFields: {
-        totalComments: { $size: "$comments" },
-        totalLikes: { $size: "$likes" },
-      },
+        author: {
+          userId: "$createdBy",
+          username: { $arrayElemAt: ["$userDetails.name", 0] },
+          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+        },
+        totalLikes: { $size: { $ifNull: ["$likes", []] } },
+        totalComments: { $size: "$commentDetails" }
+      }
     },
+    {
+      $project: {
+        userDetails: 0,
+        commentDetails: 0
+      }
+    }
   ]);
 
-  if (!answer[0]) {
-    throw new BadRequestError("Answer not found");
+  if (!answer.length) {
+    throw new NotFoundError("Answer not found");
   }
 
-  // Get the question this answer belongs to
-  const question = await Question.findById(answer[0].answeredTo);
-  if (!question) {
-    throw new BadRequestError("Question not found");
+  // Then get the question this answer belongs to
+  const question = await Question.aggregate([
+    {
+      $match: { _id: answer[0].answeredTo }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $lookup: {
+        from: "answers",
+        localField: "answers",
+        foreignField: "_id",
+        as: "answers"
+      }
+    },
+    {
+      $addFields: {
+        author: {
+          userId: "$createdBy",
+          username: { $arrayElemAt: ["$userDetails.name", 0] },
+          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+        },
+        totalAnswers: { $size: "$answers" }
+      }
+    },
+    {
+      $project: {
+        userDetails: 0,
+        answers: 0
+      }
+    }
+  ]);
+
+  if (!question.length) {
+    throw new NotFoundError("Question not found");
   }
 
-  // Get total answers for the question
-  const totalAnswers = await Answer.countDocuments({
-    answeredTo: question._id,
-  });
-
-  // Add totalAnswers to question object
-  const questionWithTotal = {
-    ...question.toObject(),
-    totalAnswers,
-  };
-
-  res.status(StatusCodes.OK).json({
+  res.status(StatusCodes.OK).json({ 
     answer: answer[0],
-    question: questionWithTotal,
+    question: question[0]
   });
 };
 export const getAnswersByQuestionId = async (req, res) => {
   const { id: questionId } = req.params;
 
-  // Find the question first
-  const question = await Question.findById(questionId);
-  if (!question) {
-    throw new BadRequestError("Question not found");
-  }
-
-  // Find all answers for the given questionId and populate comments count
-  const answers = await Answer.aggregate([
-    { $match: { answeredTo: new mongoose.Types.ObjectId(questionId) } },
+  // First get the question with user details
+  const question = await Question.aggregate([
+    {
+      $match: { _id: new mongoose.Types.ObjectId(questionId) }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $lookup: {
+        from: "answers",
+        localField: "answers",
+        foreignField: "_id",
+        as: "answers"
+      }
+    },
     {
       $addFields: {
-        totalComments: { $size: "$comments" },
-        totalLikes: { $size: "$likes" },
-      },
+        author: {
+          userId: "$createdBy",
+          username: { $arrayElemAt: ["$userDetails.name", 0] },
+          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+        },
+        totalAnswers: { $size: "$answers" }
+      }
     },
+    {
+      $project: {
+        userDetails: 0
+      }
+    }
   ]);
 
-  // Check if no answers are found
-  if (answers.length === 0) {
-    throw new BadRequestError("No answers found for this question.");
+  if (!question.length) {
+    throw new NotFoundError("Question not found");
   }
 
-  // Add totalAnswers property to the question
-  const questionWithTotalAnswers = {
-    ...question.toObject(),
-    totalAnswers: answers.length,
-  };
+  // Then get all answers with user details
+  const answers = await Answer.aggregate([
+    {
+      $match: { answeredTo: new mongoose.Types.ObjectId(questionId) }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $lookup: {
+        from: "qacomments",
+        localField: "comments",
+        foreignField: "_id",
+        as: "comments"
+      }
+    },
+    {
+      $addFields: {
+        author: {
+          userId: "$createdBy",
+          username: { $arrayElemAt: ["$userDetails.name", 0] },
+          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+        },
+        totalLikes: { $size: { $ifNull: ["$likes", []] } },
+        totalComments: { $size: { $ifNull: ["$comments", []] } }
+      }
+    },
+    {
+      $project: {
+        userDetails: 0
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
+  ]);
 
-  // Respond with both question (including totalAnswers) and answers
-  res.status(StatusCodes.OK).json({
-    question: questionWithTotalAnswers,
-    answers,
+  res.status(StatusCodes.OK).json({ 
+    question: question[0],
+    answers 
   });
 };
 export const getUserAnswers = async (req, res) => {
   const { id: userId } = req.params;
   const answers = await Answer.aggregate([
-    { $match: { "author.userId": new mongoose.Types.ObjectId(userId) } },
+    {
+      $match: { createdBy: new mongoose.Types.ObjectId(userId) }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $lookup: {
+        from: "questions",
+        localField: "answeredTo",
+        foreignField: "_id",
+        as: "question"
+      }
+    },
     {
       $addFields: {
-        totalComments: { $size: "$comments" },
-        totalLikes: { $size: "$likes" },
-      },
+        username: { $arrayElemAt: ["$userDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
+        totalLikes: { $size: { $ifNull: ["$likes", []] } },
+        totalComments: { $size: { $ifNull: ["$comments", []] } },
+        question: { $arrayElemAt: ["$question", 0] }
+      }
     },
+    {
+      $project: {
+        userDetails: 0
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
   ]);
+
   res.status(StatusCodes.OK).json({ answers });
 };
 // answer comment controllers
 export const createAnswerComment = async (req, res) => {
   const { content } = req.body;
-  const { id: postId } = req.params;
+  const { id: answerId } = req.params;
+  
   const comment = await Comment.create({
-    postId,
+    answerId,
     createdBy: req.user.userId,
-    username: req.user.username,
-    userAvatar: req.user.avatar,
     content,
   });
-  const answer = await Answer.findById(postId);
+
+  const answer = await Answer.findById(answerId);
   answer.comments.push(comment._id);
   await answer.save();
 
-  res.status(StatusCodes.CREATED).json({
-    message: "Comment created successfully",
-    comment,
-  });
-};
-export const getAllCommentsByAnswerId = async (req, res) => {
-  const { id: postId } = req.params;
-  const postComments = await Comment.aggregate([
-    { $match: { postId: new mongoose.Types.ObjectId(postId) } },
+  // Get the created comment with user details
+  const commentWithUser = await Comment.aggregate([
+    { $match: { _id: comment._id } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
     {
       $addFields: {
-        repliesLength: { $size: "$replies" },
-        totalLikes: { $size: "$likes" },
-      },
+        createdBy: "$createdBy",
+        username: { $arrayElemAt: ["$userDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
+        repliesLength: { $size: { $ifNull: ["$replies", []] } },
+        totalLikes: { $size: { $ifNull: ["$likes", []] } },
+        totalReplies: { $size: { $ifNull: ["$replies", []] } }
+      }
     },
+    {
+      $project: {
+        userDetails: 0
+      }
+    }
   ]);
-  res.status(StatusCodes.OK).json({ comments: postComments });
+
+  res.status(StatusCodes.CREATED).json({
+    message: "Comment created successfully",
+    comment: commentWithUser[0]
+  });
 };
-// answerReply controllers
+
+export const getAllCommentsByAnswerId = async (req, res) => {
+  const { id: answerId } = req.params;
+  const comments = await Comment.aggregate([
+    { 
+      $match: { 
+        answerId: new mongoose.Types.ObjectId(answerId),
+        deleted: { $ne: true }
+      } 
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $lookup: {
+        from: "answerreplies",
+        localField: "replies",
+        foreignField: "_id",
+        as: "repliesData"
+      }
+    },
+    {
+      $addFields: {
+        username: { $arrayElemAt: ["$userDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
+        repliesLength: { $size: { $ifNull: ["$replies", []] } },
+        totalLikes: { $size: { $ifNull: ["$likes", []] } },
+        totalReplies: { $size: { $ifNull: ["$replies", []] } }
+      }
+    },
+    {
+      $project: {
+        userDetails: 0,
+        repliesData: 0
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
+  ]);
+
+  res.status(StatusCodes.OK).json({ comments });
+};
+
+// Reply controllers
 export const createAnswerReply = async (req, res) => {
   const { content } = req.body;
   const { id: parentId } = req.params;
@@ -301,43 +679,259 @@ export const createAnswerReply = async (req, res) => {
   const parentReply = await Replies.findById(parentId);
 
   if (!comment && !parentReply) {
-    throw new BadRequestError("comment or reply not found");
+    throw new BadRequestError("Comment or reply not found");
   }
 
   const reply = await Replies.create({
     commentId: comment ? comment._id : parentReply.commentId,
+    parentId: parentReply ? parentReply._id : null,
     createdBy: req.user.userId,
-    username: req.user.username,
-    userAvatar: req.user.avatar,
     content,
-    commentUserId: comment ? comment.createdBy : parentReply.createdBy,
-    commentUsername: comment ? comment.username : parentReply.username,
-    commentUserAvatar: comment ? comment.userAvatar : parentReply.userAvatar,
+    replyTo: comment ? comment.createdBy : parentReply.createdBy
   });
 
-  comment.replies.push(reply._id);
-  await comment.save();
+  if (comment) {
+    comment.replies.push(reply._id);
+    await comment.save();
+  }
+
+  // Get the created reply with user details
+  const replyWithUser = await Replies.aggregate([
+    { $match: { _id: reply._id } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "authorDetails"
+      }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "replyTo",
+        foreignField: "_id",
+        as: "replyToDetails"
+      }
+    },
+    {
+      $addFields: {
+        username: { $arrayElemAt: ["$authorDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$authorDetails.avatar", 0] },
+        commentUsername: { $arrayElemAt: ["$replyToDetails.name", 0] },
+        commentUserAvatar: { $arrayElemAt: ["$replyToDetails.avatar", 0] },
+        commentUserId: "$replyTo",
+        totalLikes: { $size: { $ifNull: ["$likes", []] } }
+      }
+    },
+    {
+      $project: {
+        authorDetails: 0,
+        replyToDetails: 0
+      }
+    }
+  ]);
+
   res.status(StatusCodes.CREATED).json({
     message: "Reply created successfully",
-    reply,
+    reply: replyWithUser[0]
   });
 };
-export const getAllAnswerRepliesBYCommentId = async (req, res) => {
+
+export const getAllAnswerRepliesByCommentId = async (req, res) => {
   const { id: commentId } = req.params;
-  const replies = await Replies.find({ commentId }).lean();
+  
+  const replies = await Replies.aggregate([
+    { 
+      $match: { 
+        commentId: new mongoose.Types.ObjectId(commentId),
+        deleted: { $ne: true }
+      } 
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "authorDetails"
+      }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "replyTo",
+        foreignField: "_id",
+        as: "replyToDetails"
+      }
+    },
+    {
+      $addFields: {
+        username: { $arrayElemAt: ["$authorDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$authorDetails.avatar", 0] },
+        commentUsername: { $arrayElemAt: ["$replyToDetails.name", 0] },
+        commentUserAvatar: { $arrayElemAt: ["$replyToDetails.avatar", 0] },
+        commentUserId: "$replyTo",
+        totalLikes: { $size: { $ifNull: ["$likes", []] } }
+      }
+    },
+    {
+      $project: {
+        authorDetails: 0,
+        replyToDetails: 0
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
+  ]);
+
   if (replies.length === 0) {
     return res
       .status(StatusCodes.OK)
       .json({ message: "No replies found for this comment", replies: [] });
   }
 
-  const repliesWithCounts = replies.map((reply) => ({
-    ...reply,
-    totalLikes: (reply.likes || []).length,
-  }));
-
-  res.status(StatusCodes.OK).json({ replies: repliesWithCounts });
+  res.status(StatusCodes.OK).json({ replies });
 };
+
+export const likeAnswerReply = async (req, res) => {
+  const { id: replyId } = req.params;
+  const userId = req.user.userId;
+
+  const reply = await Replies.findById(replyId);
+  if (!reply) {
+    throw new NotFoundError("Reply not found");
+  }
+
+  const isLiked = reply.likes.includes(userId);
+  if (isLiked) {
+    reply.likes = reply.likes.filter((id) => id.toString() !== userId);
+  } else {
+    reply.likes.push(userId);
+  }
+  await reply.save();
+
+  const replyWithDetails = await Replies.aggregate([
+    { $match: { _id: reply._id } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "authorDetails"
+      }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "replyTo",
+        foreignField: "_id",
+        as: "replyToDetails"
+      }
+    },
+    {
+      $addFields: {
+        username: { $arrayElemAt: ["$authorDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$authorDetails.avatar", 0] },
+        commentUsername: { $arrayElemAt: ["$replyToDetails.name", 0] },
+        commentUserAvatar: { $arrayElemAt: ["$replyToDetails.avatar", 0] },
+        commentUserId: "$replyTo",
+        totalLikes: { $size: "$likes" }
+      }
+    },
+    {
+      $project: {
+        authorDetails: 0,
+        replyToDetails: 0
+      }
+    }
+  ]);
+
+  res.status(StatusCodes.OK).json({
+    message: isLiked ? "Reply unliked" : "Reply liked",
+    reply: replyWithDetails[0]
+  });
+};
+
+export const deleteAnswerReply = async (req, res) => {
+  const { id: replyId } = req.params;
+
+  const reply = await Replies.findById(replyId);
+  if (!reply) {
+    throw new BadRequestError("Reply not found");
+  }
+
+  if (reply.createdBy.toString() !== req.user.userId) {
+    throw new UnauthorizedError("You are not authorized to delete this reply");
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  // Delete the reply
+  await Replies.findByIdAndDelete(replyId).session(session);
+
+  // Remove reply from comment's replies array
+  const comment = await Comment.findOne({ replies: replyId }).session(session);
+  if (comment) {
+    comment.replies.pull(replyId);
+    await comment.save({ session });
+  }
+
+  await session.commitTransaction();
+  res.status(StatusCodes.OK).json({ message: "Reply deleted successfully" });
+  session.endSession();
+};
+
+// Like controllers for comments and replies
+export const likeAnswerComment = async (req, res) => {
+  const { id: commentId } = req.params;
+  const userId = req.user.userId;
+
+  const comment = await Comment.findById(commentId);
+  if (!comment) {
+    throw new NotFoundError("Comment not found");
+  }
+
+  const isLiked = comment.likes.includes(userId);
+  if (isLiked) {
+    comment.likes = comment.likes.filter((id) => id.toString() !== userId);
+  } else {
+    comment.likes.push(userId);
+  }
+  await comment.save();
+
+  const commentWithDetails = await Comment.aggregate([
+    { $match: { _id: comment._id } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $addFields: {
+        createdBy: "$createdBy",
+        username: { $arrayElemAt: ["$userDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
+        totalLikes: { $size: "$likes" }
+      }
+    },
+    {
+      $project: {
+        userDetails: 0
+      }
+    }
+  ]);
+
+  res.status(StatusCodes.OK).json({
+    message: isLiked ? "Comment unliked" : "Comment liked",
+    comment: commentWithDetails[0]
+  });
+};
+
 // delete controllers
 export const deleteQuestion = async (req, res) => {
   const { id: postId } = req.params;
@@ -493,35 +1087,6 @@ export const deleteAnswerComment = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: "Comment deleted successfully" });
   session.endSession();
 };
-export const deleteAnswerReply = async (req, res) => {
-  const { id: replyId } = req.params;
-
-  const reply = await Replies.findById(replyId);
-  if (!reply) {
-    throw new BadRequestError("Reply not found");
-  }
-
-  if (reply.createdBy.toString() !== req.user.userId) {
-    throw new UnauthorizedError("You are not authorized to delete this reply");
-  }
-
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
-  // Delete the reply
-  await Replies.findByIdAndDelete(replyId).session(session);
-
-  // Remove reply from comment's replies array
-  const comment = await Comment.findOne({ replies: replyId }).session(session);
-  if (comment) {
-    comment.replies.pull(replyId);
-    await comment.save({ session });
-  }
-
-  await session.commitTransaction();
-  res.status(StatusCodes.OK).json({ message: "Reply deleted successfully" });
-  session.endSession();
-};
 
 // like controllers
 export const likeAnswer = async (req, res) => {
@@ -556,91 +1121,4 @@ export const likeAnswer = async (req, res) => {
     likes: updatedAnswer.likes,
     totalLikes: updatedAnswer.totalLikes,
   });
-};
-export const likeAnswerComment = async (req, res) => {
-  const { id: commentId } = req.params;
-  const { userId } = req.user;
-
-  try {
-    // First find the comment to check if it exists
-    const existingComment = await Comment.findById(commentId);
-    console.log({ existingComment });
-    if (!existingComment) {
-      throw new BadRequestError("Comment not found");
-    }
-
-    // Check if user has already liked
-    const hasLiked = existingComment.likes.includes(userId);
-
-    // Update likes array based on whether user has already liked
-    const updatedComment = await Comment.findByIdAndUpdate(
-      commentId,
-      {
-        [hasLiked ? "$pull" : "$push"]: { likes: userId },
-      },
-      { new: true }
-    ).exec(); // Add .exec() to ensure promise resolution
-
-    if (!updatedComment) {
-      throw new BadRequestError("Failed to update comment");
-    }
-
-    // Update total likes count
-    updatedComment.totalLikes = updatedComment.likes.length;
-    await updatedComment.save();
-
-    res.status(StatusCodes.OK).json({
-      message: "success",
-      likes: updatedComment.likes,
-      totalLikes: updatedComment.totalLikes,
-    });
-  } catch (error) {
-    console.error("Error in likeAnswerComment:", error);
-    res.status(StatusCodes.BAD_REQUEST).json({
-      msg: error.message || "Comment not found",
-    });
-  }
-};
-export const likeAnswerReply = async (req, res) => {
-  const { id: replyId } = req.params;
-  const { userId } = req.user;
-
-  try {
-    // First find the reply to check if it exists
-    const existingReply = await Replies.findById(replyId);
-    if (!existingReply) {
-      throw new BadRequestError("Reply not found");
-    }
-
-    // Check if user has already liked
-    const hasLiked = existingReply.likes.includes(userId);
-
-    // Update likes array based on whether user has already liked
-    const updatedReply = await Replies.findByIdAndUpdate(
-      replyId,
-      {
-        [hasLiked ? "$pull" : "$push"]: { likes: userId },
-      },
-      { new: true }
-    ).exec();
-
-    if (!updatedReply) {
-      throw new BadRequestError("Failed to update reply");
-    }
-
-    // Update total likes count
-    updatedReply.totalLikes = updatedReply.likes.length;
-    await updatedReply.save();
-
-    res.status(StatusCodes.OK).json({
-      message: "success",
-      likes: updatedReply.likes,
-      totalLikes: updatedReply.totalLikes,
-    });
-  } catch (error) {
-    console.error("Error in likeAnswerReply:", error);
-    res.status(StatusCodes.BAD_REQUEST).json({
-      msg: error.message || "Reply not found",
-    });
-  }
 };

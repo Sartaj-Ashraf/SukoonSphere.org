@@ -1,17 +1,20 @@
 import { useUser } from '@/context/UserContext';
 import customFetch from '@/utils/customFetch';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import DeleteModal from '@/components/shared/DeleteModal';
-import { useOutletContext } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
+import UserAvatar from '@/components/shared/UserAvatar';
 
 const UserQuestions = () => {
     const user = useOutletContext();
+    const {user : loggedUser} = useUser();
     const [questions, setQuestions] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showActionModal, setShowActionModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [selectedQuestionId, setSelectedQuestionId] = useState(null);
+
     const fetchUserQuestions = async () => {
         try {
             const { data } = await customFetch.get(`/qa-section/user-questions/${user._id}`);
@@ -32,49 +35,44 @@ const UserQuestions = () => {
         } finally {
             setIsDeleting(false);
         }
-    };
+    }
 
     useEffect(() => {
         fetchUserQuestions();
-    }, [])
+    }, [user._id, selectedQuestionId]);
 
     return (
-        <div className='bg-white  rounded-lg p-4 space-y-4'>
-            <h2 className="text-xl font-bold mb-4 text-black text-center">Questions Posted</h2>
-            <div className="divide-y divide-gray-200 space-y-4 ">
+        <div className='bg-[var(--body)] rounded-lg shadow-sm'>
+            <h2 className="text-2xl font-semibold text-[var(--primary)] p-4 border-b">Questions Posted</h2>
+            <div className="p-4 space-y-4">
                 {questions && questions?.length === 0 ? (
-                    <p className="text-[var(--primary)] text-center py-4">No questions asked yet!</p>
+                    <div className="text-center p-8 bg-white rounded-[10px] shadow-sm">
+                        <p className="text-gray-600">No questions asked yet!</p>
+                    </div>
                 ) : (
                     questions.map((question) => (
-                        <div key={question._id} className="mb-4 p-6 rounded-xl bg-white transition duration-300 shadow-1 hover:shadow-2">
-                            <div className="flex items-center mb-4 justify-between">
-                                <div className="flex items-center">
-                                    <img
-                                        src={question.author?.picture || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWXzCSPkpN-TPug9XIsssvBxZQHkZEhjoGfg&s"}
-                                        alt={`${question.author?.username}'s avatar`}
-                                        className="w-12 h-12 rounded-full mr-3 border-2 border-blue-500"
+                        <div key={question?._id} className="bg-white rounded-[10px] shadow-sm p-4 hover:shadow-md transition-shadow">
+                            <div className="flex items-center justify-between mb-4">
+                                    <UserAvatar
+                                        createdBy={question?.author}
+                                        username={question?.username}
+                                        userAvatar={question?.userAvatar}
+                                        createdAt={question?.createdAt}
                                     />
-                                    <div>
-                                        <p className="font-semibold text-[var(--primary)]">
-                                            {question.author?.username}
-                                        </p>
-                                        <p className="text-gray-500 text-sm">
-                                            {new Date(question.createdAt).toLocaleDateString()}
-                                        </p>
-                                    </div>
-                                </div>
                                 <div className="relative">
-                                    <BsThreeDotsVertical
-                                        className="text-black cursor-pointer"
+                                    {user._id === loggedUser._id && <button
+                                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                                         onClick={() => {
                                             setSelectedQuestionId(question._id);
                                             setShowActionModal(!showActionModal);
                                         }}
-                                    />
+                                    >
+                                        <BsThreeDotsVertical className="text-gray-600" />
+                                    </button>}
                                     {showActionModal && selectedQuestionId === question._id && (
-                                        <div className="absolute right-0 mt-2 w-32 bg-white border rounded-lg shadow-lg z-10">
+                                        <div className="absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border z-10">
                                             <button
-                                                className="w-full px-4 py-2 text-left text-red-600 hover:bg-gray-100 rounded-lg"
+                                                className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                 onClick={() => {
                                                     setShowDeleteModal(true);
                                                     setShowActionModal(false);
@@ -87,20 +85,30 @@ const UserQuestions = () => {
                                 </div>
                             </div>
 
-                            <h2 className="text-xl font-semibold mb-2 text-gray-800">
-                                {question.questionText}
-                            </h2>
-                            <p className="text-gray-700 mb-4">{question.context}</p>
+                            <Link 
+                                to= {`/QA-section/question/${question._id}`}
+                                    className="cursor-pointer"
+                            >
+                                <h3 className="text-lg font-semibold text-[var(--primary)] mb-2">
+                                    {question.questionText}
+                                </h3>
+                            </Link>
+                            <p className="text-gray-700 mb-4 line-clamp-2">{question.context}</p>
 
-                            <div className="flex flex-wrap mb-4 gap-y-1">
-                                {question.tags?.map((tag, index) => (
-                                    <span
-                                        key={index}
-                                        className="bg-blue-200 text-blue-800 text-xs font-medium mr-2 px-3 py-1 rounded-full transition duration-200 hover:bg-blue-300"
-                                    >
-                                        {tag}
-                                    </span>
-                                ))}
+                            <div className="flex items-center justify-between">
+                                <div className="flex flex-wrap gap-2">
+                                    {question.tags?.map((tag, index) => (
+                                        <span
+                                            key={index}
+                                            className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm"
+                                        >
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                    {question.totalAnswers || 0} {question.totalAnswers === 1 ? 'Answer' : 'Answers'}
+                                </div>
                             </div>
                         </div>
                     ))
@@ -117,7 +125,7 @@ const UserQuestions = () => {
                 isLoading={isDeleting}
             />
         </div>
-    )
+    );
 }
 
-export default UserQuestions
+export default UserQuestions;

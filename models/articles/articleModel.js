@@ -7,7 +7,7 @@ const ArticleSchema = new mongoose.Schema(
     },
     views: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
     },
     deleted: {
       default: false,
@@ -15,7 +15,7 @@ const ArticleSchema = new mongoose.Schema(
     },
     author: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
     },
     pdfPath: {
       type: String,
