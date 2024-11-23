@@ -7,7 +7,7 @@ import { FaRegComment, FaRegHeart } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const Answer = ({ answer, user, answerCount }) => {
+const   Answer = ({ answer, user, answerCount }) => {
   const navigate = useNavigate();
   const [showAnswerDeleteModal, setShowAnswerDeleteModal] = useState(false);
   const [isLiked, setIsLiked] = useState(answer.likes?.includes(user?._id));

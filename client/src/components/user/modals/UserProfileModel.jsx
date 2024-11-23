@@ -13,7 +13,7 @@ const UserProfileModel = ({ onClose, user, handleProfileUpdate }) => {
         const formData = new FormData(event.target);
         try {
             const response = await handleProfileUpdate(formData);
-            console.log({ responseInModel: response })
+            window.location.reload();
         } catch (error) {
             console.log({ errorInModel: error })
         }

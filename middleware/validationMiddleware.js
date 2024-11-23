@@ -128,15 +128,6 @@ export const validatePostInput = withValidationErrors([
     .isLength({ max: 500 })
     .withMessage("Description must not exceed 1000 characters"),
 
-  body("tags")
-    .isArray()
-    .withMessage("Tags must be an array")
-    .custom((tags) => {
-      if (tags.length === 0) {
-        throw new BadRequestError("At least one tag is required");
-      }
-      return true;
-    }),
 ]);
 
 // qa section
@@ -146,15 +137,7 @@ export const validateQaSectionInput = withValidationErrors([
     .withMessage("Question is required")
     .isLength({ max: 100 })
     .withMessage("Question must not exceed 100 characters"),
-  body("tags")
-    .isArray()
-    .withMessage("Tags must be an array")
-    .custom((tags) => {
-      if (tags.length === 0) {
-        throw new BadRequestError("At least one tag is required");
-      }
-      return true;
-    }),
+
 ]);
 
 export const validateAnswerInput = withValidationErrors([

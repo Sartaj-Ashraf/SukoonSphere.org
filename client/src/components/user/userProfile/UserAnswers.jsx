@@ -3,10 +3,12 @@ import customFetch from '@/utils/customFetch';
 import React, { useEffect, useState } from 'react'
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import DeleteModal from '@/components/shared/DeleteModal';
-import { useOutletContext } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
+import UserAvatar from '@/components/shared/UserAvatar';
 
 const UserAnswers = () => {
     const user = useOutletContext();
+    const {user:loggedUser} = useUser();
     const [answers, setAnswers] = useState([]);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showActionModal, setShowActionModal] = useState(false);
@@ -49,22 +51,13 @@ const UserAnswers = () => {
                     answers.map((answer) => (
                         <div key={answer._id} className="mb-8 p-6 rounded-xl bg-white transition duration-300 shadow-1 hover:shadow-2">
                             <div className="flex items-center mb-4 justify-between">
-                                <div className="flex items-center">
-                                    <img
-                                        src={answer.author?.avatar || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWXzCSPkpN-TPug9XIsssvBxZQHkZEhjoGfg&s"}
-                                        alt={`${answer.author?.username}'s avatar`}
-                                        className="w-12 h-12 rounded-full mr-3 border-2 border-blue-500"
-                                    />
-                                    <div>
-                                        <p className="font-semibold text-[var(--primary)]">
-                                            {answer.author?.username}
-                                        </p>
-                                        <p className="text-gray-500 text-sm">
-                                            {new Date(answer.createdAt).toLocaleDateString()}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="relative">
+                            <UserAvatar
+                                    createdBy={answer.author?.userId}
+                                    username={answer?.username}
+                                    userAvatar={answer?.userAvatar}
+                                    createdAt={answer.createdAt}
+                                />
+                                {user._id === loggedUser._id &&<div className="relative">
                                     <BsThreeDotsVertical
                                         className="text-black cursor-pointer"
                                         onClick={() => {
@@ -85,10 +78,9 @@ const UserAnswers = () => {
                                             </button>
                                         </div>
                                     )}
-                                </div>
+                                </div>}
                             </div>
-
-                            <p className="text-gray-700 mb-4">{answer.context}</p>
+                            <Link   to={`/QA-section/question/answer/${answer._id}/comments`}><p className="text-gray-700 mb-4">{answer.context}</p></Link>
 
                             <div className="flex items-center text-sm text-gray-500">
                                 <span>{answer.likes?.length || 0} likes</span>

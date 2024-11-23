@@ -1,44 +1,25 @@
 import mongoose from "mongoose";
 
-    const replySchema = new mongoose.Schema(
+const replySchema = new mongoose.Schema(
   {
-    commentId: {
+    parentId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Comment",
       required: true,
-    },
-    parentId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Reply", // Allows referencing another reply for nested replies
-      default: null,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    username: {
-      type: String,
-      required: true,
-    },
-    userAvatar: {
-      type: String,
-    },
     content: {
       type: String,
       required: true,
     },
-    commentUserId: {
+    replyTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
-    },
-    commentUsername: {
-      type: String,
-      required: true,
-    },
-    commentUserAvatar: {
-      type: String,
+      required: true
     },
     likes: [
       {
@@ -50,8 +31,16 @@ import mongoose from "mongoose";
       type: Boolean,
       default: false,
     },
+    replies: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Reply",
+      },
+    ],
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 export default mongoose.model("Reply", replySchema);

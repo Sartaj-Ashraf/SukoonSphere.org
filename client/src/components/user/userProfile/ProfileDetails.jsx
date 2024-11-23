@@ -25,7 +25,7 @@ const ProfileDetails = ({ user }) => {
           </NavLink>
         )}
 
-        <RenderProfileLinks name="Post" link="." />
+        <RenderProfileLinks  name="Post" link="." />
         <RenderProfileLinks name="Questions" link={`/about/user/${user._id}/questions`} />
         <RenderProfileLinks name="Answers" link={`/about/user/${user._id}/answers`} />
         <RenderProfileLinks name="Followers" link={`/about/user/${user._id}/followers`} />

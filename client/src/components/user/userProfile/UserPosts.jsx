@@ -2,18 +2,23 @@ import React, { useEffect, useState } from 'react'
 import customFetch from '@/utils/customFetch'
 import PostCard from '@/components/posts/PostCard'
 import { useOutletContext } from 'react-router-dom'
+import { useUser } from '@/context/UserContext';
 
 const UserPosts = () => {
     const user = useOutletContext();
+    const {user : loggedUser} = useUser();
     const [posts, setPosts] = useState([]);
     const fetchUserPosts = async () => {
         const { data } = await customFetch.get(`/posts/user/${user._id}`);
         setPosts(data.posts);
     }
     useEffect(() => {
-        fetchUserPosts();
-    }, [])
+        if (user?._id) {
+            fetchUserPosts();
+        }
+    }, [user?._id])
 
+    console.log({posts})
     const handlePostDelete = (postId) => {
         setPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
     };
@@ -29,6 +34,7 @@ const UserPosts = () => {
                             key={post._id}
                             post={post}
                             onPostDelete={handlePostDelete}
+                            user={loggedUser}
                         />
                     ))
                 )}

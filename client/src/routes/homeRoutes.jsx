@@ -11,7 +11,6 @@ import LoadingSpinner from "@/components/loaders/LoadingSpinner";
 import { questionsAction, questionsLoader } from "@/pages/QaSection/QaSection";
 import { answerAction, answersLoader } from "@/pages/answer/Answer";
 import AllPosts, {
-  allPostsAction,
   allPostsLoader,
 } from "@/pages/posts/AllPosts";
 import SinglePost, { singlePostLoader } from "@/pages/posts/SinglePost";
@@ -109,9 +108,7 @@ export const homeRoutes = [
             <AllPosts />
           </Suspense>
         ),
-        loader: allPostsLoader,
-        action: allPostsAction,
-      },
+        loader: allPostsLoader,      },
       {
         path: "/posts/:id",
         element: (

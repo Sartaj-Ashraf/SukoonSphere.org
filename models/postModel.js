@@ -27,14 +27,12 @@ const postSchema = new mongoose.Schema(
       default: Date.now,
     },
     tags: {
-      type: [String],
-      enum: Object.values(TAGS),
-      required: true,
+      type: [String],  
     },
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // Reference to the User model
+        ref: "User", 
       },
     ],
     comments: [
