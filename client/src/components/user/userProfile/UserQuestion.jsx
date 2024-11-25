@@ -33,7 +33,7 @@ const UserQuestions = () => {
     const handleDelete = async () => {
         setIsDeleting(true);
         try {
-            await customFetch.delete(`/qa-section/questions/${selectedQuestionId}`);
+            await customFetch.delete(`/qa-section/question/${selectedQuestionId}`);
             setQuestions(questions.filter(question => question._id !== selectedQuestionId));
             setShowDeleteModal(false);
         } catch (error) {
@@ -42,7 +42,7 @@ const UserQuestions = () => {
         setIsDeleting(false);
     };
 
-    const filteredQuestions = questions.filter(question => 
+    const filteredQuestions = questions.filter(question =>
         (question.questionText?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
         (question.context?.toLowerCase() || '').includes(searchQuery.toLowerCase())
     );
@@ -82,7 +82,7 @@ const UserQuestions = () => {
                         {searchQuery ? 'No matching questions found' : 'No questions asked yet'}
                     </h2>
                     <p className="text-gray-500 max-w-md mx-auto">
-                        {searchQuery 
+                        {searchQuery
                             ? 'Try searching with different keywords'
                             : 'Start asking questions to get help from the community!'}
                     </p>
@@ -167,7 +167,7 @@ const UserQuestions = () => {
             {showDeleteModal && (
                 <DeleteModal
                     isOpen={showDeleteModal}
-                    closeModal={() => setShowDeleteModal(false)}
+                    onClose={() => setShowDeleteModal(false)}
                     onDelete={handleDelete}
                     isDeleting={isDeleting}
                     title="Delete Question"

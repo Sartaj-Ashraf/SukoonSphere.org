@@ -266,7 +266,7 @@ export const getAllQuestionsWithAnswer = async (req, res) => {
 // answer controllers
 export const createAnswer = async (req, res) => {
   const { userId } = req.user;
-  const { id: questionId } = req.params;  
+  const { id: questionId } = req.params;
   const { context } = req.body;
 
   const session = await mongoose.startSession();
@@ -433,7 +433,7 @@ export const getAnswerById = async (req, res) => {
     throw new NotFoundError("Question not found");
   }
 
-  res.status(StatusCodes.OK).json({ 
+  res.status(StatusCodes.OK).json({
     answer: answer[0],
     question: question[0]
   });
@@ -525,9 +525,9 @@ export const getAnswersByQuestionId = async (req, res) => {
     }
   ]);
 
-  res.status(StatusCodes.OK).json({ 
+  res.status(StatusCodes.OK).json({
     question: question[0],
-    answers 
+    answers
   });
 };
 export const getUserAnswers = async (req, res) => {
@@ -577,7 +577,7 @@ export const getUserAnswers = async (req, res) => {
 export const createAnswerComment = async (req, res) => {
   const { content } = req.body;
   const { id: answerId } = req.params;
-  
+
   const comment = await Comment.create({
     answerId,
     createdBy: req.user.userId,
@@ -625,11 +625,11 @@ export const createAnswerComment = async (req, res) => {
 export const getAllCommentsByAnswerId = async (req, res) => {
   const { id: answerId } = req.params;
   const comments = await Comment.aggregate([
-    { 
-      $match: { 
+    {
+      $match: {
         answerId: new mongoose.Types.ObjectId(answerId),
         deleted: { $ne: true }
-      } 
+      }
     },
     {
       $lookup: {
@@ -740,13 +740,13 @@ export const createAnswerReply = async (req, res) => {
 
 export const getAllAnswerRepliesByCommentId = async (req, res) => {
   const { id: commentId } = req.params;
-  
+
   const replies = await Replies.aggregate([
-    { 
-      $match: { 
+    {
+      $match: {
         commentId: new mongoose.Types.ObjectId(commentId),
         deleted: { $ne: true }
-      } 
+      }
     },
     {
       $lookup: {
@@ -947,7 +947,7 @@ export const deleteQuestion = async (req, res) => {
     user: req.user,
   });
   if (
-    question.author.userId.toString() !== req.user.userId &&
+    question.createdBy.toString() !== req.user.userId &&
     req.user.role !== "admin"
   ) {
     throw new UnauthorizedError(
@@ -976,7 +976,7 @@ export const deleteQuestion = async (req, res) => {
   }
 
   // Remove question from user's questions array
-  const user = await User.findById(question.author.userId).session(session);
+  const user = await User.findById(question.createdBy).session(session);
   if (user) {
     user.questions.pull(postId);
     await user.save({ session });
@@ -1005,7 +1005,7 @@ export const deleteAnswer = async (req, res) => {
     }
 
     if (
-      answer.author.userId.toString() !== req.user.userId &&
+      answer.createdBy.toString() !== req.user.userId &&
       req.user.role !== "admin"
     ) {
       throw new UnauthorizedError(

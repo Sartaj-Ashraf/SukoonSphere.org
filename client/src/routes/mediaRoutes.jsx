@@ -69,14 +69,6 @@ export const mediaRoutes = [
         loader: AllVideosLoader,
     },
     {
-        path: 'media/all-videos/video',
-        element: (
-            <Suspense fallback={<LoadingSpinner />}>
-                <Video />
-            </Suspense>
-        ),
-    },
-    {
         path: 'podcast/playlists',
         element: (
             <Suspense fallback={<LoadingSpinner />}>

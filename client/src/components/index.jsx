@@ -1,5 +1,15 @@
-import { createOptimizedComponent } from "../utils/CreateOptimizedComponent"
+import LoadingSpinner from '@/components/loaders/LoadingSpinner';
+import { lazy, Suspense } from 'react';
+// Utility function to create optimized component with fallback
+export const createOptimizedComponent = (importFn) => {
+    const LazyComponent = lazy(importFn);
 
+    return (props) => (
+        <Suspense fallback={<LoadingSpinner />}>
+            <LazyComponent {...props} />
+        </Suspense>
+    );
+};
 
 export { default as Header } from "./sharedComponents/Header";
 export { default as Footer } from "./sharedComponents/Footer";
@@ -54,7 +64,7 @@ export const RelatedVideoCard = createOptimizedComponent(() => import("./mediaLi
 // QA Section Components
 
 export const ProfileSidebar = createOptimizedComponent(() => import("./qaSectionsComponents/ProfileSidebar"));
-export const GroupsSidebar = createOptimizedComponent(() => import("./qaSectionsComponents/GroupsSideBar"));
+export const GroupsSidebar = createOptimizedComponent(() => import("./qaSectionsComponents/GroupsSidebar"));
 export const QuestionModal = createOptimizedComponent(() => import("./qaSectionsComponents/QuestionModal"));
 
 // User Profile Components
