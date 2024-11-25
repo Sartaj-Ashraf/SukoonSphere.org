@@ -32,7 +32,7 @@ const router = Router();
 router.post("/", authenticateUser, validateQaSectionInput, addQuestion);
 router.get("/all-questions", getAllQuestions);
 router.get("/", getAllQuestionsWithAnswer);
-router.get("/user-questions/:id", authenticateUser, getUserQuestions);
+router.get("/user-questions/:id", getUserQuestions);
 // answerComment routes
 router.post(
   "/answer/:id/add-comment",
@@ -69,12 +69,7 @@ router.post(
   createAnswer
 );
 router.get("/question/:id/answers", validateIdParam, getAnswersByQuestionId);
-router.get(
-  "/user-answers/:id",
-  authenticateUser,
-  validateIdParam,
-  getUserAnswers
-);
+router.get("/user-answers/:id", validateIdParam, getUserAnswers);
 router.delete(
   "/question/:id",
   authenticateUser,

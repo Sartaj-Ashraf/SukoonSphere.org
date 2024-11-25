@@ -52,7 +52,7 @@ router.post(
   validateIdParam,
   createPostComment
 );
-router.get("/user/:id", authenticateUser, validateIdParam, getAllPostsByUserId);
+router.get("/user/:id", validateIdParam, getAllPostsByUserId);
 router.get("/:id/comments", validateIdParam, getAllCommentsByPostId);
 router.post(
   "/comments/:id/replies",

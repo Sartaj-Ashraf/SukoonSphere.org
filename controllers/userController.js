@@ -128,7 +128,7 @@ export const getAllFollowers = async (req, res) => {
       avatar: follower.avatar,
       totalFollowers: follower.followers.length,
       totalFollowing: follower.following.length,
-      isFollowing: follower.followers.includes(req.user.userId)
+      isFollowing: follower.followers.includes(userId)
     }));
 
     res.status(StatusCodes.OK).json({ 
@@ -166,7 +166,7 @@ export const getAllFollowing = async (req, res) => {
       avatar: followed.avatar,
       totalFollowers: followed.followers.length,
       totalFollowing: followed.following.length,
-      isFollowing: followed.followers.includes(req.user.userId)
+      isFollowing: followed.followers.includes(userId)
     }));
 
     res.status(StatusCodes.OK).json({ 

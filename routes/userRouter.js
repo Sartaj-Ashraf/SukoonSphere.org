@@ -20,8 +20,8 @@ router.patch(
   changeUserProfile
 );
 router.patch("/follow/:id", authenticateUser, followOrUnfollowUser);
-router.get("/followers/:id", authenticateUser, getAllFollowers);
-router.get("/following/:id", authenticateUser, getAllFollowing);
+router.get("/followers/:id",  getAllFollowers);
+router.get("/following/:id",  getAllFollowing);
 router.get("/profile", profileMiddleware, getUserProfile);
 router.get("/user-details/:id", getUserDetailsById);
 router.patch("/request-to-contribute",authenticateUser, requestContributor)

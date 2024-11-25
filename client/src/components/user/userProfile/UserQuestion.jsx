@@ -19,7 +19,7 @@ const UserQuestions = () => {
 
     const fetchUserQuestions = async () => {
         try {
-            const { data } = await customFetch.get(`/qa-section/user-questions/${user._id}`);
+            const { data } = await customFetch.get(`/qa-section/user-questions/${user?._id}`);
             setQuestions(data.questions);
         } catch (error) {
             console.log(error);
@@ -28,7 +28,7 @@ const UserQuestions = () => {
 
     useEffect(() => {
         fetchUserQuestions();
-    }, [user._id]);
+    }, [user?._id]);
 
     const handleDelete = async () => {
         setIsDeleting(true);
@@ -131,7 +131,7 @@ const UserQuestions = () => {
                                             <span>{question.totalAnswers || 0} answers</span>
                                         </span>
                                     </div>
-                                    {loggedUser._id === user._id && (
+                                    {loggedUser?._id === user?._id && (
                                         <div className="relative">
                                             <button
                                                 onClick={() => {

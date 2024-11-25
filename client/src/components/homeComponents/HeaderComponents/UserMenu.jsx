@@ -24,7 +24,7 @@ function UserMenu({ user, miniMenu, handleLogout }) {
 
         <div className="flex flex-col justify-center items-center mt-[-40px] z-10">
           <img
-            className="w-12 h-12 rounded-full border-1 border-black shadow-lg"
+            className="w-12 h-12 object-cover rounded-full border-1 border-black shadow-lg"
             src={user?.avatar || "https://cdn-icons-png.flaticon.com/512/147/147142.png"}
             alt="User"
           />

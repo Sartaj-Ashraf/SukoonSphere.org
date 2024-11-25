@@ -1,7 +1,4 @@
 import React from 'react';
-import { AiOutlineComment, AiOutlineLike, AiOutlineFieldTime } from "react-icons/ai";
-import LinkButton from '../sharedComponents/Buttons/LinkButton';
-
 const QuizSummary = ({ data }) => {
     if (!data) return null; // Handle the case where no data is provided
 
@@ -44,7 +41,7 @@ const QuizSummary = ({ data }) => {
             {/* Detailed Sections */}
             {Object.keys(data).filter(key => !['title', 'subtitle', 'author', 'mainImage'].includes(key)).map((key, index) => (
                 <div key={index} className="attachment-section">
-                    <h4 className="text-base md:text-lg lg:text-xl font-bold text-[var(--black-color)] mt-6">{data[key].title}</h4>
+                    <h4 className="text-lg  lg:text-xl font-bold text-[var(--black-color)] mt-6">{data[key].title}</h4>
                     <p className="text-sm md:text-base font-normal text-[var(--grey--800)] mb-2 ">{data[key].content}</p>
                     {data[key].quote && (
                         <blockquote className="attachment-quote">

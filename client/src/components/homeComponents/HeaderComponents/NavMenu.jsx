@@ -301,7 +301,7 @@ const UserSection = ({ user, miniMenu, toggleMiniMenu, handleLogout }) => {
         <Link to={`about/user/${user._id}`}>
           <div className="group relative">
             <img
-              className="w-9 h-9 rounded-full border-[3px] border-[var(--grey--600)] hover:border-[var(--ternery)]"
+              className="w-9 h-9 object-cover rounded-full border-[3px] border-[var(--grey--600)] hover:border-[var(--ternery)]"
               src={
                 user?.avatar ||
                 "https://cdn-icons-png.flaticon.com/512/147/147142.png"
