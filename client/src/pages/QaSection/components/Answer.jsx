@@ -7,7 +7,7 @@ import { FaRegComment, FaRegHeart } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const   Answer = ({ answer, user, answerCount }) => {
+const Answer = ({ answer, user, answerCount }) => {
   const navigate = useNavigate();
   const [showAnswerDeleteModal, setShowAnswerDeleteModal] = useState(false);
   const [isLiked, setIsLiked] = useState(answer.likes?.includes(user?._id));
@@ -53,7 +53,7 @@ const   Answer = ({ answer, user, answerCount }) => {
         )}
       </div>
       <div className="prose max-w-none mb-2">
-        <p className="text-gray-700 leading-relaxed">{answer.context}</p>
+        <p className="text-base mb-2 leading-relaxed text-[var(--grey--800)]">{answer.context}</p>
       </div>
       <div className="flex items-center gap-4">
         <button

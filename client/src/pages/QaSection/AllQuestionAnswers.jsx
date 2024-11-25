@@ -60,12 +60,10 @@ const AllQuestionAnswers = () => {
         </div>
       </div>
       <div className="mb-4">
-        <h2 className="text-2xl font-bold mb-2 text-gray-800 hover:text-blue-600 transition-colors duration-200">
+        <h3 className="text-base md:text-xl mb-2 font-bold text-[var(--grey--900)] hover:text-[var(--ternery)] transition-colors duration-20">
           {question?.questionText}
-        </h2>
-        <p className="text-gray-600 mb-3 leading-relaxed">
-          {question?.context}
-        </p>
+        </h3>
+        <p className="text-base mb-2 leading-relaxed text-[var(--grey--800)]">{question?.context}</p>
         <div className="flex flex-wrap gap-2 mb-2">
           {question?.tags?.map((tag, index) => (
             <span

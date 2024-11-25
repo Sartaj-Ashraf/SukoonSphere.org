@@ -8,9 +8,9 @@ function QuizSummary({ SummaryTitle, SummarySubtitle, ShortDescription, ContentT
         <div className="sm:p-4 md:p-2 lg:p-0">
             <div>
                 <Link to={`/all-quizzes/quiz/${1}`}>
-                    <h1 className="text-xl md:text-3xl lg:text-3xl font-bold mb-2 hover:text-[var(--ternery)]">{SummaryTitle}</h1>
+                    <h2 className="text-xl md:text-3xl lg:text-3xl font-bold mb-2 hover:text-[var(--ternery)]">{SummaryTitle}</h2>
                 </Link>
-                <p className="text-[var(--black-color)] mb-4 text-sm md:text-base lg:text-base font-bold">
+                <p className="text-[var(--grey--800)] mb-4 text-sm md:text-base lg:text-base font-bold">
                     {SummarySubtitle}
                 </p>
             </div>
@@ -46,14 +46,14 @@ function QuizSummary({ SummaryTitle, SummarySubtitle, ShortDescription, ContentT
                         alt="Quiz Image"
                         className="md:w-60  object-cover"
                     />
-                    <p className="text-lg text-[var(--grey--800)] text-justify  font-medium my-3 md:mx-4">
+                    <p className="text-lg text-[var(--grey--800)] text-justify  my-3 md:mx-4">
                         {ShortDescription}
                     </p>
                 </div>
 
                 <div className="mt-4">
-                    <h1 className="text-xl md:text-xl lg:text-1xl font-bold text-[var(--black-color)] mb-2">{ContentTitle}</h1>
-                    <p className="text-sm md:text-base text-justify  text-[var(--grey--800)] font-medium">{ContentSubtitle}</p>
+                    <h2 className=" ml-3 text-xl md:text-xl lg:text-1xl font-bold text-[var(--black-color)] mb-2">{ContentTitle}</h2>
+                    <p className="text-base text-[var(--grey--800)] text-justify md:mx-4">{ContentSubtitle}</p>
                 </div>
 
                 <div className="mt-8 flex justify-center sm:justify-start">
