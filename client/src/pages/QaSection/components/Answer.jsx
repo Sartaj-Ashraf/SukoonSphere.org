@@ -43,16 +43,17 @@ const Answer = ({ answer, user, answerCount }) => {
     <div className=" p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
       <div className="flex items-center justify-between mb-2">
         <UserAvatar
-          username={answer.author?.username}
-          userAvatar={answer.author?.userAvatar}
-          createdAt={answer.createdAt}
+          createdBy={answer?.author?.userId}
+          username={answer?.author?.username}
+          userAvatar={answer?.author?.userAvatar}
+          createdAt={answer?.createdAt}
         />
         {user && answer.author?.userId === user?._id && (
           <PostActions handleDelete={() => setShowAnswerDeleteModal(true)} />
         )}
       </div>
       <div className="prose max-w-none mb-2">
-        <p className="text-gray-700 leading-relaxed">{answer.context}</p>
+        <p className="text-base mb-2 leading-relaxed text-[var(--grey--800)]">{answer.context}</p>
       </div>
       <div className="flex items-center gap-4">
         <button

@@ -1,87 +1,146 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import customFetch from '@/utils/customFetch';
-import { useUser } from '@/context/UserContext';
-import { useLoaderData } from 'react-router-dom';
+import { useLoaderData, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useUser } from '@/context/UserContext';
+import { FaUserPlus, FaUserMinus, FaSearch } from 'react-icons/fa';
 
-export const userFollowersLoader = async () => {
+export const userFollowersLoader = async ({ params }) => {
     try {
-        const { data } = await customFetch.get('/user/followers');
-        return data.followers;
+        const { data } = await customFetch.get(`/user/followers/${params.id}`);
+        return data;
     } catch (error) {
-        return error.response?.data?.msg || 'Error fetching followers';
+        console.error('Error fetching followers:', error);
+        toast.error(error.response?.data?.msg || 'Error fetching followers');
+        return { success: false, followers: [] };
     }
 };
 
 const UserFollowers = () => {
-    const { user, setUser } = useUser();
-    const followers = useLoaderData();
-    const [updatedFollowers, setUpdatedFollowers] = useState(followers);
+    const data = useLoaderData();
+    const { user: currentUser } = useUser();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isLoading, setIsLoading] = useState({});
+    
+    const followers = data?.followers || [];
 
-    if (!followers) {
-        return <div className="text-center text-red-500 p-4">Error loading followers</div>;
-    }
-
-    const handleFollowBack = async (followerId) => {
+    const handleFollowUnfollow = async (followerId) => {
+        if (isLoading[followerId]) return;
+        
         try {
-            await customFetch.post(`/user/follow/${followerId}`);
-            setUser((prevUser) => ({
-                ...prevUser,
-                following: [...prevUser.following, followerId],
-            }));
-            toast.success("Followed successfully");
-        } catch (error) {
-            console.error('Error following user:', error);
-            if (error.response?.status === 404) {
-                toast.error("User not found. Please try again.");
-            } else {
-                toast.error("An unexpected error occurred.");
+            setIsLoading(prev => ({ ...prev, [followerId]: true }));
+            const { data } = await customFetch.patch(`user/follow/${followerId}`);
+            if (data.success) {
+                toast.success(data.isFollowing ? 'Followed successfully' : 'Unfollowed successfully');
+                window.location.reload();
             }
+        } catch (error) {
+            toast.error(error.response?.data?.msg || 'Something went wrong. Please try again.');
+        } finally {
+            setIsLoading(prev => ({ ...prev, [followerId]: false }));
         }
     };
 
+    const filteredFollowers = followers.filter(follower => 
+        follower.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    if (!Array.isArray(followers)) {
+        return (
+            <div className="text-center py-12 px-4">
+                <h2 className="text-xl font-semibold text-gray-700">Unable to load followers</h2>
+                <p className="text-gray-500 mt-2">Please refresh the page to try again</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="bg-white shadow rounded-lg p-4">
-            <h2 className="text-xl font-bold mb-4 text-[var(--black-color)] text-center">Followers</h2>
-            <div className="divide-y divide-gray-200">
-                {updatedFollowers.length === 0 ? (
-                    <p className="text-center text-gray-500 py-4">No followers yet</p>
-                ) : (
-                    updatedFollowers.map((follower) => (
-                        <div key={follower._id} className="py-2 flex justify-between items-center">
-                            <div className="flex items-center space-x-3">
-                                <div className="bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center text-lg">
-                                    {follower?.avatar ? (
-                                        <img
-                                            src={follower?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(username || "Anonymous")}&background=random`}
-                                            alt={follower?.username}
-                                            className="w-8 h-8 rounded-full"
-                                        />
-                                    ) : (
-                                        <h1 className="text-xl text-[var(--primary)]">
-                                            {follower?.name[0]}
-                                        </h1>
-                                    )}
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-base text-[var(--primary)]">{follower.name}</p>
-                                    <p className="text-sm text-gray-600">{follower.email}</p>
+        <div className="p-6 bg-white rounded-xl shadow-sm">
+            {/* Search Bar */}
+            <div className="mb-8">
+                <div className="relative max-w-md mx-auto">
+                    <input
+                        type="text"
+                        placeholder="Search followers by name..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full px-5 py-3 pl-12 text-gray-700 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                    />
+                    <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
+                </div>
+            </div>
+
+            {/* Followers Count */}
+            <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-bold text-gray-800">
+                    Followers <span className="text-blue-500 ml-2">{filteredFollowers.length}</span>
+                </h2>
+            </div>
+
+            {/* Followers Grid */}
+            {filteredFollowers.length === 0 ? (
+                <div className="text-center py-12 px-4">
+                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <FaUserPlus className="w-10 h-10 text-gray-400" />
+                    </div>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-2">
+                        {searchQuery ? 'No matching followers found' : 'No followers yet'}
+                    </h2>
+                    <p className="text-gray-500 max-w-md mx-auto">
+                        {searchQuery 
+                            ? 'Try searching with a different name'
+                            : 'Share your profile with others to gain followers!'}
+                    </p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 gap-4">
+                    {filteredFollowers.map((follower) => (
+                        <div 
+                            key={follower._id} 
+                            className="bg-white rounded-xl border border-gray-100 p-4 hover:shadow-lg transition-all duration-300"
+                        >
+                            <div className="flex items-start gap-3">
+                                <Link 
+                                    to={`/about/user/${follower._id}`} 
+                                    className="flex-shrink-0 group"
+                                >
+                                    <img
+                                        src={follower.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(follower.name || 'User')}&background=random`}
+                                        alt={follower.name || 'User'}
+                                        className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 group-hover:border-blue-500 transition-colors duration-300"
+                                    />
+                                </Link>
+                                <div className="min-w-0 flex-1">
+                                    <Link 
+                                        to={`/about/user/${follower._id}`} 
+                                        className="block group"
+                                    >
+                                        <h3 className="font-semibold text-base text-gray-900 truncate group-hover:text-blue-600 transition-colors duration-300">
+                                            {follower.name || 'Anonymous User'}
+                                        </h3>
+                                    </Link>
+                                    <div className="flex gap-4 mt-1 text-sm text-gray-500">
+                                        <Link 
+                                            to={`/about/user/${follower._id}/followers`}
+                                            className="hover:text-blue-600 transition-colors duration-300"
+                                        >
+                                            <span className="font-medium">{follower.followers?.length || 0}</span>
+                                            <span className="ml-1">followers</span>
+                                        </Link>
+                                        <Link 
+                                            to={`/about/user/${follower._id}/following`}
+                                            className="hover:text-blue-600 transition-colors duration-300"
+                                        >
+                                            <span className="font-medium">{follower.following?.length || 0}</span>
+                                            <span className="ml-1">following</span>
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
-                            {/* Only show "Follow Back" button if the current user is not following this follower */}
-                            {/* {!user?.following?.includes(follower._id) && (
-                                <button
-                                    className="action-button btn-sm"
-                                    onClick={() => handleFollowBack(follower._id)}
-                                >
-                                    Follow Back
-                                </button>
-                            )} */}
                         </div>
-                    ))
-                )}
-            </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

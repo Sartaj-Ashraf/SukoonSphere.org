@@ -14,22 +14,22 @@ const ContactUs = () => {
             {/* <HeaderImg currentPage="Contact" bgImg={bgImg} /> */}
             <div className="flex flex-col lg:flex-row text-white rounded-lg overflow-hidden  max-w-7xl mx-auto " data-aos="fade" data-aos-duration="1500">
                 <div className="lg:w-1/2 px-4 py-8 space-y-6">
-                    <h1 className=" font-bold text-[1.6rem] md:text-[2.5rem] sm:text-[3.9rem] sm:leading-[3.5rem] text-[var(--grey--900)]">SukoonSphere HelpLine</h1>
-                    <p className="text-base text-[var(--grey--800)] hidden md:block">The SukoonSphere HelpLine provides the one-on-one help and information necessary to tackle tough challenges that you, your family or friends are facing.</p>
+                    <h2 className=" font-bold text-[1.6rem] md:text-[2.5rem] lg:text-[3rem] sm:leading-[3.5rem] text-[var(--grey--900)]">SukoonSphere HelpLine</h2>
+                    <p className="text-base text-[var(--grey--800)]  md:block">The SukoonSphere HelpLine provides the one-on-one help and information necessary to tackle tough challenges that you, your family or friends are facing.</p>
                     <div className="space-y-6">
                         <div className="flex items-center">
                             <img src={call_Icon} alt="" />
                             <div className="ml-4">
-                                <h2 className="text-xl font-semibold text-[var(--grey--900)]">Call</h2>
-                                <p className='text-[var(--black-color)]'>+91 7889662700</p>
+                                <h2 className="text-xl font-bold text-[var(--grey--900)] ">Call</h2>
+                                <p className='text-[var(--grey--800)]'>+91 7889662700</p>
                             </div>
                         </div>
 
                         <div className="flex items-center">
                             <img src={chat_Icon} alt="" />
                             <div className="ml-4">
-                                <h2 className="text-xl font-semibold text-[var(--grey--900)]">Chat or Text</h2>
-                                <p className='text-[var(--black-color)]'>Text 'helpline' to +91 7051679659</p>
+                                <h2 className="text-xl font-bold text-[var(--grey--900)] ">Chat or Text</h2>
+                                <p className='text-[var(--grey--800)]'>Text 'helpline' to +91 7051679659</p>
                             </div>
                         </div>
 
@@ -37,8 +37,8 @@ const ContactUs = () => {
                             <img src={crisis_Icon} alt="" />
 
                             <div className="ml-4">
-                                <h2 className="text-xl font-semibold text-[var(--grey--900)]">In a crisis?</h2>
-                                <p className='text-[var(--black-color)]'>Call or Text 988</p>
+                                <h2 className="text-xl font-bold text-[var(--grey--900)] ">In a crisis?</h2>
+                                <p className='text-[var(--grey--800)]'>Call or Text 988</p>
                             </div>
                         </div>
                     </div>

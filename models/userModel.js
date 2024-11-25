@@ -28,13 +28,13 @@ const userSchema = mongoose.Schema({
   followers: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
     },
   ],
   following: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
     },
   ],
   posts: [
@@ -57,4 +57,4 @@ const userSchema = mongoose.Schema({
   ],
 });
 
-export default mongoose.model("user", userSchema);
+export default mongoose.model("User", userSchema);

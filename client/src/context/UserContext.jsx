@@ -4,7 +4,7 @@ import customFetch from '@/utils/customFetch';
 const UserContext = createContext();
 
 const initialState = {
-    user: JSON.parse(localStorage.getItem('user')) || null,
+    user: null,
     isLoading: false,
     error: null,
 };
@@ -42,21 +42,26 @@ const userReducer = (state, action) => {
 export const UserProvider = ({ children }) => {
     const [state, dispatch] = useReducer(userReducer, initialState);
 
+    const getUserProfile = async () => {
+        try {
+            const { data } = await customFetch.get('/user/profile');
+            dispatch({ type: 'SET_USER', payload: data });
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     // Persist user to localStorage whenever it changes
     useEffect(() => {
-        if (state.user) {
-            localStorage.setItem('user', JSON.stringify(state.user));
-        } else {
-            localStorage.removeItem('user');
-        }
-    }, [state.user]);
-
+        getUserProfile()
+    }, []);
     // User actions
     const login = async (userData) => {
         try {
             dispatch({ type: 'SET_LOADING', payload: true });
             const { data } = await customFetch.post('/auth/login', userData);
-            dispatch({ type: 'SET_USER', payload: data.user });
+            // dispatch({ type: 'SET_USER', payload: data.user });
+            await getUserProfile()
             return { success: true };
         } catch (error) {
             dispatch({ type: 'SET_ERROR', payload: error.response?.data?.msg || 'Login failed' });
@@ -66,9 +71,8 @@ export const UserProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await customFetch.get('/auth/logout');
+            await customFetch.delete('/auth/logout');
             dispatch({ type: 'REMOVE_USER' });
-            localStorage.removeItem('user'); // Clear localStorage on logout
         } catch (error) {
             dispatch({ type: 'SET_ERROR', payload: error.message });
         }

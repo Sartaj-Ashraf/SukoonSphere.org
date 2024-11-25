@@ -98,7 +98,7 @@ const QuoteCard = memo(({ quote, isExpanded, onClick }) => {
     >
       <div className="h-full p-3 overflow-hidden">
         <div className="flex justify-between items-center">
-          <h3 className="font-medium text-white text-lg">{quote.theme}</h3>
+          <h2 className="font-bold text-black text-lg">{quote.theme}</h2>
           {isExpanded ? (
             <FaArrowCircleLeft className="text-white text-xl transition-transform duration-300 ease-in-out" />
           ) : (
@@ -111,7 +111,7 @@ const QuoteCard = memo(({ quote, isExpanded, onClick }) => {
         >
           {isExpanded && (
             <>
-              <p className="text-white text-sm mb-4 line-clamp-3">
+              <p className="text-white text-center text-base mb-4 line-clamp-3">
                 {quote.message}
               </p>
               <Link

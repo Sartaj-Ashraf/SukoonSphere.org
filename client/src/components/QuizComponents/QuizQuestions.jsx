@@ -73,7 +73,7 @@ const QuizQuestions = ({ quizQuestionsList }) => {
                     </div>
                     <hr className="border-gray-300 mt-4" />
                     <div>
-                        <h2 className="text-xl text-[--white-color] my-2">{question}</h2>
+                        <h3 className=" text-base md:text-lg  text-[--white-color] my-2">{question}</h3>
                     </div>
                 </div>
 

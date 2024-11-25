@@ -51,7 +51,6 @@ const QaCommentOutlet = () => {
   useEffect(() => {
     fetchComments();
   }, [answer._id]);
-  console.log({ comments });
   return (
     <CommentSection
       addComment={addComment}

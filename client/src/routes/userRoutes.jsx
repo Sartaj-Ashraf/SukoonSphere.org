@@ -1,8 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import LoadingSpinner from '@/components/loaders/LoadingSpinner';
 import { UserAnswers } from '@/components';
-import { userFollowersLoader } from '@/components/user/userProfile/UserFollowers';
-import { userFollowingLoader } from '@/components/user/userProfile/UserFollowing';
 import Articles from '@/pages/contributors/Articles';
 const ProfessionalsProfile = lazy(() => import('../pages/professionalProfile/ProfessionalsProfile'));
 const UserProfile = lazy(() => import('../pages/about/UserProfile'));
@@ -10,6 +8,10 @@ const UserPosts = lazy(() => import('../components/user/userProfile/UserPosts'))
 const UserQuestions = lazy(() => import('../components/user/userProfile/UserQuestion'));
 const UserFollowers = lazy(() => import('../components/user/userProfile/UserFollowers'));
 const UserFollowing = lazy(() => import('../components/user/userProfile/UserFollowing'));
+
+// Import the loader functions
+import { userFollowersLoader } from '../components/user/userProfile/UserFollowers';
+import { userFollowingLoader } from '../components/user/userProfile/UserFollowing';
 
 export const userRoutes = [
     {
@@ -22,7 +24,7 @@ export const userRoutes = [
     },
     // Users Routes
     {
-        path: 'about/user',
+        path: 'about/user/:id',
         element: (
             <Suspense fallback={<LoadingSpinner />}>
                 <UserProfile />
@@ -90,7 +92,6 @@ export const userRoutes = [
                     </Suspense>
                 ),
             },
-
         ],
     },
 ];

@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { TAGS } from "../../utils/constants.js";
 
 // Define the schema for Questions
 const questionSchema = new mongoose.Schema(
@@ -10,23 +9,20 @@ const questionSchema = new mongoose.Schema(
     context: {
       type: String,
     },
-    author: {
-      userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-      username: { type: String },
-      avatar: { type: String },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
     },
     tags: {
       type: [String],
-      enum: Object.values(TAGS),
+      default: [],
     },
     answers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Answer" }],
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // Reference to the User model
+        ref: "User",
       },
     ],
   },

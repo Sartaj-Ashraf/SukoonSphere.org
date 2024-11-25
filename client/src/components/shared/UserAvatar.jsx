@@ -1,7 +1,8 @@
 import React from "react";
 import { formatDistanceToNow } from "date-fns";
+import { Link } from "react-router-dom";
 
-const UserAvatar = ({ username, userAvatar, createdAt, size = "medium" }) => {
+const UserAvatar = ({ createdBy, username, userAvatar, createdAt, size = "medium" }) => {
   const sizeClasses = {
     small: {
       image: "w-5 h-5 sm:w-6 sm:h-6",
@@ -22,7 +23,7 @@ const UserAvatar = ({ username, userAvatar, createdAt, size = "medium" }) => {
       gap: "gap-4",
     },
     verySmall: {
-      image: "w-5 h-5 sm:w-6 sm:h-6",
+      image: "w-7 h-7 sm:w-6 sm:h-6",
       text: "text-xs sm:text-sm",
       date: "text-[0.7rem] ",
       gap: "gap-2",
@@ -39,10 +40,12 @@ const UserAvatar = ({ username, userAvatar, createdAt, size = "medium" }) => {
         alt={username || "User"}
         className={`${sizeClasses[size].image} rounded-full object-cover mt-1`}
       />
-      <div>
-        <h3 className={`font-semibold ${sizeClasses[size].text}`}>
-          {username}
-        </h3>
+      <div className="cursor-pointer">
+        <Link className="hover:text-blue-400" to={`/about/user/${createdBy}`}>
+          <p className={`text-sm md:text-lg font-semibold  text-[var(--grey--900)] capitalize ${sizeClasses[size].text} m-0 hover:underline `}>
+            {username}
+          </p>
+        </Link>
         <p className={`${sizeClasses[size].date} text-gray-500 mb-0`}>
           {createdAt
             ? formatDistanceToNow(new Date(createdAt), { addSuffix: true })

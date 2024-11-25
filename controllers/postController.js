@@ -1,69 +1,126 @@
 import { StatusCodes } from "http-status-codes";
 import Post from "../models/postModel.js";
-import { formatImage } from "../middleware/multer.js";
-import cloudinary from "cloudinary";
 import { BadRequestError, UnauthorizedError } from "../errors/customErors.js";
 import PostComments from "../models/postCommentsModel.js";
 import PostReplies from "../models/postReplyModel.js";
-import postModel from "../models/postModel.js";
-import postReplyModel from "../models/postReplyModel.js";
 import mongoose from "mongoose";
 import User from "../models/userModel.js";
+import { deleteFile } from '../utils/fileUtils.js';
 
 export const createPost = async (req, res) => {
   const newPost = {
-    createdBy: req.user.userId,
-    username: req.user.username,
-    userAvatar: req.user.avatar,
+    createdBy: req.user.userId,  // Only store user ID
     ...req.body,
   };
-  console.log({ req });
   if (req.file) {
-    const file = formatImage(req.file);
-    const response = await cloudinary.v2.uploader.upload(file);
-    newPost.imageUrl = response.secure_url;
-    newPost.imagePublicId = response.public_id;
+    const filepaath = `${process.env.BACKEND_URL}/public/uploads/${req.file.filename}`;
+    newPost.imageUrl = filepaath;
   }
   const post = await Post.create(newPost);
-
-  // Add post ID to user's posts array
-  await User.findByIdAndUpdate(
-    req.user.userId,
-    { $push: { posts: post._id } },
-    { new: true }
-  );
-
+  await User.findByIdAndUpdate(req.user.userId, { $push: { posts: post._id } }, { new: true });
   res.status(StatusCodes.CREATED).json({ msg: "Post uploaded successfully" });
 };
+
 export const getAllPosts = async (req, res) => {
   const posts = await Post.aggregate([
     {
-      $sort: { createdAt: -1 },
+      $match: {
+        deleted: { $ne: true }
+      }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
     },
     {
       $addFields: {
+        username: { $arrayElemAt: ["$userDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
         totalLikes: { $size: { $ifNull: ["$likes", []] } },
         totalComments: { $size: { $ifNull: ["$comments", []] } },
-      },
+      }
     },
+    {
+      $project: {
+        userDetails: 0,
+        deleted: 0,
+        __v: 0
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
   ]);
   res.status(StatusCodes.OK).json({ posts });
 };
+
+export const getAllPostsByUserId = async (req, res) => {
+  const { id: userId } = req.params;
+  const posts = await Post.aggregate([
+    {
+      $match: { createdBy: new mongoose.Types.ObjectId(userId) }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $addFields: {
+        username: { $arrayElemAt: ["$userDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
+        totalLikes: { $size: { $ifNull: ["$likes", []] } },
+        totalComments: { $size: { $ifNull: ["$comments", []] } }
+      }
+    },
+    {
+      $project: {
+        userDetails: 0,
+        __v: 0
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
+  ]);
+
+  res.status(StatusCodes.OK).json({ posts });
+};
+
 export const getPostById = async (req, res) => {
   const { id: postId } = req.params;
   const post = await Post.aggregate([
     {
-      $match: { _id: new mongoose.Types.ObjectId(postId) },
+      $match: { _id: new mongoose.Types.ObjectId(postId) }
     },
     {
-      $sort: { createdAt: -1 },
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
     },
     {
       $addFields: {
+        username: { $arrayElemAt: ["$userDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
         totalLikes: { $size: { $ifNull: ["$likes", []] } },
         totalComments: { $size: { $ifNull: ["$comments", []] } },
-      },
+      }
     },
+    {
+      $project: {
+        userDetails: 0
+      }
+    }
   ]);
   res.status(StatusCodes.OK).json({ post: post[0] });
 };
@@ -97,51 +154,81 @@ export const createPostComment = async (req, res) => {
   const { id: postId } = req.params;
   const comment = await PostComments.create({
     postId,
-    createdBy: req.user.userId,
-    username: req.user.username,
-    userAvatar: req.user.avatar,
+    createdBy: req.user.userId,  // Only store user ID
     content,
   });
   const post = await Post.findById(postId);
   post.comments.push(comment._id);
   await post.save();
+
+  // Fetch comment with current user details for response
+  const commentWithUser = await PostComments.aggregate([
+    {
+      $match: { _id: comment._id }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $addFields: {
+        username: { $arrayElemAt: ["$userDetails.username", 0] },
+        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+      }
+    },
+    {
+      $project: {
+        userDetails: 0
+      }
+    }
+  ]);
+
   res.status(StatusCodes.CREATED).json({
     message: "Comment created successfully",
-    comment,
+    comment: commentWithUser[0],
   });
 };
+
 export const getAllCommentsByPostId = async (req, res) => {
   const { id: postId } = req.params;
-  const postComments = await PostComments.find({ postId })
-    .select("-__v")
-    .sort({ createdAt: -1 }) // Sort by createdAt in descending order (newest first)
-    .lean();
+  const postComments = await PostComments.aggregate([
+    {
+      $match: { postId: new mongoose.Types.ObjectId(postId) }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $addFields: {
+        username: { $arrayElemAt: ["$userDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
+        totalReplies: { $size: { $ifNull: ["$replies", []] } },
+        totalLikes: { $size: { $ifNull: ["$likes", []] } }
+      }
+    },
+    {
+      $project: {
+        userDetails: 0,
+        __v: 0
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
+  ]);
 
-  const commentsWithReplies = postComments.map((comment) => ({
-    ...comment,
-    totalReplies: (comment.replies || []).length,
-    totalLikes: (comment.likes || []).length,
-  }));
-
-  res.status(StatusCodes.OK).json({ comments: commentsWithReplies });
+  res.status(StatusCodes.OK).json({ comments: postComments });
 };
-export const getAllPostsByUserId = async (req, res) => {
-  const { userId } = req.user;
-  const posts = await postModel
-    .find({ createdBy: userId })
-    .select("-__v")
-    .lean();
 
-  const postsWithCounts = posts.map((post) => ({
-    ...post,
-    totalLikes: (post.likes || []).length,
-    totalComments: (post.comments || []).length,
-  }));
-
-  res.status(StatusCodes.OK).json({
-    posts: postsWithCounts,
-  });
-};
 export const createReply = async (req, res) => {
   const { content } = req.body;
   const { id: parentId } = req.params;
@@ -150,53 +237,116 @@ export const createReply = async (req, res) => {
   const parentReply = await PostReplies.findById(parentId);
 
   if (!comment && !parentReply) {
-    throw new BadRequestError("Parent comment or reply not found");
+    throw new BadRequestError("Comment or reply not found");
   }
 
   const reply = await PostReplies.create({
-    commentId: comment ? comment._id : parentReply.commentId,
-    parentId: parentReply ? parentReply._id : null,
-    createdBy: req.user.userId,
-    username: req.user.username,
-    userAvatar: req.user.avatar,
     content,
-    commentUserId: comment ? comment.createdBy : parentReply.createdBy,
-    commentUsername: comment ? comment.username : parentReply.username,
-    commentUserAvatar: comment ? comment.userAvatar : parentReply.userAvatar,
+    createdBy: req.user.userId,
+    parentId,
+    replyTo: comment ? comment.createdBy : parentReply.createdBy
   });
 
   if (comment) {
     comment.replies.push(reply._id);
     await comment.save();
+  } else if (parentReply) {
+    parentReply.replies.push(reply._id);
+    await parentReply.save();
   }
+
+  // Fetch reply with current user details for response
+  const replyWithUser = await PostReplies.aggregate([
+    {
+      $match: { _id: reply._id }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "authorDetails"
+      }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "replyTo",
+        foreignField: "_id",
+        as: "replyToDetails"
+      }
+    },
+    {
+      $addFields: {
+        username: { $arrayElemAt: ["$authorDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$authorDetails.avatar", 0] },
+        commentUsername: { $arrayElemAt: ["$replyToDetails.name", 0] },
+        commentUserAvatar: { $arrayElemAt: ["$replyToDetails.avatar", 0] },
+        commentUserId: "$replyTo",
+        totalReplies: { $size: { $ifNull: ["$replies", []] } },
+        totalLikes: { $size: { $ifNull: ["$likes", []] } }
+      }
+    },
+    {
+      $project: {
+        authorDetails: 0,
+        replyToDetails: 0
+      }
+    }
+  ]);
 
   res.status(StatusCodes.CREATED).json({
     message: "Reply created successfully",
-    reply,
+    reply: replyWithUser[0],
   });
 };
+
 export const getAllRepliesByCommentId = async (req, res) => {
   const { id: commentId } = req.params;
+  const replies = await PostReplies.aggregate([
+    {
+      $match: { parentId: new mongoose.Types.ObjectId(commentId) }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "authorDetails"
+      }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "replyTo",
+        foreignField: "_id",
+        as: "replyToDetails"
+      }
+    },
+    {
+      $addFields: {
+        username: { $arrayElemAt: ["$authorDetails.name", 0] },
+        userAvatar: { $arrayElemAt: ["$authorDetails.avatar", 0] },
+        commentUsername: { $arrayElemAt: ["$replyToDetails.name", 0] },
+        commentUserAvatar: { $arrayElemAt: ["$replyToDetails.avatar", 0] },
+        commentUserId: "$replyTo",
+        totalReplies: { $size: { $ifNull: ["$replies", []] } },
+        totalLikes: { $size: { $ifNull: ["$likes", []] } }
+      }
+    },
+    {
+      $project: {
+        authorDetails: 0,
+        replyToDetails: 0,
+        __v: 0
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
+  ]);
 
-  const comment = await PostComments.findById(commentId);
-  if (!comment) {
-    throw new BadRequestError("Comment not found");
-  }
-
-  const replies = await postReplyModel
-    .find({ commentId })
-    .select("-__v")
-    .sort({ createdAt: -1 })
-    .lean();
-
-  const repliesWithCounts = replies.map((reply) => ({
-    ...reply,
-    totalLikes: (reply.likes || []).length,
-  }));
-
-  res.status(StatusCodes.OK).json({
-    replies: repliesWithCounts,
-  });
+  res.status(StatusCodes.OK).json({ replies });
 };
 
 export const deletePost = async (req, res) => {
@@ -204,36 +354,47 @@ export const deletePost = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
-  const post = await Post.findById(postId).session(session);
-  if (!post) {
-    throw new BadRequestError("Post not found");
+  try {
+    const post = await Post.findById(postId).session(session);
+    if (!post) {
+      throw new BadRequestError("Post not found");
+    }
+
+    if (post.createdBy.toString() !== req.user.userId) {
+      throw new UnauthorizedError("You are not authorized to delete this post");
+    }
+
+    // Delete the image if it exists
+    if (post.imageUrl) {
+      console.log('Deleting image:', post.imageUrl);
+      await deleteFile(post.imageUrl);
+    }
+
+    const comments = await PostComments.find({ postId }).session(session);
+
+    const commentIds = comments.map((comment) => comment._id);
+    await PostReplies.deleteMany({ parentId: { $in: commentIds } }).session(
+      session
+    );
+
+    await PostComments.deleteMany({ postId }).session(session);
+    await Post.findByIdAndDelete(postId).session(session);
+
+    await User.findByIdAndUpdate(
+      req.user.userId,
+      { $pull: { posts: postId } },
+      { session }
+    );
+
+    await session.commitTransaction();
+    res.status(StatusCodes.OK).json({ message: "Post deleted successfully" });
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
   }
-
-  if (post.createdBy.toString() !== req.user.userId) {
-    throw new UnauthorizedError("You are not authorized to delete this post");
-  }
-
-  const comments = await PostComments.find({ postId }).session(session);
-
-  const commentIds = comments.map((comment) => comment._id);
-  await PostReplies.deleteMany({ commentId: { $in: commentIds } }).session(
-    session
-  );
-
-  await PostComments.deleteMany({ postId }).session(session);
-  await Post.findByIdAndDelete(postId).session(session);
-
-  await User.findByIdAndUpdate(
-    req.user.userId,
-    { $pull: { posts: postId } },
-    { session }
-  );
-
-  await session.commitTransaction();
-
-  res.status(StatusCodes.OK).json({ message: "Post deleted successfully" });
-
-  session.endSession();
 };
 
 export const deletePostComment = async (req, res) => {
@@ -256,7 +417,7 @@ export const deletePostComment = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
-  await PostReplies.deleteMany({ commentId }).session(session);
+  await PostReplies.deleteMany({ parentId: commentId }).session(session);
 
   // Delete the comment itself
   await PostComments.findByIdAndDelete(commentId).session(session);
@@ -273,6 +434,7 @@ export const deletePostComment = async (req, res) => {
     .json({ message: "Comment and associated replies deleted successfully" });
   session.endSession();
 };
+
 export const deletePostCommentReply = async (req, res) => {
   const { id: replyId } = req.params;
   const reply = await PostReplies.findById(replyId);
@@ -291,7 +453,7 @@ export const deletePostCommentReply = async (req, res) => {
 
   // Remove reply from comment's replies array
   await PostComments.findByIdAndUpdate(
-    reply.commentId,
+    reply.parentId,
     { $pull: { replies: replyId } },
     { session }
   );
@@ -300,6 +462,7 @@ export const deletePostCommentReply = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: "Reply deleted successfully" });
   session.endSession();
 };
+
 export const likePostComment = async (req, res) => {
   const { id: commentId } = req.params;
   const userId = req.user.userId;
@@ -330,6 +493,7 @@ export const likePostComment = async (req, res) => {
     comment: updatedComment,
   });
 };
+
 export const likePostCommentReply = async (req, res) => {
   const { id: replyId } = req.params;
   const userId = req.user.userId;

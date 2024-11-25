@@ -33,7 +33,7 @@ const OurStory = () => {
               </Link>
             </div>
             <h2
-              className=" font-bold text-[1.6rem] md:text-[2.5rem] lg:text-[3rem] sm:leading-[3.5rem]"
+              className=" font-extrabold text-[1.6rem] md:text-[2.5rem] sm:leading-[3.5rem]"
               data-aos="fade-up"
             >
               {" "}

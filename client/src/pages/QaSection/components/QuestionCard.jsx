@@ -9,8 +9,6 @@ import Answer from "./Answer";
 import { Link } from "react-router-dom";
 
 const QuestionCard = ({ question }) => {
-  console.log({ question });
-
   const { user } = useUser();
   const {
     _id,
@@ -38,6 +36,7 @@ const QuestionCard = ({ question }) => {
     <div className="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-100">
       <div className="flex items-center justify-between mb-5">
         <UserAvatar
+          createdBy={author?.userId}
           username={author?.username}
           userAvatar={author?.userAvatar}
           createdAt={createdAt}
@@ -53,10 +52,10 @@ const QuestionCard = ({ question }) => {
       </div>
 
       <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-2 text-gray-800 hover:text-blue-600 transition-colors duration-200">
+        <h3 className="text-base md:text-xl mb-2 font-bold text-[var(--grey--900)] hover:text-[var(--ternery)] transition-colors duration-200">
           {questionText}
-        </h2>
-        <p className="text-gray-600 mb-2 leading-relaxed">{context}</p>
+        </h3>
+        <p className="text-base mb-2 leading-relaxed text-[var(--grey--800)]">{context}</p>
         <div className="flex flex-wrap gap-2 mb-4">
           {tags?.map((tag, index) => (
             <span

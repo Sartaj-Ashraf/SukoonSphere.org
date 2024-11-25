@@ -19,7 +19,6 @@ const AllQuestionAnswers = () => {
   const fetchAnswers = async () => {
     try {
       const { data } = await customFetch.get(`qa-section/question/${id}/answers`);
-      console.log({ data });
       setAnswers(data.answers);
       setQuestion(data.question);
     } catch (error) {
@@ -39,14 +38,13 @@ const AllQuestionAnswers = () => {
   };
   useEffect(() => {
     fetchAnswers()
-
   }, [id]);
-  console.log({ answers });
   return (
     <div className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 mb-3 border border-gray-100">
       {/* question  */}
       <div className="flex items-center justify-between mb-3">
         <UserAvatar
+          createdBy={question?.author?.userId}
           username={question?.author?.username}
           userAvatar={question?.author?.userAvatar}
           createdAt={question?.createdAt}
@@ -62,12 +60,10 @@ const AllQuestionAnswers = () => {
         </div>
       </div>
       <div className="mb-4">
-        <h2 className="text-2xl font-bold mb-2 text-gray-800 hover:text-blue-600 transition-colors duration-200">
+        <h3 className="text-base md:text-xl mb-2 font-bold text-[var(--grey--900)] hover:text-[var(--ternery)] transition-colors duration-20">
           {question?.questionText}
-        </h2>
-        <p className="text-gray-600 mb-3 leading-relaxed">
-          {question?.context}
-        </p>
+        </h3>
+        <p className="text-base mb-2 leading-relaxed text-[var(--grey--800)]">{question?.context}</p>
         <div className="flex flex-wrap gap-2 mb-2">
           {question?.tags?.map((tag, index) => (
             <span

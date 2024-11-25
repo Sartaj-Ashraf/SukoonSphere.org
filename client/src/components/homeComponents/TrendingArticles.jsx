@@ -6,10 +6,10 @@ import { Link } from "react-router-dom";
 import { articles } from "@/utils/Articles";
 import MiniArticle from "./MiniArticle";
 
-const  TrendingAricles =()=> {
-const SpotlightArticle = articles.reduce((max, article) => {
-  return article.views > max.views ? article : max;
-}, articles[0])
+const TrendingAricles = () => {
+  const SpotlightArticle = articles.reduce((max, article) => {
+    return article.views > max.views ? article : max;
+  }, articles[0])
 
   return (
     <div className="max-w-7xl mx-auto ">
@@ -29,8 +29,8 @@ const SpotlightArticle = articles.reduce((max, article) => {
               ))}
             </div>
           </div>
-          
-          <div className="rounded-md bg-[var(--blue-color)] text-white flex flex-col gap-4"  data-aos="fade-left">
+
+          <div className="rounded-md bg-[var(--blue-color)] text-white flex flex-col gap-4" data-aos="fade-left">
             <img
               className="h-96 object-cover"
               src={SpotlightArticle.image}

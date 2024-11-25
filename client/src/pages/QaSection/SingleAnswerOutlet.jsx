@@ -17,13 +17,26 @@ export const SingleAnswerOutletloader = async ({ params }) => {
     return { error: error.response.data.msg };
   }
 };
+
 const SingleAnswerOutlet = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const { answer, question } = useLoaderData();
+  const { answer, question, error } = useLoaderData();
+  
+  // Handle error state
+  if (error) {
+    return <div className="text-red-500 p-4">{error}</div>;
+  }
+  
+  // Handle loading/undefined state
+  if (!answer || !question) {
+    return <div className="p-4">Loading...</div>;
+  }
+
   const [totalComments, setTotalComments] = useState(answer.totalComments || 0);
   answer.totalComments = totalComments;
+
   const handleDeleteQuestion = async () => {
     try {
       await customFetch.delete(`/qa-section/question/${question._id}`);
@@ -33,6 +46,7 @@ const SingleAnswerOutlet = () => {
       console.log(error);
     }
   };
+
   return (
     <div className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 mb-6 border border-gray-100">
       {/* question  */}
@@ -83,4 +97,5 @@ const SingleAnswerOutlet = () => {
     </div>
   );
 };
+
 export default SingleAnswerOutlet;

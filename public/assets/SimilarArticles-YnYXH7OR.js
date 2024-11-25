@@ -1,0 +1,1 @@
+import{j as s,S as a}from"./index-CG4Wj8KP.js";const i=({title:r})=>s.jsxs("div",{className:"card grid ",children:[s.jsx("h1",{className:"card-title text-black",children:r}),s.jsx(a,{}),s.jsx("div",{className:"grid"})]});export{i as default};

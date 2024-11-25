@@ -47,11 +47,13 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
 
     setShowReplyForm(!showReplyForm);
   };
+  console.log({ reply: reply })
 
   return (
     <div key={reply._id} className="flex flex-col gap-3 reply-container">
       <div className="flex justify-between items-start">
         <UserAvatar
+          createdBy={reply.createdBy}
           username={reply.username}
           userAvatar={reply.userAvatar}
           createdAt={reply.createdAt}
@@ -64,7 +66,7 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
 
       <div className="ml-13">
         <div className="bg-gray-50 p-1 rounded-[10px]">
-          <Link className="text-blue-500" to={`/profile/${reply.createdBy}`}>@{reply.commentUsername}</Link>
+          <Link className="text-blue-500" to={`/about/user/${reply.commentUserId}`}>@{reply.commentUsername}</Link>
           <span className="text-gray-800">&nbsp; &nbsp;{reply.content}</span>
         </div>
 

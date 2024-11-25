@@ -1,5 +1,3 @@
-
-
 export const TAGS = {
   ANXIETY: "anxiety",
   DEPRESSION: "depression",

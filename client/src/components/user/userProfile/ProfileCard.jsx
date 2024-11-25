@@ -1,24 +1,68 @@
 import { useUser } from '@/context/UserContext';
 import UserProfileModel from '../modals/UserProfileModel';
-import { useState } from 'react';
-import { FaEdit, FaHeart, FaComment, FaBookmark, FaQuestion } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+import { FaBookmark, FaQuestion, FaUserPlus, FaUserMinus, FaEdit } from 'react-icons/fa';
 import { FcAnswers } from "react-icons/fc";
-const ProfileCard = () => {
+import { toast } from 'react-toastify';
+import customFetch from '@/utils/customFetch';
+import { useParams, Link } from 'react-router-dom';
+
+const ProfileCard = ({ user, fetchUserById }) => {
+    const { id: paramsId } = useParams();
+    const { updateUser, user: currentUser } = useUser();
     const [showModal, setShowModal] = useState(false);
-    const { user, updateUser } = useUser();
-    console.log({ user });
+    const [isFollowing, setIsFollowing] = useState(user?.followers?.includes(currentUser?._id));
+    const [showTooltip, setShowTooltip] = useState(false);
+
+    const isOwnProfile = currentUser?._id === user?._id;
 
     const handleProfileUpdate = async (formData) => {
         try {
-            const reponse = await updateUser(formData);
-            if (reponse.success) {
+            const response = await updateUser(formData);
+            if (response.success) {
                 setShowModal(false);
+                // Refresh user data after successful update
+                fetchUserById();
+                toast.success('Profile updated successfully!');
             }
         } catch (error) {
-            console.log({ error });
+            console.error('Profile update error:', error);
+            toast.error(error.response?.data?.message || 'Failed to update profile');
         }
     };
 
+    const handleFollowUnfollow = async () => {
+        if (isOwnProfile) return; // Prevent self-following
+
+        try {
+            const { data } = await customFetch.patch(`user/follow/${user?._id}`);
+            if (data.success) {
+                setIsFollowing(data.isFollowing);
+                // Update the followers count in the user object
+                const updatedUser = {
+                    ...user,
+                    followers: isFollowing 
+                        ? user.followers.filter(id => id !== currentUser._id)
+                        : [...user.followers, currentUser._id]
+                };
+                // Call fetchUserById to refresh the user data
+                await fetchUserById();
+                toast.success(data.isFollowing ? 'Followed successfully' : 'Unfollowed successfully');
+            }
+        } catch (error) {
+            console.error('Error following/unfollowing user:', error);
+            toast.error(error.response?.data?.msg || 'Something went wrong. Please try again.');
+        }
+    };
+
+    useEffect(() => {
+        // Update isFollowing state whenever user or currentUser changes
+        if (user?.followers && currentUser?._id) {
+            setIsFollowing(user.followers.includes(currentUser._id));
+        }
+    }, [user?.followers, currentUser?._id]);
+
+    console.log({ user, currentUser, paramsId })
     return (
         <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 max-w-7xl mx-auto">
             <div className="relative h-32 rounded-t-2xl overflow-hidden">
@@ -39,30 +83,73 @@ const ProfileCard = () => {
                                 alt="Profile"
                                 className="rounded-full w-24 h-24 border-4 border-white shadow-lg object-cover transform hover:scale-105 transition-transform duration-300"
                             />
+                            {isOwnProfile ? (
+                                <button
+                                    onClick={() => setShowModal(true)}
+                                    className="absolute bottom-0 right-0 bg-[var(--ternery)] text-white p-2 rounded-full shadow-lg hover:bg-[var(--secondary)] transition-colors duration-300"
+                                >
+                                    <FaEdit className="h-4 w-4" />
+                                </button>
+                            ) : (
+                                <div className="absolute bottom-0 right-0">
+                                    <button
+                                        onClick={handleFollowUnfollow}
+                                        onMouseEnter={() => setShowTooltip(true)}
+                                        onMouseLeave={() => setShowTooltip(false)}
+                                        className={`p-2 rounded-full shadow-lg ${
+                                            isFollowing
+                                                ? 'bg-gray-200 text-gray-800 hover:bg-red-100 hover:text-red-600'
+                                                : 'bg-[var(--ternery)] text-white hover:bg-[var(--secondary)]'
+                                        } transition-all duration-300`}
+                                    >
+                                        {isFollowing ? (
+                                            <FaUserMinus className="h-4 w-4" />
+                                        ) : (
+                                            <FaUserPlus className="h-4 w-4" />
+                                        )}
+                                    </button>
+                                    {showTooltip && (
+                                        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-50">
+                                            {isFollowing ? 'Unfollow' : 'Follow'}
+                                            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-gray-800"></div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
-                    <h1 className="text-2xl font-bold mt-2 text-gray-800 hover:text-[var(--ternery)] transition-colors duration-300">
-                        {user?.name || 'Anonymous'}
-                    </h1>
-                    <p className="text-sm text-gray-500 font-medium hover:text-gray-700 transition-colors duration-300">
-                        @{user?.name?.toLowerCase().replace(/\s+/g, '_') || 'anonymous'}
-                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                        <h1 className="text-2xl font-bold text-gray-800 hover:text-[var(--ternery)] transition-colors duration-300">
+                            {user?.name || 'Anonymous'}
+                        </h1>
+                    </div>
+                    {!isOwnProfile && (
+                        <p className="text-sm text-gray-500 font-medium hover:text-gray-700 transition-colors duration-300">
+                            {isFollowing ? 'Following' : 'Not Following'}
+                        </p>
+                    )}
                 </div>
 
                 {/* Stats Row */}
                 <div className="flex justify-center space-x-8 mt-4 border-y border-gray-100 py-3">
                     <div className="text-center group cursor-pointer">
-                        <div className="font-bold text-gray-800 group-hover:text-[var(--ternery)] transition-colors duration-300">{user?.posts?.length || 0}</div>
+                        <div className="font-bold text-gray-800 group-hover:text-[var(--ternery)] transition-colors duration-300">
+                            {user?.posts?.length || 0}
+                        </div>
                         <div className="text-sm text-gray-500 group-hover:text-gray-700 transition-colors duration-300">Posts</div>
                     </div>
-                    <div className="text-center group cursor-pointer">
-                        <div className="font-bold text-gray-800 group-hover:text-[var(--ternery)] transition-colors duration-300">{user?.followers?.length || 0}</div>
+                    <Link to={`/user/${user?._id}/followers`} className="text-center group cursor-pointer">
+                        <div className="font-bold text-gray-800 group-hover:text-[var(--ternery)] transition-colors duration-300">
+                            {user?.followers?.length || 0}
+                        </div>
                         <div className="text-sm text-gray-500 group-hover:text-gray-700 transition-colors duration-300">Followers</div>
-                    </div>
-                    <div className="text-center group cursor-pointer">
-                        <div className="font-bold text-gray-800 group-hover:text-[var(--ternery)] transition-colors duration-300">{user?.following?.length || 0}</div>
+                    </Link>
+                    <Link to={`/user/${user?._id}/following`} className="text-center group cursor-pointer">
+                        <div className="font-bold text-gray-800 group-hover:text-[var(--ternery)] transition-colors duration-300">
+                            {user?.following?.length || 0}
+                        </div>
                         <div className="text-sm text-gray-500 group-hover:text-gray-700 transition-colors duration-300">Following</div>
-                    </div>
+                    </Link>
                 </div>
 
                 {/* Engagement Stats */}
@@ -85,9 +172,8 @@ const ProfileCard = () => {
                         </div>
                     )}
                 </div>
-
             </div>
-            {/* {showModal && <UserProfileModel onClose={() => setShowModal(false)} user={user} handleProfileUpdate={handleProfileUpdate} />} */}
+            {showModal && <UserProfileModel onClose={() => setShowModal(false)} user={user} handleProfileUpdate={handleProfileUpdate} />}
         </div>
     );
 };

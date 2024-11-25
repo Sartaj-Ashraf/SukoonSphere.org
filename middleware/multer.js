@@ -1,23 +1,17 @@
 // import multer from "multer"
 // import DataParser from "datauri/parser.js"
 // import path from "path"
-
 // const storage =multer.memoryStorage()
-
 // const upload = multer({storage})
-
 // const parser = new DataParser()
-
-
 // export default upload
+
 import multer from "multer";
 import path from "path";
-//USING THIS WHERE WE NEED TO SAVE IMAGES TO CLOUDINARY
 export const formatImage = (file) => {
   const fileExtention = path.extname(file.originalname).toString();
   return parser.format(fileExtention, file.buffer).content;
 };
-//USING THIS WHERE WE NEED TO SAVE IMAGES TO THE SERVER
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "public/uploads"); // Save files to public/uploads

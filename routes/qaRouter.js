@@ -9,7 +9,7 @@ import {
   deleteAnswerComment,
   deleteAnswerReply,
   deleteQuestion,
-  getAllAnswerRepliesBYCommentId,
+  getAllAnswerRepliesByCommentId,
   getAllCommentsByAnswerId,
   getAllQuestions,
   getAllQuestionsWithAnswer,
@@ -57,7 +57,7 @@ router.post(
 router.get(
   "/answer/comments/:id/replies",
   validateIdParam,
-  getAllAnswerRepliesBYCommentId
+  getAllAnswerRepliesByCommentId
 );
 
 // answer routes
