@@ -136,32 +136,32 @@ const Articles = () => {
                     </div>
                   )}
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link 
-                    className="btn-3 inline-flex items-center gap-1 px-2 py-1 text-sm " 
-                    to={`/articles/article/${article._id}`}
-                  >
-                    <FiEye className="w-3.5 h-3.5" />
-                    Preview
-                  </Link>
-                  <button
-                    onClick={() => handlePublishArticle(article._id)}
-                    className="btn-2 inline-flex items-center gap-1 px-2 py-1 text-sm bg-green-50 text-green-600 "
-                  >
-                    <FiCheck className="w-3.5 h-3.5" />
-                    Publish
-                  </button>
-                  <button
-                    onClick={() => {
-                      setArticleId(article._id);
-                      setShowDeleteArticleModal(true);
-                    }}
-                    className="btn-red inline-flex items-center gap-1 px-2 py-1 text-sm"
-                  >
-                    <FiTrash2 className="w-3.5 h-3.5" />
-                    Delete
-                  </button>
-                </div>
+              </div>
+              <div className="flex flex-wrap items-center justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
+                <Link 
+                  className="btn-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm" 
+                  to={`/articles/article/${article._id}`}
+                >
+                  <FiEye className="w-4 h-4" />
+                  Preview
+                </Link>
+                <button
+                  onClick={() => handlePublishArticle(article._id)}
+                  className="btn-2 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-50 text-green-600"
+                >
+                  <FiCheck className="w-4 h-4" />
+                  Publish
+                </button>
+                <button
+                  onClick={() => {
+                    setArticleId(article._id);
+                    setShowDeleteArticleModal(true);
+                  }}
+                  className="btn-red inline-flex items-center gap-1.5 px-3 py-1.5 text-sm"
+                >
+                  <FiTrash2 className="w-4 h-4" />
+                  Delete
+                </button>
               </div>
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <div className="flex flex-wrap gap-2">
@@ -221,25 +221,25 @@ const Articles = () => {
                     </div>
                   )}
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link 
-                    className="btn-3 inline-flex items-center gap-1  text-sm " 
-                    to={`/articles/article/${article._id}`}
-                  >
-                    <FiEye className="w-3.5 h-3.5" />
-                    Preview
-                  </Link>
-                  <button
-                    onClick={() => {
-                      setArticleId(article._id);
-                      setShowDeleteArticleModal(true);
-                    }}
-                    className="btn-red inline-flex items-center gap-1 px-2 py-1 text-sm"
-                  >
-                    <FiTrash2 className="w-3.5 h-3.5" />
-                    Delete
-                  </button>
-                </div>
+              </div>
+              <div className="flex flex-wrap items-center justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
+                <Link 
+                  className="btn-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm" 
+                  to={`/articles/article/${article._id}`}
+                >
+                  <FiEye className="w-4 h-4" />
+                  Preview
+                </Link>
+                <button
+                  onClick={() => {
+                    setArticleId(article._id);
+                    setShowDeleteArticleModal(true);
+                  }}
+                  className="btn-red inline-flex items-center gap-1.5 px-3 py-1.5 text-sm"
+                >
+                  <FiTrash2 className="w-4 h-4" />
+                  Delete
+                </button>
               </div>
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <div className="flex flex-wrap gap-2">
@@ -262,10 +262,9 @@ const Articles = () => {
       )}
 
       {showModal && (
-        <CreateArticleModel
-          showModal={showModal}
-          setShowModal={setShowModal}
-          fetchArticles={fetchArticles}
+        <CreateArticleModel 
+          setShowModal={setShowModal} 
+          onArticleCreated={fetchArticles}
         />
       )}
 

@@ -1,0 +1,84 @@
+.page {
+  padding: 20px;
+  background-color: #fafafa;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.page.page-cover {
+  background: linear-gradient(145deg, #2c3e50 0%, #3498db 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: none;
+}
+
+.page-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.cover-content {
+  max-width: 90%;
+}
+
+.front-cover, .back-cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.cover-logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 2rem;
+}
+
+.author-info {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+}
+
+.contact-info {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+  text-align: center;
+}
+
+/* Hide overflow to prevent duplicate pages */
+.react-pdf__Document {
+  overflow: hidden;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .page-content {
+    padding: 1rem;
+  }
+
+  .cover-logo {
+    width: 80px;
+  }
+
+  .front-cover h1 {
+    font-size: 1.5rem;
+  }
+
+  .back-cover h2 {
+    font-size: 1.25rem;
+  }
+}

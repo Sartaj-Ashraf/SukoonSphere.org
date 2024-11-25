@@ -4,10 +4,12 @@ const ArticleSchema = new mongoose.Schema(
   {
     title: {
       type: String,
+      required: true,
     },
     views: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: [],
     },
     deleted: {
       default: false,
@@ -15,10 +17,12 @@ const ArticleSchema = new mongoose.Schema(
     },
     author: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
+      required: true,
     },
     pdfPath: {
       type: String,
+      required: true,
     },
     status: {
       type: String,

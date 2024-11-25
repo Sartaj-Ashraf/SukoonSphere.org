@@ -42,6 +42,7 @@ const UserProfileModel = ({ onClose, user, handleProfileUpdate }) => {
                             </label>
                             <input
                                 name="name"
+                                required
                                 className="bg-[var(--white-color)] w-full px-4 py-3 rounded-[10px] border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none min-h-[80px] "
                                 placeholder="Enter new name..."
                                 defaultValue={user?.name}
