@@ -2,9 +2,8 @@ import bg_hero from "../../assets/images/bg-mind-img.png";
 import { Link } from "react-router-dom";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import "../../assets/styles/global.css";
-import bgImg from "../../assets/images/teams-bg.png";
-
 import "../../index.css";
+import bgImg from "../../assets/images/teams-bg.png";
 
 const TopIntro = () => {
   return (
@@ -32,7 +31,7 @@ const TopIntro = () => {
           </div>
 
           {/* Main Heading */}
-          <h2 className="text-[1.9rem] md:text-[2.5rem] lg:text-[3.5rem] sm:leading-[4rem] mb-4 font-extrabold text-[var(--grey--900)] ">
+          <h2 className="text-[2rem] md:text-[2.5rem] lg:text-[3.5rem] sm:leading-[4rem] mb-4 font-extrabold text-[var(--grey--900)] ">
             Empowering you to Heal, Grow, and Thrive
           </h2>
 

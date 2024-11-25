@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BsPersonPlus, BsPersonDash } from 'react-icons/bs';
-import { useUser } from '@/context/userContext';
+import { useUser } from '@/context/UserContext';
 import '../../assets/styles/global.css';
 
 const Follow = ({ isFollowed = false, userId, followers = [], onFollow, onError }) => {

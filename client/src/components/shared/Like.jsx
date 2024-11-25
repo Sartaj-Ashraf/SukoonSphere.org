@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaHeart } from "react-icons/fa";
-import { useUser } from '@/context/userContext';
+import { useUser } from '@/context/UserContext';
 import '../../assets/styles/global.css';
 
 const Like = ({ totalLikes = 0, id, likes = [], onLike, onError, }) => {

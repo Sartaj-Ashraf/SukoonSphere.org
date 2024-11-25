@@ -26,18 +26,18 @@ const Articles = () => {
   const handleSearch = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    
+
     // Clear existing timeout
     if (searchTimeout) clearTimeout(searchTimeout);
-    
+
     // Set new timeout for debouncing
     const timeout = setTimeout(() => {
       fetchArticles(query);
     }, 500);
-    
+
     setSearchTimeout(timeout);
   };
-  console.log({articles})
+  console.log({ articles })
 
   useEffect(() => {
     fetchArticles();
@@ -51,7 +51,7 @@ const Articles = () => {
   }
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-sm max-w-7xl mx-auto">
+    <div className="p-6 rounded-xl shadow-sm max-w-7xl mx-auto">
       {/* Search Bar */}
       <div className="mb-8">
         <div className="relative max-w-md mx-auto">
@@ -82,7 +82,7 @@ const Articles = () => {
             {searchQuery ? 'No matching articles found' : 'No articles yet'}
           </h2>
           <p className="text-gray-500 max-w-md mx-auto">
-            {searchQuery 
+            {searchQuery
               ? 'Try searching with different keywords'
               : 'Be the first to contribute!'}
           </p>
@@ -90,8 +90,8 @@ const Articles = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {articles.map((article) => (
-            <Link 
-              key={article._id} 
+            <Link
+              key={article._id}
               to={`/articles/article/${article._id}`}
               className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group"
             >
@@ -111,7 +111,7 @@ const Articles = () => {
                 <h2 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-blue-500 transition-colors line-clamp-2">
                   {article?.title}
                 </h2>
-                
+
                 {/* Footer with Views */}
                 <div className="flex items-center justify-end text-sm text-gray-500">
                   <div className="flex items-center gap-1">

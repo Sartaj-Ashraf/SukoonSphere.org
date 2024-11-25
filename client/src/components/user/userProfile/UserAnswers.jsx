@@ -9,7 +9,7 @@ import UserAvatar from '@/components/shared/UserAvatar';
 
 const UserAnswers = () => {
     const user = useOutletContext();
-    const {user:loggedUser} = useUser();
+    const { user: loggedUser } = useUser();
     const [answers, setAnswers] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -26,6 +26,7 @@ const UserAnswers = () => {
         }
     };
 
+
     useEffect(() => {
         fetchUserAnswers();
     }, [user._id]);
@@ -33,7 +34,7 @@ const UserAnswers = () => {
     const handleDelete = async () => {
         setIsDeleting(true);
         try {
-            await customFetch.delete(`/qa-section/answers/${selectedAnswerId}`);
+            await customFetch.delete(`/qa-section/question/answer/${selectedAnswerId}`);
             setAnswers(answers.filter(answer => answer._id !== selectedAnswerId));
             setShowDeleteModal(false);
         } catch (error) {
@@ -42,11 +43,11 @@ const UserAnswers = () => {
         setIsDeleting(false);
     };
 
-    const filteredAnswers = answers.filter(answer => 
+    const filteredAnswers = answers.filter(answer =>
         (answer.answerText?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
         (answer.question?.questionText?.toLowerCase() || '').includes(searchQuery.toLowerCase())
     );
-    console.log({answers})
+    console.log({ answers })
 
     return (
         <div className="p-6 bg-white rounded-xl shadow-sm">
@@ -83,7 +84,7 @@ const UserAnswers = () => {
                         {searchQuery ? 'No matching answers found' : 'No answers yet'}
                     </h2>
                     <p className="text-gray-500 max-w-md mx-auto">
-                        {searchQuery 
+                        {searchQuery
                             ? 'Try searching with different keywords'
                             : 'Share your knowledge by answering questions!'}
                     </p>
@@ -163,7 +164,7 @@ const UserAnswers = () => {
             {showDeleteModal && (
                 <DeleteModal
                     isOpen={showDeleteModal}
-                    closeModal={() => setShowDeleteModal(false)}
+                    onClose={() => setShowDeleteModal(false)}
                     onDelete={handleDelete}
                     isDeleting={isDeleting}
                     title="Delete Answer"

@@ -4,7 +4,7 @@ import DeleteModal from "../DeleteModal";
 import { Form, Link } from "react-router-dom";
 import { FaRegHeart, FaReply } from "react-icons/fa";
 import { useState } from "react";
-import { useUser } from "@/context/userContext";
+import { useUser } from "@/context/UserContext";
 import { toast } from "react-toastify";
 const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
   const { user } = useUser();

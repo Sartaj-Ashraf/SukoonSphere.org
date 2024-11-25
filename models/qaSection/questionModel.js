@@ -9,6 +9,7 @@ const questionSchema = new mongoose.Schema(
     context: {
       type: String,
     },
+
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
