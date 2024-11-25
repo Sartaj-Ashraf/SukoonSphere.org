@@ -51,14 +51,14 @@ const UserProfile = () => {
                     {/* Profile Card Section */}
                     <div className="md:col-span-3">
                         <div className="lg:sticky top-[80px] transition-all duration-300 hover:shadow-lg rounded-2xl">
-                            <ProfileCard user={user} />
+                            <ProfileCard fetchUserById={fetchUserById} user={user} />
                         </div>
                     </div>
 
                     {/* Main Content Section */}
                     <div className='md:col-span-9'>
                         <div className='bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-4 lg:p-6'>
-                            <ProfileDetails user={user} />
+                            <ProfileDetails  user={user} />
                         </div>
                     </div>
                 </div>

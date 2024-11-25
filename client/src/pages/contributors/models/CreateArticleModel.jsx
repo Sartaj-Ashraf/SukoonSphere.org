@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { FaFilePdf, FaTimesCircle, FaCheckCircle } from "react-icons/fa";
 import customFetch from "../../../utils/customFetch";
 
-const CreateArticleModel = ({ setShowModal }) => {
+const CreateArticleModel = ({ setShowModal, onArticleCreated }) => {
   const [title, setTitle] = useState("");
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfPreview, setPdfPreview] = useState(null);
@@ -38,6 +38,10 @@ const CreateArticleModel = ({ setShowModal }) => {
       const response = await customFetch.post("/articles/upload-pdf", formData);
       toast.success("Article created successfully!");
       setShowModal(false);
+      // Call the callback to refresh articles
+      if (onArticleCreated) {
+        onArticleCreated();
+      }
     } catch (error) {
       console.error("Error creating article:", error);
       toast.error(error?.response?.data?.error || "Error creating article");

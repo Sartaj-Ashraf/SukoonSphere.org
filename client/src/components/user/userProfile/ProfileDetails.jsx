@@ -26,13 +26,13 @@ const ProfileDetails = ({ user }) => {
         )}
 
         <RenderProfileLinks  name="Post" link="." />
-        <RenderProfileLinks name="Questions" link={`/about/user/${user._id}/questions`} />
-        <RenderProfileLinks name="Answers" link={`/about/user/${user._id}/answers`} />
-        <RenderProfileLinks name="Followers" link={`/about/user/${user._id}/followers`} />
-        <RenderProfileLinks name="Following" link={`/about/user/${user._id}/following`} />
+        <RenderProfileLinks name="Questions" link="questions" />
+        <RenderProfileLinks name="Answers" link="answers" />
+        <RenderProfileLinks name="Followers" link="followers" />
+        <RenderProfileLinks name="Following" link="following" />
       </div>
       <div className="mt-4">
-        <Outlet context={user} />
+        <Outlet  context={user} />
       </div>
     </>
   );

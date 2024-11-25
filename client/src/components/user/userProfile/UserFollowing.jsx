@@ -1,93 +1,146 @@
-import React from 'react';
+import React, { useState } from 'react';
 import customFetch from '@/utils/customFetch';
-import { useLoaderData, useParams } from 'react-router-dom';
+import { useLoaderData, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useUser } from '@/context/UserContext';
+import { FaUserPlus, FaUserMinus, FaSearch } from 'react-icons/fa';
 
 export const userFollowingLoader = async ({ params }) => {
     try {
         const { data } = await customFetch.get(`/user/following/${params.id}`);
-        console.log('Following Response:', data);
         return data;
     } catch (error) {
         console.error('Error fetching following:', error);
-        toast.error(error.response?.data?.msg || 'Error fetching following users');
-        return { following: [] };
+        toast.error(error.response?.data?.msg || 'Error fetching following');
+        return { success: false, following: [] };
     }
 };
 
 const UserFollowing = () => {
-    const { id } = useParams(); // Get the user ID from URL params
-    const { following = [] } = useLoaderData() || {};
-    const { user } = useUser();
+    const data = useLoaderData();
+    const { user: currentUser } = useUser();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isLoading, setIsLoading] = useState({});
+    
+    const following = data?.following || [];
 
-    console.log('Component following:', following);
+    const handleFollowUnfollow = async (userId) => {
+        if (isLoading[userId]) return;
+        
+        try {
+            setIsLoading(prev => ({ ...prev, [userId]: true }));
+            const { data } = await customFetch.patch(`user/follow/${userId}`);
+            if (data.success) {
+                toast.success(data.isFollowing ? 'Followed successfully' : 'Unfollowed successfully');
+                window.location.reload();
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.msg || 'Something went wrong. Please try again.');
+        } finally {
+            setIsLoading(prev => ({ ...prev, [userId]: false }));
+        }
+    };
 
-    if (!Array.isArray(following) || following.length === 0) {
+    const filteredFollowing = following.filter(user => 
+        user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    if (!Array.isArray(following)) {
         return (
-            <div className="text-center py-8">
-                <h2 className="text-xl font-semibold text-gray-700">Not following anyone yet</h2>
-                <p className="text-gray-500 mt-2">Start following other users to see their updates!</p>
+            <div className="text-center py-12 px-4">
+                <h2 className="text-xl font-semibold text-gray-700">Unable to load following</h2>
+                <p className="text-gray-500 mt-2">Please refresh the page to try again</p>
             </div>
         );
     }
 
-    const handleFollowToggle = async (targetUserId) => {
-        try {
-            const response = await customFetch.patch(`/user/follow/${targetUserId}`);
-            if (response.data.success) {
-                toast.success(response.data.isFollowing ? 'User followed!' : 'User unfollowed');
-                // Refresh the data without full page reload
-                window.location.reload();
-            }
-        } catch (error) {
-            console.error('Follow toggle error:', error);
-            toast.error(error.response?.data?.msg || 'Error updating follow status');
-        }
-    };
-
     return (
-        <div className="p-4">
-            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Following</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {following.map((followedUser) => (
-                    <div key={followedUser._id} className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-300">
-                        <div className="flex items-center space-x-4">
-                            <img
-                                src={followedUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(followedUser.name)}&background=random`}
-                                alt={followedUser.name}
-                                className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
-                            />
-                            <div className="flex-1">
-                                <h3 className="font-semibold text-lg text-gray-800">{followedUser.name}</h3>
-                                <p className="text-gray-500 text-sm">{followedUser.email}</p>
-                                <div className="flex space-x-4 mt-2 text-sm text-gray-600">
-                                    <div className="flex items-center">
-                                        <span className="font-medium">{followedUser.totalFollowers}</span>
-                                        <span className="ml-1">followers</span>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <span className="font-medium">{followedUser.totalFollowing}</span>
-                                        <span className="ml-1">following</span>
+        <div className="p-6 bg-white rounded-xl shadow-sm">
+            {/* Search Bar */}
+            <div className="mb-8">
+                <div className="relative max-w-md mx-auto">
+                    <input
+                        type="text"
+                        placeholder="Search following by name..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full px-5 py-3 pl-12 text-gray-700 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+                    />
+                    <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
+                </div>
+            </div>
+
+            {/* Following Count */}
+            <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-bold text-gray-800">
+                    Following <span className="text-blue-500 ml-2">{filteredFollowing.length}</span>
+                </h2>
+            </div>
+
+            {/* Following Grid */}
+            {filteredFollowing.length === 0 ? (
+                <div className="text-center py-12 px-4">
+                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <FaUserPlus className="w-10 h-10 text-gray-400" />
+                    </div>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-2">
+                        {searchQuery ? 'No matching users found' : 'Not following anyone yet'}
+                    </h2>
+                    <p className="text-gray-500 max-w-md mx-auto">
+                        {searchQuery 
+                            ? 'Try searching with a different name'
+                            : 'Explore and follow other users to see their updates!'}
+                    </p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 gap-4">
+                    {filteredFollowing.map((following) => (
+                        <div 
+                            key={following._id} 
+                            className="bg-white rounded-xl border border-gray-100 p-4 hover:shadow-lg transition-all duration-300"
+                        >
+                            <div className="flex items-start gap-3">
+                                <Link 
+                                    to={`/about/user/${following._id}`} 
+                                    className="flex-shrink-0 group"
+                                >
+                                    <img
+                                        src={following.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(following.name || 'User')}&background=random`}
+                                        alt={following.name || 'User'}
+                                        className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 group-hover:border-blue-500 transition-colors duration-300"
+                                    />
+                                </Link>
+                                <div className="min-w-0 flex-1">
+                                    <Link 
+                                        to={`/about/user/${following._id}`} 
+                                        className="block group"
+                                    >
+                                        <h3 className="font-semibold text-base text-gray-900 truncate group-hover:text-blue-600 transition-colors duration-300">
+                                            {following.name || 'Anonymous User'}
+                                        </h3>
+                                    </Link>
+                                    <div className="flex gap-4 mt-1 text-sm text-gray-500">
+                                        <Link 
+                                            to={`/about/user/${following._id}/followers`}
+                                            className="hover:text-blue-600 transition-colors duration-300"
+                                        >
+                                            <span className="font-medium">{following.followers?.length || 0}</span>
+                                            <span className="ml-1">followers</span>
+                                        </Link>
+                                        <Link 
+                                            to={`/about/user/${following._id}/following`}
+                                            className="hover:text-blue-600 transition-colors duration-300"
+                                        >
+                                            <span className="font-medium">{following.following?.length || 0}</span>
+                                            <span className="ml-1">following</span>
+                                        </Link>
                                     </div>
                                 </div>
-                                {followedUser._id !== user?.userId && (
-                                    <button
-                                        onClick={() => handleFollowToggle(followedUser._id)}
-                                        className={`mt-2 px-4 py-1 rounded-full text-sm font-medium ${
-                                            followedUser.isFollowing
-                                                ? 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                                                : 'bg-blue-500 text-white hover:bg-blue-600'
-                                        }`}
-                                    >
-                                        {followedUser.isFollowing ? 'Unfollow' : 'Follow'}
-                                    </button>
-                                )}
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

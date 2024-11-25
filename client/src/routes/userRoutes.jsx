@@ -9,6 +9,10 @@ const UserQuestions = lazy(() => import('../components/user/userProfile/UserQues
 const UserFollowers = lazy(() => import('../components/user/userProfile/UserFollowers'));
 const UserFollowing = lazy(() => import('../components/user/userProfile/UserFollowing'));
 
+// Import the loader functions
+import { userFollowersLoader } from '../components/user/userProfile/UserFollowers';
+import { userFollowingLoader } from '../components/user/userProfile/UserFollowing';
+
 export const userRoutes = [
     {
         path: '/user-profile/:id',
@@ -36,7 +40,7 @@ export const userRoutes = [
                 ),
             },
             {
-                path: '/about/user/:id/questions',
+                path: 'questions',
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
                         <UserQuestions />
@@ -44,7 +48,7 @@ export const userRoutes = [
                 ),
             },
             {
-                path: '/about/user/:id/answers',
+                path: 'answers',
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
                         <UserAnswers />
@@ -52,20 +56,22 @@ export const userRoutes = [
                 ),
             },
             {
-                path: '/about/user/:id/followers',
+                path: 'followers',
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
                         <UserFollowers />
                     </Suspense>
                 ),
+                loader: userFollowersLoader
             },
             {
-                path: '/about/user/:id/following',
+                path: 'following',
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
                         <UserFollowing />
                     </Suspense>
                 ),
+                loader: userFollowingLoader
             },
         ],
     },
@@ -86,7 +92,6 @@ export const userRoutes = [
                     </Suspense>
                 ),
             },
-
         ],
     },
 ];
