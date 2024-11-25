@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { BsKey, BsDatabase, BsPencil } from 'react-icons/bs';
 import { MdPrivateConnectivity } from 'react-icons/md';
+import { CiMedal } from 'react-icons/ci';
 
 function UserMenu({ user, miniMenu, handleLogout }) {
   return (
@@ -29,6 +30,9 @@ function UserMenu({ user, miniMenu, handleLogout }) {
           />
           <h4 className="text-[var(--gray--900)] mt-2 font-semibold">{user?.name}</h4>
           <p className="text-[var(--grey--800)] text-sm">{user?.email}</p>
+          <div className='mt-2'>
+            {/* <Link to={`/user/request-contributor`} className='text-blue-500'>Click here</Link><span> to become a contributor</span> */}
+          </div>
           <div className="flex gap-1">
             <UserActionButtons />
           </div>
@@ -43,16 +47,32 @@ function UserMenu({ user, miniMenu, handleLogout }) {
 
 const UserActionButtons = () => (
   <>
-    <Link to="/user/change-passowrd">
-      <button className="bg-gray-800 hover:bg-gray-900 text-white rounded-full p-2">
-        <BsKey className="size-5" />
-      </button>
-    </Link>
-    {/* <Link to="/">
-      <button className="bg-gray-800 hover:bg-gray-900 text-white rounded-full p-2">
-        <MdPrivateConnectivity className="size-5" />
-      </button>
-    </Link>
+    <div className="relative group">
+      <Link to="/user/change-passowrd">
+        <button className="bg-gray-800 hover:bg-gray-900 text-white rounded-full p-2">
+          <BsKey className="text-lg" />
+        </button>
+      </Link>
+      <div className="absolute left-1/2 transform -translate-x-1/2 -top-10 bg-gray-800 text-white text-sm rounded py-1 px-3 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300">
+        Change Password
+        <div className="absolute left-1/2 transform -translate-x-1/2 button-4 w-2 h-2 bg-gray-800 rotate-45"></div>
+      </div>
+    </div>
+
+
+    <div className="relative group">
+      <Link to="/user/request-contributor">
+        <button className="bg-gray-800 hover:bg-gray-900 text-white rounded-full p-2">
+          <CiMedal className="size-5" />
+        </button>
+      </Link>
+      <div className="absolute left-1/2 transform -translate-x-1/2 -top-10 bg-gray-800 text-white text-sm rounded py-1 px-3 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300">
+        Request to contribute
+        <div className="absolute left-1/2 transform -translate-x-1/2  button-4 w-2 h-2 bg-gray-800 rotate-45"></div>
+      </div>
+    </div>
+
+    {/*
     <Link to="/">
       <button className="bg-gray-800 hover:bg-gray-900 text-white rounded-full p-2">
         <BsDatabase className="size-5" />

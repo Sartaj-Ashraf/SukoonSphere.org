@@ -12,6 +12,7 @@ import { MdOutlinePassword } from "react-icons/md";
 import { BiLogIn } from "react-icons/bi";
 import { FiUserPlus } from "react-icons/fi";
 import { BiMessageSquareAdd } from "react-icons/bi";
+import { CiMedal } from "react-icons/ci";
 import { BiUser } from "react-icons/bi";
 function NavMenu() {
   const [activeSublink, setActiveSublink] = useState(null);
@@ -46,6 +47,11 @@ function NavMenu() {
 
   const settingsLinks = user
     ? [
+      {
+        name: "Become a contributor",
+        address: '/user/request-contributor',
+        icon: <CiMedal />,
+      },
       {
         name: "Change Password",
         address: "/user/change-passowrd",

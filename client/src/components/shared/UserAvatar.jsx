@@ -23,7 +23,7 @@ const UserAvatar = ({ createdBy, username, userAvatar, createdAt, size = "medium
       gap: "gap-4",
     },
     verySmall: {
-      image: "w-5 h-5 sm:w-6 sm:h-6",
+      image: "w-7 h-7 sm:w-6 sm:h-6",
       text: "text-xs sm:text-sm",
       date: "text-[0.7rem] ",
       gap: "gap-2",
@@ -42,9 +42,9 @@ const UserAvatar = ({ createdBy, username, userAvatar, createdAt, size = "medium
       />
       <div className="cursor-pointer">
         <Link className="hover:text-blue-400" to={`/about/user/${createdBy}`}>
-          <h3 className={`font-semibold ${sizeClasses[size].text}`}>
+          <p className={`text-sm md:text-lg font-semibold  text-[var(--grey--900)] capitalize ${sizeClasses[size].text} m-0 hover:underline `}>
             {username}
-          </h3>
+          </p>
         </Link>
         <p className={`${sizeClasses[size].date} text-gray-500 mb-0`}>
           {createdAt

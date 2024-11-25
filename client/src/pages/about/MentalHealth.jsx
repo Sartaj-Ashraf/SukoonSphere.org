@@ -2,13 +2,14 @@ import React from 'react'
 import MentalHeathSummary from '@/utils/about/MentalHealth'
 import bgImg from '../../assets/images/mentalHealthImg.jpg'
 import { HeaderImg } from '@/components'
+import { Link } from 'react-router-dom'
 
 function MentalHealth() {
     return (
         <>
             {/* <HeaderImg currentPage="About / Mental Health" bgImg={bgImg} /> */}
             <div className="p-4  lg:p-8 rounded-lg max-w-7xl mx-auto space-y-16">
-                <h1 className="text-lg font-semibold mb-2 text-[2rem] md:text-[2.5rem] sm:text-[3.5rem] sm:leading-[3.5rem] text-[var(--grey--900)]">Mental health</h1>
+                <h2 className="text-lg font-bold mb-2 text-[2rem] md:text-[2.5rem] lg:text-[3.5rem] sm:leading-[3.5rem] text-[var(--grey--900)]">Mental health</h2>
                 {/* Overview Section */}
                 <section className="mb-8 grid grid-cols-12 gap-6" data-aos="fade-up" data-aos-duration="1500">
                     <div className="col-span-12 order-2 lg:order-1 lg:col-span-6 gap-4">
@@ -76,7 +77,7 @@ function MentalHealth() {
                         {MentalHeathSummary.heplingOthers.title}
                     </h2>
                     <p className="text-[var(--grey--800)] text-base">{MentalHeathSummary.heplingOthers.description}</p>
-                    <button className="mt-4 btn-1 glossy-effect-bar" >One-on-One counselling</button>
+                    <Link to="/contact-us" className=" mt-4 btn-1 glossy-effect-bar w-1/4" >One-on-One counselling</Link>
                 </section>
 
                 {/* Causes Section */}

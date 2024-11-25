@@ -4,7 +4,7 @@ import RequestToContribute from '@/pages/contributors/RequestToContribute';
 
 export const contributerRoutes = [
     {
-        path: "/user/request-contibuter",
+        path: "/user/request-contributor",
         element: (
             <Suspense fallback={<LoadingSpinner />}>
                 <RequestToContribute />

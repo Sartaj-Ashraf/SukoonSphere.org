@@ -3,6 +3,7 @@ import { OurTeam } from '..'
 import img_2 from "../../assets/images/About-usPage-img.png";
 import { Link } from 'react-router-dom';
 import { AiOutlineArrowRight } from "react-icons/ai";
+import { FaLongArrowAltRight } from 'react-icons/fa';
 function AboutUs() {
     const points = [
         { text: "We offer a personalized approach to mental health and wellness, recognizing that there’s no one-size-fits-all solution." },
@@ -29,34 +30,35 @@ function AboutUs() {
                     </div>
                     {/* Text Content */}
                     <div className="w-full lg:w-1/2 px-4 flex flex-col items-center">
-                        <h1 className="text-4xl font-bold text-[var(--grey--900)]  mb-4 text-[1.6rem] md:text-[3.5rem] sm:text-[3.5rem] sm:leading-[3.5rem]">
-                            A Safe Place to Nurture Your Mind
-                        </h1>
+                        <h2 className="text-4xl font-bold text-[var(--grey--900)]  mb-4 text-[1.6rem] md:text-[3.5rem] sm:text-[3.5rem] sm:leading-[3.5rem]">
+                            A Safe Place to Nurture Your Mind.
+                        </h2>
                         <p className="text-lg text-[--grey--800] mb-8">
                             Our mission is to offer a safe, nurturing space where individuals can explore their mental health and find the support they need to grow.
 
                         </p>
-                        <button className="btn-1">
-                            Schedule a call with us
-                        </button>
+                        <Link to={"/contact-us"} className="btn-1">
+                            Contact Us
+                            <FaLongArrowAltRight className='ml-2 size-5' />
+                        </Link>
                     </div>
                 </div>
-                <div className='max-w-4xl flex flex-col md:flex-row items-center md:space-y-0 my-4 md:my-24 gap-6 px-4 '>
+                <div className='max-w-4xl flex flex-col md:flex-row md:space-y-0 my-4 md:my-24 gap-6 px-4 '>
                     <div className="w-full md:w-1/2 space-y-2 " data-aos="fade-up" >
-                        <h1 className='text-[var(--grey--900)] text-[1.6rem] sm:text-[2.5rem] lg:text-[3.5rem] md:leading-[3.5rem]'>What we do? </h1>
+                        <h2 className='font-bold text-[var(--grey--900)] text-[1.6rem] sm:text-[2.5rem] lg:text-[3.5rem] md:leading-[3.5rem]'>What we do? </h2>
                         <hr />
-                        <p className='text-[var(--grey--800)] text-justify lg:text-center'>We provide a safe space for individuals to access mental health resources, join supportive communities, and connect with professional guidance.</p>
+                        <p className='text-[var(--grey--800)] text-justify lg:text-center text-sm md:text-base'>We provide a safe space for individuals to access mental health resources, join supportive communities, and connect with professional guidance.</p>
                     </div>
                     <div className="w-full md:w-1/2 space-y-2" data-aos="fade-up" data-aos-delay="500">
-                        <h1 className='text-[var(--grey--900)] text-[1.6rem] sm:text-[2.5rem] lg:text-[3.5rem] md:leading-[3.5rem]'>Why we do it?</h1>
+                        <h2 className='font-bold text-[var(--grey--900)] text-[1.6rem] sm:text-[2.5rem] lg:text-[3.5rem] md:leading-[3.5rem]'>Why we do it?</h2>
                         <hr />
-                        <p className='text-[var(--grey--800)] text-justify lg:text-center'> Mental health is as essential as physical health, yet it often goes unnoticed. We believe everyone deserves to prioritize their well-being and feel supported on their journey.</p>
+                        <p className='text-[var(--grey--800)] text-justify lg:text-center text-sm md:text-base'> Mental health is as essential as physical health, yet it often goes unnoticed. We believe everyone deserves to prioritize their well-being and feel supported on their journey.</p>
                     </div>
 
                 </div>
 
                 <div className=' max-w-7xl mx-auto px-4 md:px-0 bg-[--primary] text-white  rounded-[20px]' data-aos="fade-up">
-                    <div className="flex flex-col md:flex-row items-center justify-between  md:space-y-0 md:space-x-8">
+                    <div className="flex flex-col md:flex-row items-center justify-between md:space-y-0 md:space-x-8">
                         <div className="md:w-1/2 md:space-y-6 md:px-4 py-8" data-aos="fade-up">
                             <div className="bg-[var(--grey--900)] text-[--gray-700] text-[12px] sm:text-sm inline-flex items-center py-2 px-3 rounded-full mb-4 glossy-effect-bar">
                                 <span className="bg-[#01427a] text-white rounded-full w-4 h-4 flex items-center justify-center mr-2">N</span>
@@ -64,14 +66,14 @@ function AboutUs() {
                                     NMHP: National Mental Health Programme
                                 </Link>
                             </div>
-                            <h2 className=" font-bold text-[1.6rem] md:text-[2.5rem] sm:text-[3.5rem] sm:leading-[3.5rem]" data-aos="fade-up">Creating Spaces for Healing and Growth.</h2>
+                            <h2 className=" font-extrabold text-[1.6rem] md:text-[2.5rem] lg:text-[3.5rem] sm:leading-[4rem]" data-aos="fade-up">Creating Spaces for Healing and Growth.</h2>
                             <p className="text-lg font-light mb-4 text-[var(--grey--600)] text-justify lg:text-center" >
                                 Our mission is to create safe and supportive environments where individuals can heal, grow, and thrive mentally and emotionally.
                             </p>
                             <hr />
                         </div>
 
-                        <div className="relative md:w-1/2 flex flex-col justify-start items-start p-12" data-aos="fade-left" data-aos-duration="1500">
+                        <div className="md:w-1/2 flex flex-col justify-start items-start p-12 m-4" data-aos="fade-left" data-aos-duration="1500">
                             <div
                                 className="w-full h-16 bg-contain bg-center flex justify-center items-center sm:h-[30rem]"
                             >
@@ -80,8 +82,8 @@ function AboutUs() {
                         </div>
 
                     </div>
-                    <div className=' md:px-6 py-8 text-left' data-aos="fade-up">
-                        <h1 className="text-[1.6rem] md:text-[2.5rem] lg:text-[3.5rem] sm:leading-[3.5rem]font-bold mb-4 text-[var(--white-color)]" data-aos="fade-up">Our mission is to help you prioritize your mental health and find balance.</h1>
+                    <div className='md:px-6 py-8 text-left mt-2' data-aos="fade-up">
+                        <h2 className="text-[1.6rem] md:text-[2.5rem] lg:text-[3rem] sm:leading-[4rem] font-bold mb-4 text-[var(--white-color)]" data-aos="fade-up">Our mission is to help you prioritize your mental health and find balance.</h2>
                         <ol className="text-[var(--grey--600)] text-left space-y-4 text-base" data-aos="fade-up" data-aos-duration="1500">
                             {points.map((point) => {
                                 return (

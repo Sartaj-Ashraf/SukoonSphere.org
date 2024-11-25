@@ -37,12 +37,12 @@ const RequestToContribute = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center bg-[var(--body)]">
+        <div className="flex flex-col items-center justify-center bg-[var(--body)] mt-2">
             <div className="bg-[var(--white-color)] shadow-lg rounded-xl p-8 w-[90%] max-w-md">
-                <h2 className="h2 text-[var(--primary)] font-bold sm:text-lg md:text-4xl text-center">
+                <h2 className="text-[var(--primary)] font-bold text-2xl md:text-4xl text-center">
                     Become a Contributor
                 </h2>
-                <p className="text-[var(--grey--700)] text-sm text-center mb-6">
+                <p className="text-[var(--grey--700)] text-xs md:text-sm text-center mb-6">
                     Enter the secret key to unlock contributor access. As a contributor, you can:
                 </p>
                 <ul className="text-[var(--grey--700)] text-sm mb-6 space-y-4">
@@ -75,7 +75,7 @@ const RequestToContribute = () => {
                         placeholder="Enter secret key..."
                         value={secret}
                         onChange={(e) => setSecretKey(e.target.value)}
-                        className="w-full px-4 py-3 bg-[var(--light-bg)] border border-[var(--grey--300)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--btn-primary)] transition-all duration-300 placeholder-[var(--grey--600)]"
+                        className="input w-full bg-gray-100 text-[var(--black-color)] border border-[var(--grey--300)] rounded-[8px] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all duration-300 placeholder-[var(--grey--600)]"
                     />
                     <button
                         type="submit"

@@ -9,7 +9,7 @@ const OurTeam = () => {
             <div className="px-[1.5rem] max-w-7xl mx-auto flex flex-col items-center justify-center text-center pt-20" data-aos="fade-up" >
                 <div className="flex flex-row justify-center mb-12 bg-contain md:bg-center object-bottom gap-12"
                     style={{
-                        backgroundImage: `url(${bgImg}) `, width: '100%', backgroundRepeat:'no-repeat',
+                        backgroundImage: `url(${bgImg}) `, width: '100%', backgroundRepeat: 'no-repeat',
                     }}>
 
                     <div className="w-56 h-56 rounded-lg overflow-hidden" data-aos="fade-up-left">

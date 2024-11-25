@@ -139,18 +139,18 @@ const Answer = () => {
                   key={question._id}
                   className="flex flex-col gap-3 p-4 md:p-6 bg-white rounded-xl shadow-sm mb-4 border border-gray-100"
                 >
-                   <UserAvatar
-                                    createdBy={question?.author.userId}
-                                    username={question?.author.username}
-                                    userAvatar={question?.author.userAvatar}
-                                    createdAt={question?.createdAt}
-                                />
-                
+                  <UserAvatar
+                    createdBy={question?.author.userId}
+                    username={question?.author.username}
+                    userAvatar={question?.author.userAvatar}
+                    createdAt={question?.createdAt}
+                  />
 
-                  <h3 className="text-lg md:text-xl font-semibold text-gray-800 hover:text-blue-600 transition-colors">
+
+                  <h3 className="text-base md:text-xl mb-2 font-bold text-[var(--grey--900)] hover:text-[var(--ternery)] transition-colors duration-200s">
                     {question?.questionText}
                   </h3>
-                  <p className="text-gray-600 mb-3 leading-relaxed text-sm md:text-base">{question.context}</p>
+                  <p className="text-base mb-2 leading-relaxed text-[var(--grey--800)]">{question.context}</p>
 
                   <div className="flex flex-wrap gap-2 mb-4">
                     {question?.tags?.map((tag, index) => (

@@ -56,7 +56,7 @@ const DisorderTags = () => {
             <SectionTitle title={"Mental Health disorders"} />
             <div className=" md:px-0 md:max-w-7xl md:mx-auto  relative  overflow-x-hidden" data-aos="fade-up" >
                 <h1 className=" h2 hidden md:block px-4 md:p-0 w-full text-wrap text-[var(--grey--900)] sm:mb-6 md:text-center text-[1.6rem] md:text-[2.5rem] lg:text-[3.5rem] sm:leading-[3.5rem]" data-aos="fade-up" >
-                    Monitor for early indicators of hundreds of disorders
+                    Track. Detect. Prevent.
                 </h1>
                 <div className=" carousel-wrapper sm:mt-8">
                     {/* Anxiety Disorders */}

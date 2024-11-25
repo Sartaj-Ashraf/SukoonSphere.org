@@ -1,14 +1,15 @@
 import { createOptimizedComponent } from "../utils/CreateOptimizedComponent"
 
-// Shared Components
 
 export { default as Header } from "./sharedComponents/Header";
 export { default as Footer } from "./sharedComponents/Footer";
 export { default as HeaderImg } from "./sharedComponents/HeaderImg";
 export { default as PodcastCard } from "./sharedComponents/PodcastCard";
+export const Like = createOptimizedComponent(() => import("./shared/Like"));
+export const Follow = createOptimizedComponent(() => import("./shared/Follow"));
+export const Spinner = createOptimizedComponent(() => import("./shared/Spinner"));
 
 // Home Components
-
 export const TopIntro = createOptimizedComponent(() => import("./homeComponents/TopIntro"));
 export const Infography = createOptimizedComponent(() => import("./homeComponents/Infography"));
 export const DisorderTags = createOptimizedComponent(() => import("./homeComponents/DisorderTags"));
@@ -65,16 +66,4 @@ export const UserAnswers = createOptimizedComponent(() => import("./user/userPro
 export const UserQuestions = createOptimizedComponent(() => import("./user/userProfile/UserQuestion"));
 export const UserFollowers = createOptimizedComponent(() => import("./user/userProfile/UserFollowers"));
 export const UserFollowing = createOptimizedComponent(() => import("./user/userProfile/UserFollowing"));
-
-// Admin Components
-
-// export const AdminHeader = createOptimizedComponent(() => import("./dashboard/admin/AdminHeader"));
-// export const AdminNavbar = createOptimizedComponent(() => import("./dashboard/admin/AdminNavbar"));
-
-// Shared Components
-
-export const Like = createOptimizedComponent(() => import("./shared/Like"));
-export const Follow = createOptimizedComponent(() => import("./shared/Follow"));
-
-export const Spinner = createOptimizedComponent(() => import("./shared/Spinner"));
 

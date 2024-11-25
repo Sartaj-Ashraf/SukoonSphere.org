@@ -17,7 +17,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Development Notice Section */}
           <div className="lg:col-span-5 space-y-6">
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl md:text-4xl lg-text-4xl font-bold text-white">
               Website Under Development
             </h2>
             <p className="text-slate-300">
@@ -34,14 +34,14 @@ const Footer = () => {
             <p className="text-sm text-slate-400">
               Your feedback helps us improve. Thank you for your patience and support.
             </p>
-            <div className="flex items-center gap-4 mt-6">
+            {/* <div className="flex items-center gap-4 mt-6">
               <span className="text-slate-300">Follow us on</span>
               <div className="flex gap-4">
                 <FaFacebook className="w-6 h-6 text-slate-400 hover:text-blue-400 transition-colors duration-200 cursor-pointer" />
                 <FaTwitter className="w-6 h-6 text-slate-400 hover:text-blue-400 transition-colors duration-200 cursor-pointer" />
                 <AiFillInstagram className="w-6 h-6 text-slate-400 hover:text-pink-400 transition-colors duration-200 cursor-pointer" />
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Vertical Divider */}
@@ -58,33 +58,28 @@ const Footer = () => {
                   Quick Links
                 </h3>
                 <ul className="space-y-3">
-                  {links.map((link, index) => (
-                    link.name !== "Media Libraries" && (
-                      <li key={`${link.name}-${index}`}>
-                        <span
-                          className="text-slate-300  font-medium"
-                        >
-                          {link.name}
-                        </span>
-                        {link.sublinks && (
-                          <ul className="mt-2 ml-4 space-y-2">
-                            {link.sublinks.map((sublink) => (
-                              <li key={sublink.name} className="flex items-center gap-2">
-                                <FaCircleDot className="w-2 h-2 text-slate-500" />
-                                <NavLink
-                                  to={sublink.address}
-                                  className="text-slate-400 hover:text-amber-400 text-sm"
-                                >
-                                  {sublink.name}
-                                </NavLink>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </li>
-                    )
+                  {links.slice(0, 3).map((link, index) => (
+                    <li key={`${link.name}-${index}`}>
+                      <span className="text-slate-300 font-medium">{link.name}</span>
+                      {link.sublinks && (
+                        <ul className="mt-2 ml-4 space-y-2">
+                          {link.sublinks.map((sublink) => (
+                            <li key={sublink.name} className="flex items-center gap-2">
+                              <FaCircleDot className="w-2 h-2 text-slate-500" />
+                              <NavLink
+                                to={sublink.address}
+                                className="text-slate-400 hover:text-amber-400 text-sm"
+                              >
+                                {sublink.name}
+                              </NavLink>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
                   ))}
                 </ul>
+
               </div>
 
               {/* Know Us */}
@@ -93,46 +88,26 @@ const Footer = () => {
                   Know Us
                 </h3>
                 <ul className="space-y-3">
-                  <li>
-                    <Link
-                      to="about/mental-health"
-                      className="text-slate-300 hover:text-amber-400 font-medium"
-                    >
-                      About Mental Health
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="about/mental-health"
-                      className="text-slate-300 hover:text-amber-400 font-medium"
-                    >
-                      About Us
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/about/our-team"
-                      className="text-slate-300 hover:text-amber-400 font-medium"
-                    >
-                      Our Review Board
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to=""
-                      className="text-slate-300 hover:text-amber-400 font-medium"
-                    >
-                      Contact Page
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to=""
-                      className="text-slate-300 hover:text-amber-400 font-medium"
-                    >
-                      Terms of Service
-                    </Link>
-                  </li>
+                  {links.slice(4,).map((link, index) => (
+                    <li key={`${link.name}-${index}`}>
+                      <span className="text-slate-300 font-medium">{link.name}</span>
+                      {link.sublinks && (
+                        <ul className="mt-2 ml-4 space-y-2">
+                          {link.sublinks.map((sublink) => (
+                            <li key={sublink.name} className="flex items-center gap-2">
+                              <FaCircleDot className="w-2 h-2 text-slate-500" />
+                              <NavLink
+                                to={sublink.address}
+                                className="text-slate-400 hover:text-amber-400 text-sm"
+                              >
+                                {sublink.name}
+                              </NavLink>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  ))}
                 </ul>
               </div>
 
