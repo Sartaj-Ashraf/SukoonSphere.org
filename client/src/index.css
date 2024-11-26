@@ -309,7 +309,9 @@ all other colors below
 .tranctcate-text-3 {
   -webkit-line-clamp: 3;
 }
-
+.rounded-lg{
+  border-radius: 10px;
+}
 /* Styling for the action buttons */
 .action-button {
   background-color: var(--btn-primary);
