@@ -55,7 +55,7 @@ const Articles = () => {
       toast.success("Article published successfully");
       fetchArticles();
     } catch (error) {
-      toast.error("Failed to publish article");
+      console.log(error)
     }
   };
 
@@ -138,8 +138,8 @@ const Articles = () => {
                 </div>
               </div>
               <div className="flex flex-wrap items-center justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
-                <Link 
-                  className="btn-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm" 
+                <Link
+                  className="bg-blue-500 text-white inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-[6px] hover:bg-blue-600 hover:scale-105 transition-all duration-300"
                   to={`/articles/article/${article._id}`}
                 >
                   <FiEye className="w-4 h-4" />
@@ -147,7 +147,7 @@ const Articles = () => {
                 </Link>
                 <button
                   onClick={() => handlePublishArticle(article._id)}
-                  className="btn-2 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-50 text-green-600"
+                  className="bg-[var(--secondary)] inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-[6px] hover:scale-105 transition-all duration-300 hover:bg-[var(--secondary-hover)] "
                 >
                   <FiCheck className="w-4 h-4" />
                   Publish
@@ -223,8 +223,8 @@ const Articles = () => {
                 </div>
               </div>
               <div className="flex flex-wrap items-center justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
-                <Link 
-                  className="btn-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm" 
+                <Link
+                  className="btn-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm"
                   to={`/articles/article/${article._id}`}
                 >
                   <FiEye className="w-4 h-4" />
@@ -262,8 +262,8 @@ const Articles = () => {
       )}
 
       {showModal && (
-        <CreateArticleModel 
-          setShowModal={setShowModal} 
+        <CreateArticleModel
+          setShowModal={setShowModal}
           onArticleCreated={fetchArticles}
         />
       )}

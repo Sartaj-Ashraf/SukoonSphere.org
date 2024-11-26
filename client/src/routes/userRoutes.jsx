@@ -73,17 +73,6 @@ export const userRoutes = [
                 ),
                 loader: userFollowingLoader
             },
-        ],
-    },
-
-    {
-        path: 'contributor/',
-        element: (
-            <Suspense fallback={<LoadingSpinner />}>
-                <UserProfile />
-            </Suspense>
-        ),
-        children: [
             {
                 path: 'articles',
                 element: (
@@ -94,4 +83,5 @@ export const userRoutes = [
             },
         ],
     },
+
 ];
