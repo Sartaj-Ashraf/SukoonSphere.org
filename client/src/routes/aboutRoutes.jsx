@@ -1,5 +1,6 @@
 
 import LoadingSpinner from '@/components/loaders/LoadingSpinner';
+import GetAKey from '@/pages/about/helpDesk/GetAKey';
 import React, { lazy, Suspense } from 'react';
 
 
@@ -38,6 +39,14 @@ export const aboutRoutes = [
         element: (
             <Suspense fallback={<LoadingSpinner />}>
                 <ContactUs />
+            </Suspense>
+        ),
+    },
+    {
+        path: 'get-a-key',
+        element: (
+            <Suspense fallback={<LoadingSpinner />}>
+                <GetAKey />
             </Suspense>
         ),
     },

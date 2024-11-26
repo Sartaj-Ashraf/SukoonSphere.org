@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { FaVideo, FaEdit, FaComments, FaLightbulb } from "react-icons/fa";
 import { useUser } from "@/context/UserContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import customFetch from "@/utils/customFetch";
 
 const RequestToContribute = () => {
@@ -69,6 +69,7 @@ const RequestToContribute = () => {
                     </h2>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-4">
+
                     <input
                         type="password"
                         name="secret"
@@ -77,6 +78,9 @@ const RequestToContribute = () => {
                         onChange={(e) => setSecretKey(e.target.value)}
                         className="input w-full bg-gray-100 text-[var(--black-color)] border border-[var(--grey--300)] rounded-[8px] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all duration-300 placeholder-[var(--grey--600)]"
                     />
+                    <div>
+                        <p>To obtain a key, please <Link to="/get-a-key" className="text-blue-600">click here</Link>.</p>
+                    </div>
                     <button
                         type="submit"
                         className={`w-full ${loading ? " btn-2 bg-[var(--grey--300)] cursor-not-allowed" : "btn-2"}`} // Disable button when loading
