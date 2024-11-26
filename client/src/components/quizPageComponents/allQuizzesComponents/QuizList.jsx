@@ -14,7 +14,7 @@ function QuizList({ quizCategories, }) {
                     <h2 className="text-xl font-bold text-[var(--black-color)] mb-4">{allCategory.category}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
                         {allCategory.quizzes.map((quiz) => (
-                            <div key={quiz.id} className=" bg-white shadow-lg rounded-[10px] transform transition-transform duration-300 ease-in-out hover:scale-[101%]">
+                            <div key={quiz.id} className=" bg-white shadow-lg rounded-lg transform transition-transform duration-300 ease-in-out hover:scale-[101%]">
                                 <Link to={`quiz/${quiz.quizId}`}>
                                     <figure>
                                         <img

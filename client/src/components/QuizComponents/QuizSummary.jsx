@@ -46,17 +46,17 @@ function QuizSummary({ SummaryTitle, SummarySubtitle, ShortDescription, ContentT
                         alt="Quiz Image"
                         className="md:w-60  object-cover"
                     />
-                    <p className="text-lg text-[var(--grey--800)] text-justify  my-3 md:mx-4">
+                    <p className="text-lg text-[var(--grey--800)] text-justify  md:mx-4">
                         {ShortDescription}
                     </p>
                 </div>
 
                 <div className="mt-4">
-                    <h2 className=" ml-3 text-xl md:text-xl lg:text-1xl font-bold text-[var(--black-color)] mb-2">{ContentTitle}</h2>
-                    <p className="text-base text-[var(--grey--800)] text-justify md:mx-4">{ContentSubtitle}</p>
+                    <h2 className="text-xl md:text-xl lg:text-1xl font-bold text-[var(--black-color)] mb-2">{ContentTitle}</h2>
+                    <p className="text-base text-[var(--grey--800)] text-justify ">{ContentSubtitle}</p>
                 </div>
 
-                <div className="mt-8 flex justify-center sm:justify-start">
+                <div className="mt-8 flex justify-start">
                     <Link to={`/all-quizzes/quiz/${1}`}>
                         <button className="btn-1 glossy-effect-bar" >
                             Read more

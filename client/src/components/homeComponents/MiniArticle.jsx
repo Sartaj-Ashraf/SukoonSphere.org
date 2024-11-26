@@ -3,7 +3,7 @@ import { MdOutlineDateRange } from "react-icons/md";
 import { Link } from "react-router-dom";
 function MiniArticle({ article }) {
   return (
-    // <div className="border-[1px] rounded-[10px] h-[400px] shadow-lg hover:-translate-y-3.5 hover:shadow-xl transition-all duration-300 ease-in-out overflow-hidden flex flex-col gap-4">
+    // <div className="border-[1px] rounded-lg h-[400px] shadow-lg hover:-translate-y-3.5 hover:shadow-xl transition-all duration-300 ease-in-out overflow-hidden flex flex-col gap-4">
     //   <img className="w-full h-60 object-cover  " src={article.image} alt="" />
     //   <div className="flex flex-col gap-2 text-black px-3 py-3  transition ease-in-out ">
     //     <Link to={`/articles/article`}>

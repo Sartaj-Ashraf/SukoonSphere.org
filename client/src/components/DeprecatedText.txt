@@ -504,7 +504,7 @@ const PostCard = ({ post, onPostDelete }) => {
 
     return (
         <>
-            <div className="mb-4 p-3 sm:p-4 border rounded-[10px] bg-[var(--white-color)]">
+            <div className="mb-4 p-3 sm:p-4 border rounded-lg bg-[var(--white-color)]">
                 <div className="flex items-center mb-4 justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2">
                         <UserAvatar

@@ -24,7 +24,7 @@ function OurTeam() {
                     {boardMembers.map((member, index) => (
                         <div className='bg-white p-4 rounded-[20px] space-y-4 shadow-lg hover:scale-110 transition-all duration-300' key={index} data-aos="zoom-in">
                             <div className='object-cover'>
-                                <img src={member.imgUrl} alt={member.name} className="w-full h-full rounded-[10px] object-cover" />
+                                <img src={member.imgUrl} alt={member.name} className="w-full h-full rounded-lg object-cover" />
                             </div>
                             <div className='space-y-2'>
                                 <Link to={`/user-profile/${member.userId}`}>

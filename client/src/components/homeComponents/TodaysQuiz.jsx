@@ -90,13 +90,13 @@ function TodaysQuiz() {
       <div className="max-w-7xl mx-auto  ">
         <div className="grid grid-cols-1  lg:grid-cols-12 gap-4  px-4 md:px-6 ">
           <div
-            className=" col-span-12 lg:col-span-5  grid gap-6 bg-white rounded-[20px] shadow-lg"
+            className=" col-span-full lg:col-span-5  grid gap-6 bg-white rounded-[20px] shadow-lg"
             data-aos="fade-down"
           >
             <QuizQuestions quizQuestionsList={quizQuestions} />
           </div>
           <div
-            className="col-span-12 sm:col-span-7 sm:p-6  rounded-lg"
+            className="col-span-full lg:col-span-7  rounded-lg"
             data-aos="fade-up"
             data-aos-delay="300"
           >

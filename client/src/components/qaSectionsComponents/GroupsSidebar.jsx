@@ -42,7 +42,7 @@ const GroupsSidebar = ({ groups }) => {
                 <h3 className="text-lg mb-2 text-[var(--black-color)]">Groups you've joined</h3>
                 <div className="space-y-2">
                     {groups.map((group, index) => (
-                        <div key={index} className="flex justify-between items-center bg-gray-100 rounded-[10px] p-2">
+                        <div key={index} className="flex justify-between items-center bg-gray-100 rounded-lg p-2">
                             <div className="flex items-center space-x-2">
                                 <img src={group.avatar} alt="Group" className="h-8 w-8 rounded-full" />
                                 <div>

@@ -83,7 +83,7 @@ const QuizQuestions = ({ quizQuestionsList }) => {
                         <li
                             key={index}
                             onClick={(event) => handleOptionClick(event, option)}
-                            className={`p-2 bg-[var(--body)] rounded-[10px] text-black cursor-pointer hover:border-[var(--primary)] hover:border-l-4 hover:glossy-effect-bar transition-all duration-200 ease-in-out ${getOptionClasses(option)}`}
+                            className={`p-2 bg-[var(--body)] rounded-lg text-black cursor-pointer hover:border-[var(--primary)] hover:border-l-4 hover:glossy-effect-bar transition-all duration-200 ease-in-out ${getOptionClasses(option)}`}
                         // data-aos="fade-up"
                         // data-aos-duration="1500"
                         >

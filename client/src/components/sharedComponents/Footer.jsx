@@ -133,8 +133,8 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="mt-12 pt-8 border-t border-slate-800">
-          <div className="text-slate-400 space-y-4">
+        <div className="mt-2 lg:mt-12 pt-2 lg:pt-8 border-t border-slate-800">
+          <div className="text-slate-400 space-y-2">
             <p className="text-sm">
               SukoonSphere's content is for informational and educational purposes
               only. Our website is not intended to be a substitute for

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 function MiniCard({ article }) {
   return (
     <Link to={`/articles/article/${article._id}`} className="block">
-      <div className="border-[1px] rounded-[10px] h-[400px] shadow-lg hover:-translate-y-3.5 hover:shadow-xl transition-all duration-300 ease-in-out overflow-hidden flex flex-col gap-4">
+      <div className="border-[1px] rounded-lg h-[400px] shadow-lg hover:-translate-y-3.5 hover:shadow-xl transition-all duration-300 ease-in-out overflow-hidden flex flex-col gap-4">
         <div className="h-60 overflow-hidden">
           <div
             className="prose max-w-none scale-50 origin-top h-full"

@@ -3,7 +3,7 @@ import React from 'react';
 const SectionHeader = ({ title }) => {
   return (
       <>
-    <div className="max-w-7xl mx-auto px-4 py-8 lg:py-12">
+    <div className="max-w-7xl mx-auto px-6 py-8 lg:py-12">
       <div className="relative">
         {/* Decorative elements */}
         <div className="absolute left-[-10px] md:left-[-1rem] top-1/2 w-1 h-1 md:w-2 md:h-2 bg-gray-600 rounded-full transform -translate-y-1/2" />

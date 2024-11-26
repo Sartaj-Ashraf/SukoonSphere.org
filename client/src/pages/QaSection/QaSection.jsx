@@ -72,8 +72,8 @@ const QaSection = () => {
       <div className="relative w-full max-w-7xl mx-auto p-2 sm:p-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Left sidebar */}
-          <div className="rounded-[10px] shadow-sm hidden lg:block lg:col-span-3 h-screen sticky top-20">
-            <div className="bg-white p-4 rounded-[10px]">
+          <div className="rounded-lg shadow-sm hidden lg:block lg:col-span-3 h-screen sticky top-20">
+            <div className="bg-white p-4 rounded-lg">
               <h3 className="text-lg font-semibold mb-4">Coming Soon</h3>
               <div className="space-y-4">
                 {groups.map((group) => (
@@ -94,7 +94,7 @@ const QaSection = () => {
           {/* Middle section */}
           <div className="col-span-1 lg:col-span-6">
             {/* Header */}
-            <div className="mb-3 text-center bg-white p-4 rounded-[10px]">
+            <div className="mb-3 text-center bg-white p-4 rounded-lg">
               <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">
                 Have a Question or Insight? Share it with Us!
               </h2>

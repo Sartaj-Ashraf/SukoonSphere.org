@@ -57,7 +57,7 @@ const PostCard = ({
 
   console.log({post})
   return (
-    <div className="bg-white rounded-[10px] shadow-sm mb-2  p-4">
+    <div className="bg-white rounded-lg shadow-sm mb-2  p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <UserAvatar
@@ -76,7 +76,7 @@ const PostCard = ({
         <img
           src={post?.imageUrl}
           alt="Post content"
-          className="w-full h-auto rounded-[10px] mb-4"
+          className="w-full h-auto rounded-lg mb-4"
         />
       )}
       <p className="text-gray-800 mb-4">{post?.description}</p>

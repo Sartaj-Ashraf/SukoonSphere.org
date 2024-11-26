@@ -108,7 +108,7 @@ const Answer = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Profile Sidebar - Hidden on mobile, visible on md+ screens */}
           <div className="hidden lg:block md:col-span-3 sticky top-[10%] h-screen overflow-y-auto">
-            <div className="bg-white p-4 rounded-[10px]">
+            <div className="bg-white p-4 rounded-lg">
               <h3 className="text-lg font-semibold mb-4">Coming Soon</h3>
               <div className="space-y-4">
                 {groups.map((group) => (

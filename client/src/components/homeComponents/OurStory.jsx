@@ -10,7 +10,7 @@ const OurStory = () => {
     <>
       <SectionTitle title={"Our Story"}></SectionTitle>
       <div
-        className=" max-w-7xl mx-auto px-4  bg-[--primary] text-white rounded-[10px]"
+        className=" max-w-7xl mx-auto px-4  bg-[--primary] text-white rounded-lg"
         data-aos="fade-up"
       >
         <div className="flex flex-col-reverse lg:flex-row items-center justify-between  md:space-y-0 lg:space-x-8">
@@ -83,7 +83,7 @@ const OurStory = () => {
             >
               <div className="relative w-full h-72 md:h-96 flex justify-center items-center ">
                 <video
-                  className="absolute inset-0 w-full h-full object-cover rounded-[10px]"
+                  className="absolute inset-0 w-full h-full object-cover rounded-lg"
                   src={IntroVideo}
                   loop
                   muted

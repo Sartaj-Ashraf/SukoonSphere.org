@@ -42,7 +42,7 @@ const SignIn = () => {
           </div>
           <Form
             onSubmit={handleSubmit}
-            className="flex flex-col gap-4 p-4 rounded-[10px] w-full max-w-[500px] mx-auto"
+            className="flex flex-col gap-4 p-4 rounded-lg w-full max-w-[500px] mx-auto"
           >
             {error && (
               <p className="text-red-400 text-center">

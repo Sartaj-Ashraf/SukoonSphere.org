@@ -65,7 +65,7 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
       </div>
 
       <div className="ml-13">
-        <div className="bg-gray-50 p-1 rounded-[10px]">
+        <div className="bg-gray-50 p-1 rounded-lg">
           <Link className="text-blue-500" to={`/about/user/${reply.commentUserId}`}>@{reply.commentUsername}</Link>
           <span className="text-gray-800">&nbsp; &nbsp;{reply.content}</span>
         </div>

@@ -26,7 +26,7 @@ const ForgetPassword = () => {
   const data = useActionData();
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 rounded-[10px]">
+    <div className="min-h-screen flex items-center justify-center p-4 rounded-lg">
       <div className="bg-white shadow-xl max-w-6xl flex flex-col sm:flex-row">
         {/* Image Section - left Half */}
         <div className="w-full sm:w-1/2 p-4 pt-12 flex flex-col justify-center items-center bg-gray-50">
@@ -50,7 +50,7 @@ const ForgetPassword = () => {
           </div>
           <Form
             method="post"
-            className="flex flex-col gap-4 p-4 rounded-[10px] w-full max-w-[500px] mx-auto"
+            className="flex flex-col gap-4 p-4 rounded-lg w-full max-w-[500px] mx-auto"
           >
             <h1 className="font-bold text-[var(--white-color)] text-center text-2xl">
               Forgot Password?

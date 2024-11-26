@@ -11,7 +11,7 @@ const ProfileSidebar = ({
     events,
 }) => {
     return (
-        <div className="flex flex-col gap-4 bg-white text-gray-800 shadow rounded-[10px] p-4">
+        <div className="flex flex-col gap-4 bg-white text-gray-800 shadow rounded-lg p-4">
             <div className="flex items-center space-x-4 p-2">
                 <img
                     src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWXzCSPkpN-TPug9XIsssvBxZQHkZEhjoGfg&s"

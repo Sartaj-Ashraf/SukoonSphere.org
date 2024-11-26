@@ -5,12 +5,12 @@ import { Form, Link, useLoaderData } from "react-router-dom";
 function SearchFilters() {
     const { category } = useLoaderData()
     return (
-        <Form className='flex flex-col w-full gap-4 bg-white/80 backdrop-blur-sm p-4 rounded-[10px] shadow-lg'>
+        <Form className='flex flex-col w-full gap-4 bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-lg'>
             <div className='flex flex-col lg:flex-row gap-4'>
                 <div className='w-full lg:w-1/2 relative group'>
                     <input
                         type="text"
-                        className="w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-[10px] text-[var(--black-color)] placeholder:text-gray-400 focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all duration-300"
+                        className="w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg text-[var(--black-color)] placeholder:text-gray-400 focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all duration-300"
                         placeholder="Search by name or category"
                         name="search"
                     />
@@ -30,7 +30,7 @@ function SearchFilters() {
                 <div className='w-full lg:w-1/3'>
                     <select
                         name="category"
-                        className="w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-[10px] text-[var(--black-color)] cursor-pointer focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all duration-300 appearance-none"
+                        className="w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg text-[var(--black-color)] cursor-pointer focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all duration-300 appearance-none"
                         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23666666'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundPosition: 'right 1rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
                     >
                         <option disabled selected>
@@ -44,13 +44,13 @@ function SearchFilters() {
                 <div className='flex gap-3  lg:justify-end'>
                     <button
                         type="submit"
-                        className="p-3 bg-[var(--primary)] hover:bg-[var(--ternery)] text-white rounded-[10px] shadow-sm hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                        className="p-3 bg-[var(--primary)] hover:bg-[var(--ternery)] text-white rounded-lg shadow-sm hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                     >
                         <FaSearch className="size-5" />
                     </button>
                     <Link 
                         to="/media/all-videos" 
-                        className='p-3 bg-gray-100 hover:bg-gray-200 text-[var(--primary)] rounded-[10px] shadow-sm hover:shadow-xl transform hover:scale-105 transition-all duration-300'
+                        className='p-3 bg-gray-100 hover:bg-gray-200 text-[var(--primary)] rounded-lg shadow-sm hover:shadow-xl transform hover:scale-105 transition-all duration-300'
                     >
                         <RxReset className="size-5" />
                     </Link>

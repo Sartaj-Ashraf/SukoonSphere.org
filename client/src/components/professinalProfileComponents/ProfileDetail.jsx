@@ -2,7 +2,7 @@ import React from 'react';
 
 const ProfileDetail = ({ expertise, education, highlights, experience, educationDetails, organizationName, organizationDescription, editorialProcess }) => {
   return (
-    <div className="max-w-7xl mx-auto bg-gradient-to-br shadow-sm from-white to-blue-50/40 min-h-screen p-4 sm:p-8 rounded-[10px]">
+    <div className="max-w-7xl mx-auto bg-gradient-to-br shadow-sm from-white to-blue-50/40 min-h-screen p-4 sm:p-8 rounded-lg">
       <div className="mx-auto space-y-12">
         {/* Highlights Section */}
         <div>
