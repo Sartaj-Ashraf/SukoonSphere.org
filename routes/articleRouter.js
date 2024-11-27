@@ -30,7 +30,7 @@ router.get("/get-pending-articles", authenticateUser, getPendingArticles);
 // to get published articles
 router.get("/get-published-articles", getPublishedArticles);
 // to get published articles by user
-router.get("/get-published-articles-by-user", authenticateUser, getPublishedArticlesByUser);
+router.get("/get-published-articles-by-user/:id",  getPublishedArticlesByUser);
 // to upload image
 router.post("/upload-image", upload.single("image"), uploadImage);
 // to delete image

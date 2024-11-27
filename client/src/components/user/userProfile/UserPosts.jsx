@@ -45,6 +45,14 @@ const UserPosts = () => {
         setIsDeleting(false);
     };
 
+    const handlePostUpdate = (updatedPost) => {
+        setPosts(currentPosts =>
+            currentPosts.map(post =>
+                post._id === updatedPost._id ? updatedPost : post
+            )
+        );
+    };
+
     const filteredPosts = posts.filter(post => 
         (post.description?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
         post.tags?.some(tag => (tag?.toLowerCase() || '').includes(searchQuery.toLowerCase()))
@@ -88,6 +96,7 @@ const UserPosts = () => {
                         {searchQuery 
                             ? 'Try searching with different keywords'
                             : 'Share your thoughts and experiences with the community!'}
+
                     </p>
                 </div>
             ) : (
@@ -98,6 +107,7 @@ const UserPosts = () => {
                             post={post}
                             user={loggedUser}
                             onPostDelete={handlePostDelete}
+                            onPostUpdate={handlePostUpdate}
                         />
                     ))}
                 </div>

@@ -9,6 +9,7 @@ import {
   deleteAnswerComment,
   deleteAnswerReply,
   deleteQuestion,
+  editAnswer,
   getAllAnswerRepliesByCommentId,
   getAllCommentsByAnswerId,
   getAllQuestions,
@@ -47,6 +48,13 @@ router.get(
   getAllCommentsByAnswerId
 );
 router.get("/answer/:id", validateIdParam, getAnswerById);
+router.patch(
+  "/answer/:id",
+  authenticateUser,
+  validateIdParam,
+  validateAnswerInput,
+  editAnswer
+);
 router.post(
   "/answer/comments/:id/replies",
   authenticateUser,

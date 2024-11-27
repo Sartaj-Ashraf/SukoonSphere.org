@@ -3,8 +3,12 @@ import { Link } from 'react-router-dom';
 import { BsKey, BsDatabase, BsPencil } from 'react-icons/bs';
 import { MdPrivateConnectivity } from 'react-icons/md';
 import { CiMedal } from 'react-icons/ci';
+import { useUser } from '@/context/UserContext';
 
 function UserMenu({ user, miniMenu, handleLogout }) {
+   const { user: loggedInUser } = useUser();
+   console.log({loggedInUser})
+  
   return (
     <div
       className={`${miniMenu ? "opacity-100 max-h-[500px] " : "opacity-0 max-h-0"
@@ -34,7 +38,7 @@ function UserMenu({ user, miniMenu, handleLogout }) {
             {/* <Link to={`/user/request-contributor`} className='text-blue-500'>Click here</Link><span> to become a contributor</span> */}
           </div>
           <div className="flex gap-1">
-            <UserActionButtons />
+            <UserActionButtons loggedInUser={loggedInUser} />
           </div>
           <div className="flex justify-center gap-4 mt-4">
             <button onClick={handleLogout} className="btn-2">Logout</button>
@@ -45,7 +49,7 @@ function UserMenu({ user, miniMenu, handleLogout }) {
   );
 }
 
-const UserActionButtons = () => (
+const UserActionButtons = ({ loggedInUser }) => (
   <>
     <div className="relative group">
       <Link to="/user/change-passowrd">
@@ -60,7 +64,7 @@ const UserActionButtons = () => (
     </div>
 
 
-    <div className="relative group">
+    {(loggedInUser?.role !== "contributor" || loggedInUser?.role === "admin") && <div className="relative group">
       <Link to="/user/request-contributor">
         <button className="bg-gray-800 hover:bg-gray-900 text-white rounded-full p-2">
           <CiMedal className="size-5" />
@@ -70,14 +74,20 @@ const UserActionButtons = () => (
         Request to contribute
         <div className="absolute left-1/2 transform -translate-x-1/2  button-4 w-2 h-2 bg-gray-800 rotate-45"></div>
       </div>
-    </div>
+    </div>}
 
-    {/*
-    <Link to="/">
-      <button className="bg-gray-800 hover:bg-gray-900 text-white rounded-full p-2">
-        <BsDatabase className="size-5" />
-      </button>
-    </Link> */}
+    {loggedInUser?.role === "admin" && <div className="relative group">
+      <Link to="/admin-inbox">
+        <button className="bg-gray-800 hover:bg-gray-900 text-white rounded-full p-2">
+          <MdPrivateConnectivity className="text-lg" />
+        </button>
+      </Link>
+      <div className="absolute left-1/2 transform -translate-x-1/2 -top-10 bg-gray-800 text-white text-sm rounded py-1 px-3 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300">
+        Admin inbox
+        <div className="absolute left-1/2 transform -translate-x-1/2  button-4 w-2 h-2 bg-gray-800 rotate-45"></div>
+      </div>
+    </div>}
+
   </>
 );
 

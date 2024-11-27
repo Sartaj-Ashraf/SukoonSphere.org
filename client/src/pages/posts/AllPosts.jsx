@@ -17,9 +17,18 @@ export const allPostsLoader = async () => {
 };
 
 const AllPosts = () => {
-    const { posts } = useLoaderData();
+    const { posts: initialPosts } = useLoaderData();
     const { user } = useUser();
     const [showModal, setShowModal] = useState(false);
+    const [posts, setPosts] = useState(initialPosts);
+
+    const handlePostUpdate = (updatedPost) => {
+        setPosts(currentPosts =>
+            currentPosts.map(post =>
+                post._id === updatedPost._id ? updatedPost : post
+            )
+        );
+    };
 
     return (
         <div>
@@ -52,14 +61,13 @@ const AllPosts = () => {
                             key={post._id}
                             post={post}
                             user={user}
-                            comment="link"
+                            onPostUpdate={handlePostUpdate}
                         />
                     ))}
                 </div>
             ) : (
-                <div className="text-center p-8 bg-white rounded-lg shadow-sm">
-                    <h3 className="text-xl font-semibold text-gray-700 mb-2">No Posts Yet</h3>
-                    <p className="text-gray-600">Be the first one to share your thoughts with the community!</p>
+                <div className="text-center text-gray-500 mt-8">
+                    No posts found. Be the first to share something!
                 </div>
             )}
         </div>

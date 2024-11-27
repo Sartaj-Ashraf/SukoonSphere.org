@@ -11,6 +11,8 @@ import { Link } from "react-router-dom";
 import UserAvatar from "../shared/UserAvatar";
 import PostActions from "../shared/PostActions";
 import { toast } from "react-toastify";
+import EditPostModal from "./EditPostModal";
+import { formatDistanceToNow } from "date-fns";
 
 const PostCard = ({
   post,
@@ -18,17 +20,30 @@ const PostCard = ({
   comment = "link",
   totalComments,
   onCommentClick,
+  onPostUpdate,
 }) => {
   const [isLiked, setIsLiked] = useState(post?.likes?.includes(user?._id));
-  const [showDropdown, setShowDropdown] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [likesCount, setLikesCount] = useState(post?.totalLikes || 0);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPost, setCurrentPost] = useState(post);
 
   const handleDelete = () => {
     setShowDeleteModal(true);
-    setShowDropdown(false);
   };
+
+  const handleEdit = () => {
+    setShowEditModal(true);
+  };
+
+  const handlePostUpdate = (updatedPost) => {
+    setCurrentPost(updatedPost);
+    if (onPostUpdate) {
+      onPostUpdate(updatedPost);
+    }
+  };
+
   const handleDeletePost = async () => {
     try {
       await customFetch.delete(`/posts/${post._id}`);
@@ -38,6 +53,7 @@ const PostCard = ({
       console.log(error);
     }
   };
+
   const handleLike = async () => {
     if (!user) {
       toast.error("Please login to like this post!");
@@ -45,7 +61,7 @@ const PostCard = ({
     }
     setIsLoading(true);
     try {
-      await customFetch.patch(`/posts/${post._id}/like`);
+      await customFetch.patch(`/posts/${currentPost._id}/like`);
       setIsLiked(!isLiked);
       setLikesCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1));
     } catch (error) {
@@ -55,83 +71,109 @@ const PostCard = ({
     }
   };
 
-  console.log({post})
+  const isEdited = currentPost.createdAt !== currentPost.updatedAt;
+
   return (
-    <div className="bg-white rounded-lg shadow-sm mb-2  p-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <UserAvatar
-          createdBy={post.createdBy}
-          username={post?.username}
-          userAvatar={post?.userAvatar}
-          createdAt={post?.createdAt}
-        />
-        {user && post?.createdBy && user._id && post.createdBy.toString() === user._id.toString() && (
-          <PostActions handleDelete={handleDelete} />
+    <>
+      <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex items-center gap-2">
+            <UserAvatar
+              username={currentPost.username}
+              userAvatar={currentPost.userAvatar}
+              createdBy={currentPost.createdBy}
+              createdAt={currentPost.createdAt}
+              size="medium"
+            />
+          </div>
+
+          {user?._id === currentPost.createdBy && (
+            <PostActions
+              handleEdit={handleEdit}
+              handleDelete={handleDelete}
+            />
+          )}
+        </div>
+
+        {currentPost.imageUrl && (
+          <img
+            src={currentPost.imageUrl}
+            alt="Post"
+            className="w-full object-cover rounded-lg mb-4"
+          />
         )}
+        <p className="text-gray-800 mb-4">{currentPost.description}</p>
+
+        {/* Tags Section */}
+        {currentPost.tags && currentPost.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {currentPost.tags.map((tag, index) => (
+              <span
+                key={index}
+                className="px-2 py-1 bg-blue-50 text-blue-600 rounded-full text-sm"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="flex items-center gap-4 text-gray-500">
+          <button
+            onClick={handleLike}
+            disabled={isLoading}
+            className={`flex items-center gap-1 ${
+              isLiked ? "text-red-500" : ""
+            } hover:text-red-500 transition-colors`}
+          >
+            <FaRegHeart className={isLiked ? "fill-current" : ""} />
+            <span>{likesCount}</span>
+          </button>
+
+          {comment === "link" ? (
+            <Link
+              to={`/posts/${currentPost._id}`}
+              className="flex items-center gap-1 hover:text-blue-500"
+            >
+              <FaRegComment />
+              <span>{currentPost.totalComments || 0}</span>
+            </Link>
+          ) : (
+            <button
+              className="flex items-center gap-1 hover:text-blue-500"
+              onClick={() => onCommentClick(currentPost._id)}
+            >
+              <FaRegComment />
+              <span>{totalComments}</span>
+            </button>
+          )}
+          
+          {isEdited && (
+            <span className="text-xs text-gray-400 ml-auto">
+              edited {formatDistanceToNow(new Date(currentPost.updatedAt), { addSuffix: true })}
+            </span>
+          )}
+        </div>
       </div>
 
-      {/* Content */}
-      {post?.imageUrl && (
-        <img
-          src={post?.imageUrl}
-          alt="Post content"
-          className="w-full h-auto rounded-lg mb-4"
+      {showDeleteModal && (
+        <DeleteModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onDelete={handleDeletePost}
+          title="Delete Post"
+          message="Are you sure you want to delete this post? This action cannot be undone."
         />
       )}
-      <p className="text-gray-800 mb-4">{post?.description}</p>
 
-      {/* Tags */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {post?.tags?.map((tag, index) => (
-          <span
-            key={index}
-            className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-
-      {/* Footer */}
-      <div className="flex items-center gap-6">
-
-        <button
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-200 ${isLiked
-            ? "text-red-500 bg-red-50 hover:bg-red-100"
-            : "text-gray-500 hover:bg-gray-100"
-            }`}
-          onClick={handleLike}
-          disabled={isLoading}
-        >
-          <FaRegHeart className="w-4 h-4" />
-          <span>{likesCount}</span>
-        </button>
-
-        {comment === "link" ? (
-          <Link
-            to={`/posts/${post._id}`}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-gray-500 hover:bg-gray-100 transition-all duration-200"
-          >
-            <FaRegComment className="w-4 h-4" />
-            <span>{post?.totalComments || 0}</span>
-          </Link>
-        ) : (
-          <span className="flex items-center gap-2 text-gray-500 hover:text-blue-500">
-            <FaRegComment size={20} />
-            <span>{totalComments || 0}</span>
-          </span>
-        )}
-      </div>
-      <DeleteModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onDelete={handleDeletePost}
-        title="Delete Post"
-        message="Are you sure you want to delete this post?"
-        itemType="post"
-      />
-    </div>
+      {showEditModal && (
+        <EditPostModal
+          post={currentPost}
+          onClose={() => setShowEditModal(false)}
+          onPostUpdated={handlePostUpdate}
+        />
+      )}
+    </>
   );
 };
 

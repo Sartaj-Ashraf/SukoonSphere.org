@@ -22,6 +22,7 @@ import {
   likePostCommentReply,
   likePosts,
   getPostById,
+  editPost,
 } from "../controllers/postController.js";
 
 router.post(
@@ -33,6 +34,14 @@ router.post(
 );
 router.get("/", getAllPosts);
 router.get("/:id", validateIdParam, getPostById);
+router.patch(
+  "/:id",
+  authenticateUser,
+  upload.single("imageUrl"),
+  validateIdParam,
+  validatePostInput,
+  editPost
+);
 router.patch("/:id/like", authenticateUser, validateIdParam, likePosts);
 router.patch(
   "/comments/:id/like",

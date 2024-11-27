@@ -6,6 +6,7 @@ import { FcAnswers } from "react-icons/fc";
 import { toast } from 'react-toastify';
 import customFetch from '@/utils/customFetch';
 import { useParams, Link } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const ProfileCard = ({ user, fetchUserById }) => {
     const { id: paramsId } = useParams();
@@ -13,50 +14,57 @@ const ProfileCard = ({ user, fetchUserById }) => {
     const [showModal, setShowModal] = useState(false);
     const [isFollowing, setIsFollowing] = useState(user?.followers?.includes(currentUser?._id));
     const [showTooltip, setShowTooltip] = useState(false);
+    const queryClient = useQueryClient();
 
     const isOwnProfile = currentUser?._id === user?._id;
 
-    const handleProfileUpdate = async (formData) => {
-        try {
+    const updateProfileMutation = useMutation({
+        mutationFn: async (formData) => {
             const response = await updateUser(formData);
-            if (response.success) {
-                setShowModal(false);
-                // Refresh user data after successful update
-                fetchUserById();
-                toast.success('Profile updated successfully!');
-            }
-        } catch (error) {
+            return response;
+        },
+        onSuccess: () => {
+            setShowModal(false);
+            fetchUserById();
+            toast.success('Profile updated successfully!');
+            queryClient.invalidateQueries(['user', user?._id]);
+        },
+        onError: (error) => {
             console.error('Profile update error:', error);
             toast.error(error.response?.data?.message || 'Failed to update profile');
+        }
+    });
+
+    const followMutation = useMutation({
+        mutationFn: async () => {
+            const { data } = await customFetch.patch(`user/follow/${user?._id}`);
+            return data;
+        },
+        onSuccess: (data) => {
+            setIsFollowing(data.isFollowing);
+            fetchUserById();
+            queryClient.invalidateQueries(['user', user?._id]);
+            toast.success(data.isFollowing ? 'Followed successfully' : 'Unfollowed successfully');
+        },
+        onError: (error) => {
+            console.error('Error following/unfollowing user:', error);
+            toast.error(error.response?.data?.msg || 'Something went wrong. Please try again.');
+        }
+    });
+
+    const handleProfileUpdate = async (formData) => {
+        if (isOwnProfile) {
+            updateProfileMutation.mutate(formData);
         }
     };
 
     const handleFollowUnfollow = async () => {
-        if (isOwnProfile) return; // Prevent self-following
-
-        try {
-            const { data } = await customFetch.patch(`user/follow/${user?._id}`);
-            if (data.success) {
-                setIsFollowing(data.isFollowing);
-                // Update the followers count in the user object
-                const updatedUser = {
-                    ...user,
-                    followers: isFollowing 
-                        ? user.followers.filter(id => id !== currentUser._id)
-                        : [...user.followers, currentUser._id]
-                };
-                // Call fetchUserById to refresh the user data
-                await fetchUserById();
-                toast.success(data.isFollowing ? 'Followed successfully' : 'Unfollowed successfully');
-            }
-        } catch (error) {
-            console.error('Error following/unfollowing user:', error);
-            toast.error(error.response?.data?.msg || 'Something went wrong. Please try again.');
+        if (!isOwnProfile) {
+            followMutation.mutate();
         }
     };
 
     useEffect(() => {
-        // Update isFollowing state whenever user or currentUser changes
         if (user?.followers && currentUser?._id) {
             setIsFollowing(user.followers.includes(currentUser._id));
         }

@@ -8,6 +8,7 @@ const OurTeam = lazy(() => import('../pages/about/OurTeam'));
 const MentalHealth = lazy(() => import('../pages/about/MentalHealth'));
 const AboutUs = lazy(() => import('../pages/about/AboutUs'));
 const ContactUs = lazy(() => import('../pages/about/ContactUs'));
+const Inbox = lazy(() => import('../pages/admin/Inbox'));
 
 export const aboutRoutes = [
     {
@@ -50,4 +51,10 @@ export const aboutRoutes = [
             </Suspense>
         ),
     },
+   { path:"admin-inbox",
+    element: (
+        <Suspense fallback={<LoadingSpinner />}>
+            <Inbox />
+        </Suspense>
+    ),}
 ];

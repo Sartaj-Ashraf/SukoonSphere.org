@@ -1,7 +1,8 @@
 import { ProfileCard, ProfileDetails } from '@/components'
 import customFetch from '@/utils/customFetch';
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 
 const UserProfile = () => {
     const groups = [
@@ -32,18 +33,16 @@ const UserProfile = () => {
         }
     ];
     const { id: paramId } = useParams()
-    const [user, setUser] = useState({})
-    const fetchUserById = async () => {
-        try {
+    const { data: user = {}, refetch: fetchUserById } = useQuery({
+        queryKey: ['user', paramId],
+        queryFn: async () => {
             const { data } = await customFetch.get(`user/user-details/${paramId}`);
-            setUser(data)
-        } catch (error) {
-            console.log({ error });
-        }
-    }
-    useEffect(() => {
-        fetchUserById()
-    }, [paramId])
+            return data;
+        },
+        staleTime: 1000 * 60 * 5, // Data stays fresh for 5 minutes
+        cacheTime: 1000 * 60 * 30, // Cache persists for 30 minutes
+    });
+
     return (
         <>
             <div className='relative max-w-7xl mx-auto p-4 lg:p-8'>
@@ -58,7 +57,7 @@ const UserProfile = () => {
                     {/* Main Content Section */}
                     <div className='md:col-span-9'>
                         <div className='bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-4 lg:p-6'>
-                            <ProfileDetails  user={user} />
+                            <ProfileDetails user={user} />
                         </div>
                     </div>
                 </div>

@@ -184,7 +184,7 @@ const Article = () => {
                       <p className="text-lg mb-2">By {article?.author?.name}</p>
                       <p className="text-sm">Published on {new Date(article?.createdAt).toLocaleDateString()}</p>
                     </div>
-                    <div className="mt-8 text-sm">
+              <div className="mt-8 text-sm">
                       <p>SukoonSphere Health Mission</p>
                       <p>Mental Health & Wellness</p>
                     </div>

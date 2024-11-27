@@ -25,6 +25,10 @@ const userSchema = mongoose.Schema({
   avatarPublicId: String,
   phone: String,
   location: String,
+  contributerKey: {
+    type: String,
+    default: "",
+  },
   followers: [
     {
       type: mongoose.Schema.Types.ObjectId,

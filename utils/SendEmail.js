@@ -24,11 +24,7 @@ const SendEmail = async ({ to, subject, html }) => {
     // Send the email
     const info = await transporter.sendMail(mailOptions);
 
-    // Log the message ID or URL for viewing the sent email
-    console.log("Message sent: %s", info.messageId);
-    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
   } catch (error) {
-    // Handle any errors that occur during email sending
     console.error("Error sending email:", error);
     throw error; // Propagate the error for further handling
   }

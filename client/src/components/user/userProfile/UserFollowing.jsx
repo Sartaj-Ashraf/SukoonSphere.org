@@ -18,32 +18,12 @@ export const userFollowingLoader = async ({ params }) => {
 
 const UserFollowing = () => {
   const data = useLoaderData();
-  const { user: currentUser } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState({});
 
   const following = data?.following || [];
 
-  const handleFollowUnfollow = async (userId) => {
-    if (isLoading[userId]) return;
 
-    try {
-      setIsLoading((prev) => ({ ...prev, [userId]: true }));
-      const { data } = await customFetch.patch(`user/follow/${userId}`);
-      if (data.success) {
-        toast.success(
-          data.isFollowing ? "Followed successfully" : "Unfollowed successfully"
-        );
-        window.location.reload();
-      }
-    } catch (error) {
-      toast.error(
-        error.response?.data?.msg || "Something went wrong. Please try again."
-      );
-    } finally {
-      setIsLoading((prev) => ({ ...prev, [userId]: false }));
-    }
-  };
 
   const filteredFollowing = following.filter((user) =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase())

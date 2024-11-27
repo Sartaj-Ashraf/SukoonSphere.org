@@ -932,6 +932,69 @@ export const likeAnswerComment = async (req, res) => {
   });
 };
 
+// edit controllers
+export const editAnswer = async (req, res) => {
+  const { id: answerId } = req.params;
+  const { context } = req.body;
+  const { userId } = req.user;
+
+  if (!context) {
+    throw new BadRequestError('Answer context is required');
+  }
+
+  // Find the answer and check if it exists
+  const answer = await Answer.findById(answerId);
+  if (!answer) {
+    throw new NotFoundError('Answer not found');
+  }
+
+  // Check if the user is authorized to edit this answer
+  if (answer.createdBy.toString() !== userId) {
+    throw new UnauthorizedError('Not authorized to edit this answer');
+  }
+
+  // Update the answer
+  const updatedAnswer = await Answer.findByIdAndUpdate(
+    answerId,
+    { context },
+    { new: true, runValidators: true }
+  );
+
+  // Fetch the updated answer with user details
+  const answerWithDetails = await Answer.aggregate([
+    {
+      $match: { _id: updatedAnswer._id }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "userDetails"
+      }
+    },
+    {
+      $addFields: {
+        author: {
+          userId: "$createdBy",
+          username: { $arrayElemAt: ["$userDetails.name", 0] },
+          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+        }
+      }
+    },
+    {
+      $project: {
+        userDetails: 0
+      }
+    }
+  ]);
+
+  res.status(StatusCodes.OK).json({
+    msg: "Answer updated successfully",
+    answer: answerWithDetails[0]
+  });
+};
+
 // delete controllers
 export const deleteQuestion = async (req, res) => {
   const { id: postId } = req.params;

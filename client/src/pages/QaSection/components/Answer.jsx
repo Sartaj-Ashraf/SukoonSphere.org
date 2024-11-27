@@ -2,16 +2,23 @@ import DeleteModal from "@/components/shared/DeleteModal";
 import PostActions from "@/components/shared/PostActions";
 import UserAvatar from "@/components/shared/UserAvatar";
 import customFetch from "@/utils/customFetch";
+import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import { FaRegComment, FaRegHeart } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const Answer = ({ answer, user, answerCount }) => {
+const Answer = ({ answer: initialAnswer, user, answerCount }) => {
   const navigate = useNavigate();
   const [showAnswerDeleteModal, setShowAnswerDeleteModal] = useState(false);
-  const [isLiked, setIsLiked] = useState(answer.likes?.includes(user?._id));
-  const [likeCount, setLikeCount] = useState(answer.totalLikes || 0);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [isLiked, setIsLiked] = useState(initialAnswer.likes?.includes(user?._id));
+  const [likeCount, setLikeCount] = useState(initialAnswer.totalLikes || 0);
+  const [answer, setAnswer] = useState(initialAnswer);
+  const [editedContext, setEditedContext] = useState(answer.context);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const isEdited = answer.createdAt !== answer.updatedAt;
 
   const handleDeleteAnswer = async () => {
     try {
@@ -39,8 +46,38 @@ const Answer = ({ answer, user, answerCount }) => {
     }
   };
 
+  const handleEdit = () => {
+    setIsEditing(true);
+    setEditedContext(answer.context);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditedContext(answer.context);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editedContext.trim()) {
+      toast.error("Answer cannot be empty");
+      return;
+    }
+
+    try {
+      const response = await customFetch.patch(
+        `/qa-section/answer/${answer._id}`,
+        { context: editedContext }
+      );
+      setAnswer(response.data.answer);
+      setIsEditing(false);
+      toast.success("Answer updated successfully");
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response?.data?.msg || "Failed to update answer");
+    }
+  };
+
   return (
-    <div className=" p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
+    <div className="p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100">
       <div className="flex items-center justify-between mb-2">
         <UserAvatar
           createdBy={answer?.author?.userId}
@@ -49,29 +86,65 @@ const Answer = ({ answer, user, answerCount }) => {
           createdAt={answer?.createdAt}
         />
         {user && answer.author?.userId === user?._id && (
-          <PostActions handleDelete={() => setShowAnswerDeleteModal(true)} />
+          <PostActions
+            handleEdit={handleEdit}
+            handleDelete={() => setShowAnswerDeleteModal(true)}
+          />
         )}
       </div>
       <div className="prose max-w-none mb-2">
-        <p className="text-base mb-2 leading-relaxed text-[var(--grey--800)]">{answer.context}</p>
+        {isEditing ? (
+          <div className="space-y-3">
+            <textarea
+              value={editedContext}
+              onChange={(e) => setEditedContext(e.target.value)}
+              placeholder="Edit your answer..."
+              className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary min-h-[100px] resize-none"
+            />
+            <div className="flex justify-end gap-3 pt-3 border-t">
+              <button
+                onClick={handleCancelEdit}
+                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={!editedContext.trim()}
+                className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-base mb-2 leading-relaxed text-[var(--grey--800)]">
+            {answer.context}
+          </p>
+        )}
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 text-gray-500">
         <button
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-200 ${isLiked ? "text-red-500 bg-red-50 hover:bg-red-100" : "text-gray-500 hover:bg-gray-100"}`}
+          className={`flex items-center gap-2 ${
+            isLiked ? "text-red-500" : ""
+          } hover:text-red-500 transition-colors`}
           onClick={handleLikeAnswer}
         >
-          <FaRegHeart className="w-4 h-4" />
-          <span className="text-sm font-medium text-gray-600">{likeCount}</span>
+          <FaRegHeart className={isLiked ? "fill-current" : ""} />
+          <span>{likeCount}</span>
         </button>
         <Link
           to={`/QA-section/question/answer/${answer._id}/comments`}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full text-gray-500 hover:bg-gray-100 transition-all duration-200"
+          className="flex items-center gap-2 hover:text-blue-500 transition-colors"
         >
-          <FaRegComment className="w-4 h-4" />
-          <span className="text-sm font-medium text-gray-600">
-            {answer.totalComments}
-          </span>
+          <FaRegComment />
+          <span>{answer.totalComments}</span>
         </Link>
+        {isEdited && (
+          <span className="text-xs text-gray-400 ml-auto">
+            edited {formatDistanceToNow(new Date(answer.updatedAt), { addSuffix: true })}
+          </span>
+        )}
       </div>
       <DeleteModal
         isOpen={showAnswerDeleteModal}

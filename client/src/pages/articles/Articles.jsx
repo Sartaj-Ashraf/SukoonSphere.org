@@ -4,49 +4,43 @@ import { FiFileText, FiEye, FiSearch } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import UserAvatar from '@/components/shared/UserAvatar';
 import { formatDistanceToNow } from "date-fns";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const Articles = () => {
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTimeout, setSearchTimeout] = useState(null);
+  const queryClient = useQueryClient();
 
-  const fetchArticles = async (search = '') => {
-    try {
-      setLoading(true);
-      const response = await customFetch(`articles/get-published-articles${search ? `?search=${search}` : ''}`);
-      setArticles(response.data.articles);
-    } catch (error) {
-      console.error('Error fetching articles:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: articles = [], isLoading } = useQuery({
+    queryKey: ['articles', searchQuery],
+    queryFn: async () => {
+      const response = await customFetch(`articles/get-published-articles${searchQuery ? `?search=${searchQuery}` : ''}`);
+      return response.data.articles;
+    },
+    staleTime: 1000 * 60 * 5, // Data stays fresh for 5 minutes
+    cacheTime: 1000 * 60 * 30, // Cache persists for 30 minutes
+  });
 
   const handleSearch = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
 
-    // Clear existing timeout
     if (searchTimeout) clearTimeout(searchTimeout);
 
-    // Set new timeout for debouncing
     const timeout = setTimeout(() => {
-      fetchArticles(query);
+      queryClient.invalidateQueries(['articles', query]);
     }, 500);
 
     setSearchTimeout(timeout);
   };
-  console.log({ articles })
 
   useEffect(() => {
-    fetchArticles();
     return () => {
       if (searchTimeout) clearTimeout(searchTimeout);
     };
   }, []);
 
-  if (loading) {
+  if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 

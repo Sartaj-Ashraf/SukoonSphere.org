@@ -518,3 +518,53 @@ export const likePostCommentReply = async (req, res) => {
     reply: updatedReply,
   });
 };
+
+export const editPost = async (req, res) => {
+  const { id: postId } = req.params;
+  const { userId } = req.user;
+
+  const post = await Post.findById(postId);
+  if (!post) {
+    throw new BadRequestError('Post not found');
+  }
+
+  if (post.createdBy.toString() !== userId) {
+    throw new UnauthorizedError('Not authorized to edit this post');
+  }
+
+  // Parse tags if they exist
+  if (req.body.tags) {
+    try {
+      req.body.tags = JSON.parse(req.body.tags);
+    } catch (error) {
+      throw new BadRequestError('Invalid tags format');
+    }
+  }
+
+  // Handle image removal
+  if (req.body.removeImage === 'true' && post.imageUrl) {
+    const oldImagePath = post.imageUrl.replace(`${process.env.BACKEND_URL}/public/uploads/`, '');
+    await deleteFile(oldImagePath);
+    req.body.imageUrl = null; // Clear the imageUrl in database
+  }
+  // Handle new image upload
+  else if (req.file) {
+    if (post.imageUrl) {
+      const oldImagePath = post.imageUrl.replace(`${process.env.BACKEND_URL}/public/uploads/`, '');
+      await deleteFile(oldImagePath);
+    }
+    const filepaath = `${process.env.BACKEND_URL}/public/uploads/${req.file.filename}`;
+    req.body.imageUrl = filepaath;
+  }
+
+  const updatedPost = await Post.findByIdAndUpdate(
+    postId,
+    { $set: req.body },
+    { new: true }
+  );
+
+  res.status(StatusCodes.OK).json({ 
+    msg: "Post updated successfully",
+    post: updatedPost
+  });
+};

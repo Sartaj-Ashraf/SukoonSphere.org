@@ -201,7 +201,7 @@ export const getPublishedArticles = async (req, res) => {
   }
 };
 export const getPublishedArticlesByUser = async (req, res) => {
-  const { userId } = req.user;
+  const {id: userId } = req.params;
   const articles = await ArticleModel.find({ status: "published", author: userId });
   const articlesWithAuthor = await Promise.all(
     articles.map(async (article) => {
