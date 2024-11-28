@@ -519,7 +519,7 @@ export const likePostCommentReply = async (req, res) => {
   });
 };
 
-export const editPost = async (req, res) => {
+export const updatePost = async (req, res) => {
   const { id: postId } = req.params;
   const { userId } = req.user;
 
@@ -566,5 +566,86 @@ export const editPost = async (req, res) => {
   res.status(StatusCodes.OK).json({ 
     msg: "Post updated successfully",
     post: updatedPost
+  });
+};
+
+export const updatePostComment = async (req, res) => {
+  const { id: commentId } = req.params;
+  const { content } = req.body;
+  const { userId } = req.user;
+
+  if (!content) {
+    throw new BadRequestError('Comment content is required');
+  }
+
+  const comment = await PostComments.findById(commentId);
+  if (!comment) {
+    throw new BadRequestError("Comment not found");
+  }
+
+  if (comment.createdBy.toString() !== userId) {
+    throw new UnauthorizedError("Not authorized to edit this comment");
+  }
+
+  const updatedComment = await PostComments.findByIdAndUpdate(
+    commentId,
+    { content },
+    { new: true }
+  ).populate('createdBy', 'name avatar');
+
+  res.status(StatusCodes.OK).json({
+    message: "Comment updated successfully",
+    comment: {
+      ...updatedComment.toObject(),
+      username: updatedComment.createdBy.name,
+      userAvatar: updatedComment.createdBy.avatar,
+      totalReplies: updatedComment.replies?.length || 0,
+      totalLikes: updatedComment.likes?.length || 0
+    }
+  });
+};
+
+export const updatePostCommentReply = async (req, res) => {
+  const { id: replyId } = req.params;
+  const { content } = req.body;
+  const { userId } = req.user;
+
+  if (!content) {
+    throw new BadRequestError('Reply content is required');
+  }
+
+  const reply = await PostReplies.findOne({ _id: replyId, deleted: false })
+    .populate('createdBy', 'name avatar')
+    .populate('replyTo', 'name avatar')
+    .populate('parentId');
+
+  if (!reply) {
+    throw new BadRequestError("Reply not found");
+  }
+
+  if (reply.createdBy._id.toString() !== userId) {
+    throw new UnauthorizedError("Not authorized to edit this reply");
+  }
+
+  reply.content = content;
+  await reply.save();
+
+  res.status(StatusCodes.OK).json({
+    message: "Reply updated successfully",
+    reply: {
+      _id: reply._id,
+      content: reply.content,
+      createdAt: reply.createdAt,
+      updatedAt: reply.updatedAt,
+      createdBy: reply.createdBy._id,
+      parentId: reply.parentId._id,
+      username: reply.createdBy.name,
+      userAvatar: reply.createdBy.avatar,
+      commentUsername: reply.replyTo.name,
+      commentUserAvatar: reply.replyTo.avatar,
+      commentUserId: reply.replyTo._id,
+      likes: reply.likes || [],
+      totalLikes: reply.likes?.length || 0
+    }
   });
 };

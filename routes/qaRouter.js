@@ -10,6 +10,8 @@ import {
   deleteAnswerReply,
   deleteQuestion,
   editAnswer,
+  editAnswerComment,
+  editAnswerReply,
   getAllAnswerRepliesByCommentId,
   getAllCommentsByAnswerId,
   getAllQuestions,
@@ -66,6 +68,23 @@ router.get(
   "/answer/comments/:id/replies",
   validateIdParam,
   getAllAnswerRepliesByCommentId
+);
+
+// Edit routes for comments and replies
+router.patch(
+  "/answer/comments/:id",
+  authenticateUser,
+  validateIdParam,
+  validateQaCommentInput,
+  editAnswerComment
+);
+
+router.patch(
+  "/answer/comments/replies/:id",
+  authenticateUser,
+  validateIdParam,
+  validateQaCommentInput,
+  editAnswerReply
 );
 
 // answer routes

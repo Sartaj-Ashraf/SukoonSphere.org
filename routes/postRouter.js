@@ -22,7 +22,9 @@ import {
   likePostCommentReply,
   likePosts,
   getPostById,
-  editPost,
+  updatePost,
+  updatePostComment,
+  updatePostCommentReply
 } from "../controllers/postController.js";
 
 router.post(
@@ -40,7 +42,7 @@ router.patch(
   upload.single("imageUrl"),
   validateIdParam,
   validatePostInput,
-  editPost
+  updatePost
 );
 router.patch("/:id/like", authenticateUser, validateIdParam, likePosts);
 router.patch(
@@ -60,6 +62,18 @@ router.post(
   authenticateUser,
   validateIdParam,
   createPostComment
+);
+router.patch(
+  "/comments/:id",
+  authenticateUser,
+  validateIdParam,
+  updatePostComment
+);
+router.patch(
+  "/comments/replies/:id",
+  authenticateUser,
+  validateIdParam,
+  updatePostCommentReply
 );
 router.get("/user/:id", validateIdParam, getAllPostsByUserId);
 router.get("/:id/comments", validateIdParam, getAllCommentsByPostId);
@@ -83,4 +97,5 @@ router.delete(
   validateIdParam,
   deletePostCommentReply
 );
+
 export default router;
