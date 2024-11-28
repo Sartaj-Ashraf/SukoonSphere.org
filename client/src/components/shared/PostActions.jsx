@@ -21,7 +21,7 @@ const PostActions = ({ handleDelete, handleEdit }) => {
               }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200 font-medium"
             >
-              <FaEdit className="inline mr-2" /> Edit Post
+              <FaEdit className="inline mr-2" /> Edit 
             </button>
             <button
               onClick={() => {

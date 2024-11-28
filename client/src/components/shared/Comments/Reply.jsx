@@ -6,12 +6,18 @@ import { FaRegHeart, FaReply } from "react-icons/fa";
 import { useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { toast } from "react-toastify";
-const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
+import EditReply from "../EditReply";
+import { formatDistanceToNow } from "date-fns";
+
+const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
   const { user } = useUser();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [reply, setReply] = useState(initialReply);
   const [isLiked, setIsLiked] = useState(reply.likes.includes(user?._id));
   const [likesCount, setLikesCount] = useState(reply.totalLikes || 0);
   const [showReplyForm, setShowReplyForm] = useState(false);
+  const isEdited = reply.createdAt !== reply.updatedAt;
 
   const deleteReply = async () => {
     try {
@@ -36,6 +42,19 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
     }
   };
 
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleCloseEdit = () => {
+    setIsEditing(false);
+  };
+
+  const handleUpdateReply = (updatedReply) => {
+    setReply(updatedReply);
+    setIsEditing(false);
+  };
+
   const handleReplyClick = () => {
     // Close any other open reply forms first
     const allReplyForms = document.querySelectorAll('.reply-form');
@@ -47,7 +66,6 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
 
     setShowReplyForm(!showReplyForm);
   };
-  console.log({ reply: reply })
 
   return (
     <div key={reply._id} className="flex flex-col gap-3 reply-container">
@@ -60,62 +78,86 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
           size="verySmall"
         />
         {user?._id === reply.createdBy && (
-          <PostActions handleDelete={() => setShowDeleteModal(true)} />
+          <PostActions 
+            handleEdit={handleEdit}
+            handleDelete={() => setShowDeleteModal(true)} 
+          />
         )}
       </div>
-
       <div className="ml-13">
-        <div className="bg-gray-50 p-1 rounded-lg">
-          <Link className="text-blue-500" to={`/about/user/${reply.commentUserId}`}>@{reply.commentUsername}</Link>
-          <span className="text-gray-800">&nbsp; &nbsp;{reply.content}</span>
-        </div>
-
-        <div className="flex items-center gap-4 mt-2">
-          <button
-            className={`flex items-center gap-2 px-2 py-1 rounded-full transition-all duration-200 ${isLiked
-              ? "text-red-500 bg-red-50 hover:bg-red-100"
-              : "text-gray-500 hover:bg-gray-100"
-              }`}
-            onClick={likeReply}
-          >
-            <FaRegHeart className="w-3 h-3 md:w-4 md:h-4" />
-            <span className="text-sm">{likesCount}</span>
-          </button>
-
-          <button
-            onClick={handleReplyClick}
-            className="flex items-center gap-1 text-gray-500 hover:text-blue-500"
-          >
-            <FaReply className="w-3 h-3 md:w-4 md:h-4" />
-          </button>
-        </div>
-
-        {showReplyForm && (
-          <Form onSubmit={(e) => {
-            handleSubmit(e)
-            window.scrollTo({ top: 700, behavior: 'smooth' });
-
-          }} className="mt-2 relative reply-form">
-            <textarea
-              name="content"
-              placeholder="Write a reply..."
-              className="w-full p-3 pr-14 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none text-gray-700"
-              rows="1"
+        <div className="bg-gray-50 px-3 py-1 md:py-2 rounded-xl border border-gray-100">
+          {isEditing ? (
+            <EditReply
+              reply={reply}
+              onClose={handleCloseEdit}
+              onUpdate={handleUpdateReply}
             />
+          ) : (
+            <div className="relative">
+              <p className="text-gray-600 text-xs md:text-sm mb-0">{reply.content}</p>
+              {isEdited && (
+                <span className="absolute bottom-0 right-0 text-[10px] text-gray-400 italic">
+                  {formatDistanceToNow(new Date(reply.updatedAt), { addSuffix: true })}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+        {!isEditing && (
+          <div className="flex items-center gap-3 my-1">
             <button
-              className="absolute bottom-3 right-2 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1"
+              className={`flex items-center gap-2 px-2 py-1 rounded-full transition-all duration-200 ${
+                isLiked
+                  ? "text-red-500 bg-red-50 hover:bg-red-100"
+                  : "text-gray-500 hover:bg-gray-100"
+              }`}
+              onClick={likeReply}
             >
-              <FaReply className="w-2 h-2 md:w-3 md:h-3" />
+              <FaRegHeart className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="text-xs md:text-sm font-medium">{likesCount}</span>
             </button>
-          </Form>
+            <button
+              onClick={handleReplyClick}
+              className="flex items-center gap-1 text-gray-500 hover:text-blue-500"
+            >
+              <FaReply className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="text-xs md:text-sm font-medium">Reply</span>
+            </button>
+          </div>
         )}
       </div>
+      {showReplyForm && (
+        <div className="reply-form ml-13">
+          <Form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <textarea
+                name="content"
+                placeholder="Write a reply..."
+                className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary min-h-[100px] resize-none"
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowReplyForm(false)}
+                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Reply
+              </button>
+            </div>
+          </Form>
+        </div>
+      )}
       <DeleteModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        onDelete={async () => {
-          await deleteReply();
-        }}
+        onDelete={deleteReply}
         title="Delete Reply"
         message="Are you sure you want to delete this reply?"
         itemType="reply"
@@ -123,4 +165,5 @@ const Reply = ({ reply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
     </div>
   );
 };
+
 export default Reply;
