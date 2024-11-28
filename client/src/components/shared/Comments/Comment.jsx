@@ -18,7 +18,7 @@ const Comment = ({ comment: initialComment, handleDeleteComment, handleLikeComme
   const [isLiked, setIsLiked] = useState(comment.likes.includes(user?._id));
   const [likesCount, setLikesCount] = useState(comment.totalLikes || 0);
   const isEdited = comment.createdAt !== comment.updatedAt;
-  
+
   const replyLink = toggleReply
     ? `/QA-section/question/answer/${comment.answerId}/comments/${comment._id}/reply`
     : `/posts/${comment.postId}/comment-id/${comment._id}`;
@@ -61,9 +61,9 @@ const Comment = ({ comment: initialComment, handleDeleteComment, handleLikeComme
           size="verySmall"
         />
         {user?._id === comment.createdBy && (
-          <PostActions 
+          <PostActions
             handleEdit={handleEdit}
-            handleDelete={() => setShowDeleteModal(true)} 
+            handleDelete={() => setShowDeleteModal(true)}
           />
         )}
       </div>
@@ -80,7 +80,7 @@ const Comment = ({ comment: initialComment, handleDeleteComment, handleLikeComme
               <p className="text-gray-600 text-xs md:text-sm mb-0">{comment.content}</p>
               {isEdited && (
                 <span className="absolute bottom-0 right-0 text-[10px] text-gray-400 italic">
-                  {formatDistanceToNow(new Date(comment.updatedAt), { addSuffix: true })}
+                  Edited {formatDistanceToNow(new Date(comment.updatedAt), { addSuffix: true })}
                 </span>
               )}
             </div>
@@ -89,11 +89,10 @@ const Comment = ({ comment: initialComment, handleDeleteComment, handleLikeComme
         {!isEditing && (
           <div className="flex items-center gap-3 my-1">
             <button
-              className={`flex items-center gap-2 px-2 py-1 rounded-full transition-all duration-200 ${
-                isLiked
-                  ? "text-red-500 bg-red-50 hover:bg-red-100"
-                  : "text-gray-500 hover:bg-gray-100"
-              }`}
+              className={`flex items-center gap-2 px-2 py-1 rounded-full transition-all duration-200 ${isLiked
+                ? "text-red-500 bg-red-50 hover:bg-red-100"
+                : "text-gray-500 hover:bg-gray-100"
+                }`}
               onClick={likeCommnet}
             >
               <FaRegHeart className="w-3 h-3 md:w-4 md:h-4" />

@@ -13,7 +13,6 @@ export const createOptimizedComponent = (importFn) => {
 
 export { default as Header } from "./shared/Header";
 export { default as Footer } from "./shared/Footer";
-export { default as PodcastCard } from "./sharedComponents/PodcastCard";
 export const Like = createOptimizedComponent(() => import("./shared/Like"));
 export const Follow = createOptimizedComponent(() => import("./shared/Follow"));
 export const Spinner = createOptimizedComponent(() => import("./shared/Spinner"));
@@ -28,7 +27,6 @@ export const OurStory = createOptimizedComponent(() => import("./homeComponents/
 export const TodaysQuiz = createOptimizedComponent(() => import("./homeComponents/TodaysQuiz"));
 export const TodaysQuote = createOptimizedComponent(() => import("./homeComponents/TodaysQuote"));
 export const CampusPartners = createOptimizedComponent(() => import("./homeComponents/CampusPartners"));
-export const Podcasts = createOptimizedComponent(() => import("./homeComponents/Podcasts"));
 // Professional Profile Components
 
 export const Intro = createOptimizedComponent(() => import("./professinalProfileComponents/Intro"));

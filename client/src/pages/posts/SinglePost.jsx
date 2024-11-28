@@ -5,19 +5,6 @@ import PostCard from "@/components/posts/PostCard";
 import { useUser } from "@/context/UserContext";
 import { toast } from "react-toastify";
 
-export const singlePostLoader = async ({ params }) => {
-  const { id } = params;
-  try {
-    const { data } = await customFetch.get(`/posts/${id}`);
-    return data;
-  } catch (error) {
-    console.log(error);
-    return {
-      error: error?.response?.data?.msg || "Failed to load post",
-    };
-  }
-};
-
 const SinglePost = () => {
   const [showComments, setShowComments] = useState(true);
   const { post } = useLoaderData();

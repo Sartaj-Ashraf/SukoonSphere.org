@@ -108,9 +108,9 @@ const links = [
         icon: <FaBrain />,
       },
       {
-        name: "Our Review Board",
+        name: "Our Contributors",
         address: '/about/our-team',
-        description: "Meet our expert team",
+        description: "Meet our contributors",
         // icon: <FaCaretRight />,
         icon: <FiUsers />,
       },

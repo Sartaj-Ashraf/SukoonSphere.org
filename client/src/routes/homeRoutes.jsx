@@ -8,19 +8,23 @@ const Article = lazy(() => import("../pages/articles/Article"));
 
 // Keep the loader as 
 import LoadingSpinner from "@/components/loaders/LoadingSpinner";
-import { questionsAction, questionsLoader } from "@/pages/QaSection/QaSection";
-import { answerAction, answersLoader } from "@/pages/answer/Answer";
-import AllPosts, {
-  allPostsLoader,
-} from "@/pages/posts/AllPosts";
-import SinglePost, { singlePostLoader } from "@/pages/posts/SinglePost";
+import { questionsAction } from "@/pages/QaSection/QaSection";
+import { answerAction } from "@/pages/answer/Answer";
+import AllPosts from "@/pages/posts/AllPosts";
+import SinglePost from "@/pages/posts/SinglePost";
 import CommentsOutlet from "@/pages/posts/CommentsOutlet";
 import RepliesOutlet from "@/pages/posts/RepliesOutlet";
 import QaOutlet from "@/pages/QaSection/QaOutlet";
 import AllQuestionAnswers from "@/pages/QaSection/AllQuestionAnswers";
-import SingleAnswerOutlet, { SingleAnswerOutletloader } from "@/pages/QaSection/SingleAnswerOutlet";
+import SingleAnswerOutlet from "@/pages/QaSection/SingleAnswerOutlet";
 import QaCommentOutlet from "@/pages/QaSection/QaCommentOutlet";
 import QaRepliesOutlet from "@/pages/QaSection/QaRepliesOutlet";
+import { SingleAnswerOutletloader } from "@/loaders/SingleAnswerOutletloader";
+import { questionsLoader } from "@/loaders/questionsLoader";
+import { answersLoader } from "@/loaders/answersLoader";
+import { allPostsLoader } from "@/loaders/allPostsLoader";
+import { singlePostLoader } from "@/loaders/singlePostLoader";
+import { homeLoader } from "@/loaders/homeLoader";
 
 export const homeRoutes = [
   {
@@ -30,6 +34,7 @@ export const homeRoutes = [
         <Home />
       </Suspense>
     ),
+    loader: homeLoader
   },
   {
     path: "/QA-section",
