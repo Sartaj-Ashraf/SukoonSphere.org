@@ -6,9 +6,8 @@ const PreviewPageModel = ({ onClose, pageId, type }) => {
     const handlePreviewPage = async () => {
         try {
             const response = await customFetch.get(`/${type === 'page' ? 'articles/get-article-page' : 'articles/get-article-cover-page'}/${pageId}`);
-            console.log({ responseDataaaaaaaaaaa: response });
+            
             setPageData(type === "page" ? response.data.page.pageContent : response.data.coverPage.coverPage);
-            console.log({ pageData ,response });
         } catch (error) {
             console.log(error);
         }

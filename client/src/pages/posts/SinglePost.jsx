@@ -9,7 +9,6 @@ export const singlePostLoader = async ({ params }) => {
   const { id } = params;
   try {
     const { data } = await customFetch.get(`/posts/${id}`);
-    console.log({ data });
     return data;
   } catch (error) {
     console.log(error);
@@ -72,7 +71,6 @@ const SinglePost = () => {
       const { data } = await customFetch.patch(
         `/posts/comments/${commentId}/like`
       );
-      console.log({ likedata: data });
     } catch (error) {
       console.log({ likeError: error });
     }

@@ -7,7 +7,6 @@ import { useUser } from '@/context/UserContext';
 
 function UserMenu({ user, miniMenu, handleLogout }) {
    const { user: loggedInUser } = useUser();
-   console.log({loggedInUser})
   
   return (
     <div

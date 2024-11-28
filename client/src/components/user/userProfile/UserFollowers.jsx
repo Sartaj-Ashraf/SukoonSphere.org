@@ -44,7 +44,7 @@ const UserFollowers = () => {
       setIsLoading((prev) => ({ ...prev, [followerId]: false }));
     }
   };
-  console.log({ followers });
+  
   const filteredFollowers = followers.filter((follower) =>
     follower.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
