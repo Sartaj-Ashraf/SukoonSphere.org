@@ -5,6 +5,10 @@ import { formatImage } from "../middleware/multer.js";
 import { deleteFile } from '../utils/fileUtils.js';
 import RequestContribute from "../models/requestContribute/requestContributeModel.js";
 import sendContributorKeyEmail from "../utils/sendContributorKeyEmail.js";
+import Article from "../models/articles/articleModel.js";
+import Post from "../models/postModel.js";
+import Question from "../models/qaSection/questionModel.js";
+import Answer from "../models/qaSection/answerModel.js";
 
 export const getUserProfile = async (req, res) => {
   const user = await User.findById(req.user.userId).select(
@@ -346,5 +350,189 @@ export const AcceptContributorsRequest = async (req, res) => {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ error: "Something went wrong. Please try again later." });
+  }
+};
+
+export const getAllContributors = async (req, res) => {
+  try {
+    const contributors = await User.find({ role: "contributor" }).select(
+      "-password -__v -contributerKey"
+    );
+    res.status(StatusCodes.OK).json({ contributors });
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "Something went wrong. Please try again later." });
+  }
+};
+
+export const getMostLikedContent = async (req, res) => {
+  try {
+    // Get 4 most liked articles (based on views)
+    const mostLikedArticles = await Article.find({ 
+      deleted: false,
+      status: "published" 
+    })
+      .sort({ views: -1 })
+      .limit(4)
+      .populate('author', 'name avatar _id')
+      .select('title pdfPath timestamp views');
+
+    // Get 3 most liked posts
+    const mostLikedPosts = await Post.find({ deleted: false })
+      .sort({ likes: -1 })
+      .limit(3)
+      .populate('createdBy', 'name avatar _id')
+      .populate('comments')
+      .select('description imageUrl datePublished likes comments');
+
+    // Transform posts to include total comments
+    const transformedPosts = mostLikedPosts.map(post => ({
+      _id: post._id,
+      description: post.description,
+      imageUrl: post.imageUrl,
+      datePublished: post.datePublished,
+      likesCount: post.likes.length,
+      commentsCount: post.comments.length,
+      author: {
+        _id: post.createdBy._id,
+        name: post.createdBy.name,
+        avatar: post.createdBy.avatar
+      }
+    }));
+
+    // Get 3 questions with most answers and their most liked answer
+    const questionsWithMostAnswers = await Question.aggregate([
+      // Match questions that have at least one answer
+      {
+        $match: {
+          answers: { $exists: true, $not: { $size: 0 } }
+        }
+      },
+      // Add answer count field
+      {
+        $addFields: {
+          answerCount: { $size: "$answers" }
+        }
+      },
+      // Sort by answer count descending
+      {
+        $sort: { answerCount: -1 }
+      },
+      // Get top 3 questions
+      {
+        $limit: 3
+      },
+      // Lookup answers for these questions
+      {
+        $lookup: {
+          from: 'answers',
+          localField: 'answers',
+          foreignField: '_id',
+          as: 'answersData'
+        }
+      },
+      // Lookup question author details
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'createdBy',
+          foreignField: '_id',
+          as: 'authorData'
+        }
+      },
+      // Find the most liked answer
+      {
+        $addFields: {
+          mostLikedAnswer: {
+            $let: {
+              vars: {
+                sortedAnswers: {
+                  $sortArray: {
+                    input: '$answersData',
+                    sortBy: { $size: '$$this.likes' }
+                  }
+                }
+              },
+              in: { $arrayElemAt: ['$$sortedAnswers', -1] }
+            }
+          }
+        }
+      },
+      // Lookup author of the most liked answer
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'mostLikedAnswer.createdBy',
+          foreignField: '_id',
+          as: 'answerAuthorData'
+        }
+      },
+      // Lookup comments for the most liked answer
+      {
+        $lookup: {
+          from: 'qacomments',
+          let: { answerId: '$mostLikedAnswer._id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$answeredTo', '$$answerId'] }
+              }
+            }
+          ],
+          as: 'answerComments'
+        }
+      },
+      // Project final structure
+      {
+        $project: {
+          _id: 1,
+          questionText: 1,
+          context: 1,
+          tags: 1,
+          answerCount: 1,
+          createdAt: 1,
+          author: {
+            _id: { $arrayElemAt: ['$authorData._id', 0] },
+            name: { $arrayElemAt: ['$authorData.name', 0] },
+            avatar: { $arrayElemAt: ['$authorData.avatar', 0] }
+          },
+          mostLikedAnswer: {
+            $cond: {
+              if: { $gt: [{ $size: '$answersData' }, 0] },
+              then: {
+                _id: '$mostLikedAnswer._id',
+                context: '$mostLikedAnswer.context',
+                createdAt: '$mostLikedAnswer.createdAt',
+                likesCount: { $size: { $ifNull: ['$mostLikedAnswer.likes', []] } },
+                commentsCount: { $size: '$answerComments' },
+                author: {
+                  _id: { $arrayElemAt: ['$answerAuthorData._id', 0] },
+                  name: { $arrayElemAt: ['$answerAuthorData.name', 0] },
+                  avatar: { $arrayElemAt: ['$answerAuthorData.avatar', 0] }
+                }
+              },
+              else: null
+            }
+          }
+        }
+      }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        mostLikedArticles,
+        mostLikedPosts: transformedPosts,
+        questionsWithMostAnswers
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching most liked content',
+      error: error.message
+    });
   }
 };

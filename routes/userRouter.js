@@ -12,7 +12,9 @@ import {
   getUserDetailsById,
   getUserProfile,
   requestContributor,
-  verifyContributor
+  verifyContributor,
+  getAllContributors,
+  getMostLikedContent
 } from "../controllers/userController.js";
 import upload from "../middleware/multer.js";
 
@@ -36,5 +38,9 @@ router.post("/request-contributor", authenticateUser, requestContributor);
 router.get("/contributor-requests", authenticateUser, getAllContributorsRequests);
 router.delete("/contributor-request/:id", authenticateUser, deleteContributorsRequest);
 router.patch("/accept-contributor/:id", authenticateUser, AcceptContributorsRequest);
+router.get("/all-contributors",  getAllContributors);
+// home
+router.get("/get-most-liked-content", getMostLikedContent);
+
 
 export default router;
