@@ -10,7 +10,6 @@ function OurTeam() {
         qualification: professional.profile.fullTitle,
         description: `${professional.profile.quote} Known for: ${professional.profile.highlights.join(', ')}.`,
     }));
-    console.log({ boardMembers })
 
     return (
         <div className="max-w-7xl mx-auto pt-10 " data-aos="fade" data-aos-duration="1500">

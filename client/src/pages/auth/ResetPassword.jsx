@@ -29,7 +29,6 @@ const ResetPassword = () => {
         email: paramEmail,
         password,
       });
-      console.log({ resetPassword: data });
       setMessage({ success: data.msg });
     } catch (error) {
       console.log({ error });

@@ -39,7 +39,6 @@ const VerifyEmailAddres = () => {
         verificationToken: query.get("token"),
         email: query.get("email"),
       });
-      console.log({ datafrombeackend: data });
     } catch (error) {
       setError(true);
     }

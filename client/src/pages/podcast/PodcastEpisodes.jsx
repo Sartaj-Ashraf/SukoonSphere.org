@@ -9,8 +9,7 @@ import SimilarPodcasts from "@/components/podcastComponents/SimilarPodcasts";
 const PodcastEpisodes = () => {
   const { id: paramsId } = useParams()
   const podcastList = podcastsLists.find(podcast => podcast.podcastListId === paramsId)
-  console.log({ paramsId })
-  console.log({ podcastList })
+
 
   // console.log(podcastsLists[0].podcasts)
   return (

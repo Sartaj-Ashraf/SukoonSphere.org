@@ -22,7 +22,6 @@ const RequestToContribute = () => {
         setLoading(true);
         try {
             const response = await customFetch.post("/user/request-contributor", { key: secret });
-            console.log({ response })
             if (response.status === 200) {
                 toast.success("Access granted! You can now contribute.");
                 navigate(`/about/user/${user?._id}`);

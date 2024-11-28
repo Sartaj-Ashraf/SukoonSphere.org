@@ -12,9 +12,7 @@ function PodcastPage() {
  
   const {id:paramsId} = useParams()
   const podcastList = podcastsLists[0].podcasts.find(podcast => podcast.podcastId === Number(paramsId))
-  console.log({podcastList})
-  console.log({paramsId})
-  
+
 
   const {
     episodeNo,

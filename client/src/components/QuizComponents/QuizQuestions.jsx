@@ -41,7 +41,7 @@ const QuizQuestions = ({ quizQuestionsList }) => {
             setSelectedAnswer(null);
             setDisableSelection(false);
         } else {
-            console.log('Quiz Completed');
+            // console.log('Quiz Completed');
             setIsQuizCompleted(true);
             setCurrentQuestionIndex(0);
             setSelectedAnswer(null);

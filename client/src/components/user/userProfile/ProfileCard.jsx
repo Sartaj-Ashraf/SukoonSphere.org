@@ -70,7 +70,6 @@ const ProfileCard = ({ user, fetchUserById }) => {
         }
     }, [user?.followers, currentUser?._id]);
 
-    console.log({ user, currentUser, paramsId })
     return (
         <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 max-w-7xl mx-auto">
             <div className="relative h-32 rounded-t-2xl overflow-hidden">

@@ -7,9 +7,8 @@ import { Form, Link, redirect, useActionData } from "react-router-dom";
 // Action function for handling password change
 export const changePasswordAction = async ({ request }) => {
   const result = await request.formData();
-  console.log({ result });
   const data = Object.fromEntries(result);
-  console.log({ data });
+  
   try {
     const response = await customFetch.post("auth/change-password", data);
     if (response.status === 200) {
@@ -24,7 +23,6 @@ export const changePasswordAction = async ({ request }) => {
 const ChangePassword = () => {
   const data = useActionData();
   const isSubmitting = navigation.state === "submitting";
-  console.log({ datafromcomponent: data });
   return (
     <div className="min-h-screen  flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
