@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import LoadingSpinner from '@/components/loaders/LoadingSpinner';
-import RequestToContribute from '@/pages/contributors/RequestToContribute';
+import RequestToContribute from '@/pages/about/helpDesk/RequestToContribute';
 
 export const contributerRoutes = [
     {

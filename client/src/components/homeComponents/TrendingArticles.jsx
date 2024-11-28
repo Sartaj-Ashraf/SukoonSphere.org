@@ -1,12 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { articles } from "@/utils/Articles";
+import { Link, useLoaderData } from "react-router-dom";
 
 const TrendingArticles = () => {
+  const { mostLikedArticles } = useLoaderData()
+  console.log(mostLikedArticles)
   return (
     <div className="max-w-7xl mx-auto px-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-8">Recent Articles</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {articles.slice(0, 3).map((article, index) => (
           <div
             key={index}
@@ -21,7 +22,7 @@ const TrendingArticles = () => {
             </Link>
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 };

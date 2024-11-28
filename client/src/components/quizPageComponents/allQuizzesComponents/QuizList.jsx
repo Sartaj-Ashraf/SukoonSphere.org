@@ -1,9 +1,4 @@
 import React from 'react'
-import {
-    AiOutlineComment,
-    AiOutlineLike,
-    AiOutlineFieldTime,
-} from "react-icons/ai";
 import { Link } from 'react-router-dom';
 
 function QuizList({ quizCategories, }) {

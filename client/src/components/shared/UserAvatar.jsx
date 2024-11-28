@@ -23,15 +23,15 @@ const UserAvatar = ({ createdBy, username, userAvatar, createdAt, size = "medium
       gap: "gap-4",
     },
     verySmall: {
-      image: "w-7 h-7 sm:w-6 sm:h-6",
-      text: "text-xs sm:text-sm",
+      image: "w-7 h-7 sm:w-8 sm:h-8",
+      text: "text-[.8rem]",
       date: "text-[0.7rem] ",
       gap: "gap-2",
     },
   };
 
   return (
-    <div className={`flex  ${sizeClasses[size].gap}`}>
+    <div className={`flex ${sizeClasses[size].gap}`}>
       <img
         src={
           userAvatar ||
@@ -42,7 +42,7 @@ const UserAvatar = ({ createdBy, username, userAvatar, createdAt, size = "medium
       />
       <div className="cursor-pointer">
         <Link className="hover:text-blue-400" to={`/about/user/${createdBy}`}>
-          <p className={`text-sm md:text-lg font-semibold  text-[var(--grey--900)] capitalize ${sizeClasses[size].text} m-0 hover:underline `}>
+          <p className={`font-semibold  text-[var(--grey--900)] capitalize ${sizeClasses[size].text} m-0 hover:underline `}>
             {username}
           </p>
         </Link>

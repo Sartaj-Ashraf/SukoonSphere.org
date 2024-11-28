@@ -1,7 +1,7 @@
 function QuizSubmissionDialog({ answers }) {
     return (
         <div>
-            <dialog id="my_modal_3 " className="modal ">
+            <dialog id="my_modal_3" className="modal">
                 <div className="modal-box w-11/12 overflow-hidden max-w-5xl p-4 sm:p-6 md:p-8 shadow-xl rounded-2xl bg-gradient-to-br from-blue-100 via-purple-50 to-pink-100">
                     <form method="dialog">
                         <button className="btn btn-sm btn-circle btn-ghost absolute right-2 sm:right-4 top-2 sm:top-4 hover:bg-red-100 hover:text-red-500 transition-all duration-300">

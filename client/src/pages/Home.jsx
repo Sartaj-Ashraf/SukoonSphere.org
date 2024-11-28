@@ -1,8 +1,8 @@
 import React, { Fragment, lazy, Suspense } from "react";
 import LoadingSpinner from "@/components/loaders/LoadingSpinner";
+import { TrendingArticles } from "@/components";
 
 // Lazy load components
-const Podcasts = lazy(() => import("../components/homeComponents/Podcasts"));
 const TopIntro = lazy(() => import("../components/homeComponents/TopIntro"));
 const TodaysQuote = lazy(() => import("../components/homeComponents/TodaysQuote"));
 const TodaysQuiz = lazy(() => import("../components/homeComponents/TodaysQuiz"));
@@ -30,9 +30,9 @@ const Home = () => {
       <Suspense fallback={<LoadingSpinner />}>
         <Infography />
       </Suspense>
-      {/* <Suspense fallback={<LoadingSpinner />}>
+      <Suspense fallback={<LoadingSpinner />}>
         <TrendingArticles />
-      </Suspense> */}
+      </Suspense>
       <Suspense fallback={<LoadingSpinner />}>
         <TodaysQuiz />
       </Suspense>

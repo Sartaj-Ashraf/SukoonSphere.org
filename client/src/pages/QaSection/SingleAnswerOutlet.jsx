@@ -7,28 +7,18 @@ import { useUser } from "@/context/UserContext";
 import DeleteModal from "@/components/shared/DeleteModal";
 import { useState } from "react";
 
-export const SingleAnswerOutletloader = async ({ params }) => {
-  const { id } = params;
-  try {
-    const response = await customFetch(`/qa-section/answer/${id}`);
-    return { answer: response.data.answer, question: response.data.question };
-  } catch (error) {
-    console.log(error);
-    return { error: error.response.data.msg };
-  }
-};
 
 const SingleAnswerOutlet = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { answer, question, error } = useLoaderData();
-  
+
   // Handle error state
   if (error) {
     return <div className="text-red-500 p-4">{error}</div>;
   }
-  
+
   // Handle loading/undefined state
   if (!answer || !question) {
     return <div className="p-4">Loading...</div>;

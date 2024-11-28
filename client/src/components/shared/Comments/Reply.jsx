@@ -78,9 +78,9 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
           size="verySmall"
         />
         {user?._id === reply.createdBy && (
-          <PostActions 
+          <PostActions
             handleEdit={handleEdit}
-            handleDelete={() => setShowDeleteModal(true)} 
+            handleDelete={() => setShowDeleteModal(true)}
           />
         )}
       </div>
@@ -97,7 +97,7 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
               <p className="text-gray-600 text-xs md:text-sm mb-0">{reply.content}</p>
               {isEdited && (
                 <span className="absolute bottom-0 right-0 text-[10px] text-gray-400 italic">
-                  {formatDistanceToNow(new Date(reply.updatedAt), { addSuffix: true })}
+                  Edited {formatDistanceToNow(new Date(reply.updatedAt), { addSuffix: true })}
                 </span>
               )}
             </div>
@@ -106,11 +106,10 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
         {!isEditing && (
           <div className="flex items-center gap-3 my-1">
             <button
-              className={`flex items-center gap-2 px-2 py-1 rounded-full transition-all duration-200 ${
-                isLiked
-                  ? "text-red-500 bg-red-50 hover:bg-red-100"
-                  : "text-gray-500 hover:bg-gray-100"
-              }`}
+              className={`flex items-center gap-2 px-2 py-1 rounded-full transition-all duration-200 ${isLiked
+                ? "text-red-500 bg-red-50 hover:bg-red-100"
+                : "text-gray-500 hover:bg-gray-100"
+                }`}
               onClick={likeReply}
             >
               <FaRegHeart className="w-3 h-3 md:w-4 md:h-4" />

@@ -2,7 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import LoadingSpinner from '@/components/loaders/LoadingSpinner';
 import { UserAnswers } from '@/components';
 import Articles from '@/pages/contributors/Articles';
-const ProfessionalsProfile = lazy(() => import('../pages/professionalProfile/ProfessionalsProfile'));
+const ProfessionalsProfile = lazy(() => import('../pages/about/professionalProfile/ProfessionalsProfile'));
 const UserProfile = lazy(() => import('../pages/about/UserProfile'));
 const UserPosts = lazy(() => import('../components/user/userProfile/UserPosts'));
 const UserQuestions = lazy(() => import('../components/user/userProfile/UserQuestion'));

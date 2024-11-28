@@ -1,5 +1,6 @@
 
 import LoadingSpinner from '@/components/loaders/LoadingSpinner';
+import { boardMembersLoader } from '@/loaders/boardMembersLoader';
 import GetAKey from '@/pages/about/helpDesk/GetAKey';
 import React, { lazy, Suspense } from 'react';
 
@@ -18,6 +19,7 @@ export const aboutRoutes = [
                 <OurTeam />
             </Suspense>
         ),
+        loader: boardMembersLoader
     },
     {
         path: 'about/mental-health',
@@ -51,10 +53,12 @@ export const aboutRoutes = [
             </Suspense>
         ),
     },
-   { path:"admin-inbox",
-    element: (
-        <Suspense fallback={<LoadingSpinner />}>
-            <Inbox />
-        </Suspense>
-    ),}
+    {
+        path: "admin-inbox",
+        element: (
+            <Suspense fallback={<LoadingSpinner />}>
+                <Inbox />
+            </Suspense>
+        ),
+    }
 ];
