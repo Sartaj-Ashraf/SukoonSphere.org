@@ -1,33 +1,9 @@
 import React, { useState } from "react";
-import { data } from "../../db/QuizData";
-import QuizQuestions from "../quizComponents/QuizQuestions";
 import SectionTitle from "../sharedComponents/SectionTitle";
 import QuizSummary from "../quizComponents/QuizSummary";
+import QuizQuestions from "../quizComponents/QuizQuestions";
 
 function TodaysQuiz() {
-  const [index, setIndex] = useState(0);
-  const [disableSelection, setDisableSelection] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [answers, setAnswers] = useState([]);
-  const question = data[index];
-
-  const handleAnswer = (event, optionText) => {
-    if (!disableSelection) {
-      setSelectedAnswer(optionText);
-      setDisableSelection(true);
-      setAnswers((prevAnswers) => [...prevAnswers, optionText]);
-
-      setTimeout(() => {
-        handleNextQuestion();
-      }, 2000);
-    }
-  };
-
-  const handleNextQuestion = () => {
-    setIndex((prevIndex) => prevIndex + 1);
-    setDisableSelection(false);
-    setSelectedAnswer(null);
-  };
 
   const quizQuestions = [
     {

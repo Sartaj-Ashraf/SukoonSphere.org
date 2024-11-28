@@ -1,12 +1,7 @@
-import React, { useState } from "react";
-import { GroupsSidebar, ProfileSidebar } from "@/components";
+import React from "react";
 import { Outlet } from "react-router-dom";
-import { useUser } from "@/context/UserContext";
 
 const Posts = () => {
-  const { user } = useUser();
-  const [showModal, setShowModal] = useState(false);
-
   const groups = [
     {
       id: 1,
@@ -69,17 +64,6 @@ const Posts = () => {
 
         {/* Right Sidebar - Profile */}
         <div className="hidden shadow-sm lg:block lg:col-span-3  rounded-lg">
-          {/* <ProfileSidebar
-            username={user ? user.name : "Anonymous"}
-            userTag="Mental Health Advocate"
-            questionsPosted={33}
-            answersPosted={44}
-            savedItems={["Mindfulness Techniques", "Stress Reduction"]}
-            recentItems={["Mental Health", "Mindfulness Practices"]}
-            groups={["Mindfulness and Meditation", "Therapy Techniques"]}
-            followedHashtags={["#mentalhealth", "#mindfulness", "#selfcare"]}
-            events={["Mental Wellness Workshop", "Mindfulness Session"]}
-          /> */}
         </div>
       </div>
     </div>

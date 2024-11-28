@@ -1,17 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import QuizQuestions from "@/components/quizComponents/QuizQuestions";
 import QuizList from "@/components/quizPageComponents/QuizList";
 import QuizSummary from "@/components/quizPageComponents/QuizSummary";
-import { Quizzes } from "@/utils/Quizzes";
-import bgImg from "../../assets/images/bg_podcast.jpg";
-import { HeaderImg } from "@/components";
 import { useLoaderData } from "react-router-dom";
 
 function Quiz() {
   const { quiz, quizDetails, quizQuestions } = useLoaderData();
   return (
     <>
-      {/* <HeaderImg currentPage="Quiz" bgImg={bgImg} /> */}
       <div className="max-w-full mx-auto px-4 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Sidebar */}

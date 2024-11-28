@@ -1,13 +1,11 @@
 import React from 'react'
 import MentalHeathSummary from '@/utils/about/MentalHealth'
 import bgImg from '../../assets/images/mentalHealthImg.jpg'
-import { HeaderImg } from '@/components'
 import { Link } from 'react-router-dom'
 
 function MentalHealth() {
     return (
         <>
-            {/* <HeaderImg currentPage="About / Mental Health" bgImg={bgImg} /> */}
             <div className="p-4  lg:p-8 rounded-lg max-w-7xl mx-auto space-y-16">
                 <h2 className="text-lg font-bold mb-2 text-[2rem] md:text-[2.5rem] lg:text-[3.5rem] sm:leading-[3.5rem] text-[var(--grey--900)]">Mental health</h2>
                 {/* Overview Section */}

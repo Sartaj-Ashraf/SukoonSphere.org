@@ -1,5 +1,5 @@
-import { HeaderImg, Search, SimilarArticles } from "@/components";
-import { useLoaderData, useParams } from "react-router-dom";
+
+import { useParams } from "react-router-dom";
 import React, { useState } from "react";
 import notFoundBySearch from "../../assets/images/notFoundBySearch.jpg";
 import { PodcastCard } from "@/components";
@@ -15,7 +15,6 @@ const PodcastEpisodes = () => {
   // console.log(podcastsLists[0].podcasts)
   return (
     <>
-      {/* <HeaderImg currentPage="Podcast" bgImg={bgImg} /> */}
       <div className="md:px-7 ">
         <div className=" gap-4 mt-6">
           {/* Articles */}
@@ -45,8 +44,8 @@ const PodcastEpisodes = () => {
           </div>
           {/* Search filters */}
 
-      
-          </div>
+
+        </div>
       </div>
     </>
   );

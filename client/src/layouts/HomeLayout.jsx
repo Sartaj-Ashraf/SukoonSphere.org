@@ -6,8 +6,8 @@ import { Suspense, lazy } from "react"
 import LoadingSpinner from "@/components/loaders/LoadingSpinner"
 
 // Lazy load components
-const Header = lazy(() => import("../components/sharedComponents/Header"))
-const Footer = lazy(() => import("../components/sharedComponents/Footer"))
+const Header = lazy(() => import("../components/shared/Header"))
+const Footer = lazy(() => import("../components/shared/Footer"))
 
 // Memoize logout action
 const logoutAction = async () => {
