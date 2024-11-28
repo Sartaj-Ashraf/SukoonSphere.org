@@ -20,7 +20,7 @@ const GetAKey = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!user) {
             toast.error('Please login to request contributor access');
             return;
@@ -33,7 +33,7 @@ const GetAKey = () => {
                 email,
                 message
             });
-            
+
             toast.success(response.data.msg);
             // Clear form
             setName('');

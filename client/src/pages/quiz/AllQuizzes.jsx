@@ -1,27 +1,7 @@
-import { FilterQuizByCatagory, HeaderImg, QuizIntro, QuizList } from '@/components'
+import { FilterQuizByCatagory, QuizIntro, QuizList } from '@/components'
 import React from 'react'
-import bgImg from '../../assets/images/bg_podcast.jpg'
-import { Quizzes } from '@/utils/Quizzes';
 import { useLoaderData } from "react-router-dom";
 
-
-
-// export const AllQuizzesLoader = async ({ request }) => {
-//     const url = new URL(request.url);
-//     const searchParams = Object.fromEntries(url.searchParams.entries());
-
-//     const {
-//         category: selectedCategory = "",
-//     } = searchParams;
-//     let filteredQuizzes = JSON.parse(JSON.stringify(Quizzes[0].quizCategories));
-//     if (selectedCategory) {
-//         filteredQuizzes = filteredQuizzes.filter((category) =>
-//             category.category.toLowerCase().includes(selectedCategory.toLowerCase())
-//         );
-//     }
-//     const allCategories = Quizzes[0].quizCategories.map(category => category.category);
-//     return { data: filteredQuizzes, allCategories };
-// };
 function AllQuizzes() {
     const { data: quizCategories, allCategories } = useLoaderData();
     return (

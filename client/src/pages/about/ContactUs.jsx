@@ -3,15 +3,12 @@ import contactImg from "../../assets/images/ContactImg.jpg"
 import call_Icon from "../../assets/icons/call.png"
 import chat_Icon from "../../assets/icons/chat.png"
 import crisis_Icon from "../../assets/icons/crisis.png"
-import { HeaderImg } from '@/components';
-import bgImg from "../../assets/images/ContactImg.jpg"
 import { toast } from 'react-toastify';
 import customFetch from '@/utils/customFetch';
 
 const ContactUs = () => {
     return (
         <>
-            {/* <HeaderImg currentPage="Contact" bgImg={bgImg} /> */}
             <div className="flex flex-col lg:flex-row text-white rounded-lg overflow-hidden  max-w-7xl mx-auto " data-aos="fade" data-aos-duration="1500">
                 <div className="lg:w-1/2 px-4 py-8 space-y-6">
                     <h2 className=" font-bold text-[1.6rem] md:text-[2.5rem] lg:text-[3rem] sm:leading-[3.5rem] text-[var(--grey--900)]">SukoonSphere HelpLine</h2>

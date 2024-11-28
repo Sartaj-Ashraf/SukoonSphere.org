@@ -108,7 +108,8 @@ export const homeRoutes = [
             <AllPosts />
           </Suspense>
         ),
-        loader: allPostsLoader,      },
+        loader: allPostsLoader,
+      },
       {
         path: "/posts/:id",
         element: (

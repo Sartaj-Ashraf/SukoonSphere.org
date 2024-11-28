@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaQuestionCircle } from "react-icons/fa";
 import { AiOutlineComment } from "react-icons/ai";
-import { ProfileSidebar, QuestionModal, Spinner } from "@/components";
+import { QuestionModal, Spinner } from "@/components";
 import { Link, Outlet, useLoaderData, useNavigation } from "react-router-dom";
 import customFetch from "@/utils/customFetch";
 import QuestionCard from "./components/QuestionCard";
@@ -121,8 +121,8 @@ const QaSection = () => {
             </div>
 
             {/* Questions List */}
-          
-              <Outlet context={{ questions }} />
+
+            <Outlet context={{ questions }} />
           </div>
         </div>
 

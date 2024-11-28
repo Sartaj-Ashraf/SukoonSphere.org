@@ -11,9 +11,8 @@ export const createOptimizedComponent = (importFn) => {
     );
 };
 
-export { default as Header } from "./sharedComponents/Header";
-export { default as Footer } from "./sharedComponents/Footer";
-export { default as HeaderImg } from "./sharedComponents/HeaderImg";
+export { default as Header } from "./shared/Header";
+export { default as Footer } from "./shared/Footer";
 export { default as PodcastCard } from "./sharedComponents/PodcastCard";
 export const Like = createOptimizedComponent(() => import("./shared/Like"));
 export const Follow = createOptimizedComponent(() => import("./shared/Follow"));
@@ -30,8 +29,6 @@ export const TodaysQuiz = createOptimizedComponent(() => import("./homeComponent
 export const TodaysQuote = createOptimizedComponent(() => import("./homeComponents/TodaysQuote"));
 export const CampusPartners = createOptimizedComponent(() => import("./homeComponents/CampusPartners"));
 export const Podcasts = createOptimizedComponent(() => import("./homeComponents/Podcasts"));
-export const TrendingVideos = createOptimizedComponent(() => import("./homeComponents/TrendingVideos"));
-
 // Professional Profile Components
 
 export const Intro = createOptimizedComponent(() => import("./professinalProfileComponents/Intro"));
@@ -56,15 +53,7 @@ export const QuizIntro = createOptimizedComponent(() => import("./quizPageCompon
 export const QuizList = createOptimizedComponent(() => import("./quizPageComponents/allQuizzesComponents/QuizList"));
 export const FilterQuizByCatagory = createOptimizedComponent(() => import("./quizPageComponents/allQuizzesComponents/filterQuizzesByCatagory"));
 
-// Media Components
-
-export const VideoCard = createOptimizedComponent(() => import("./mediaLibrary/VideoCard"));
-export const RelatedVideoCard = createOptimizedComponent(() => import("./mediaLibrary/RelatedVideoCard"));
-
 // QA Section Components
-
-export const ProfileSidebar = createOptimizedComponent(() => import("./qaSectionsComponents/ProfileSidebar"));
-export const GroupsSidebar = createOptimizedComponent(() => import("./qaSectionsComponents/GroupsSidebar"));
 export const QuestionModal = createOptimizedComponent(() => import("./qaSectionsComponents/QuestionModal"));
 
 // User Profile Components

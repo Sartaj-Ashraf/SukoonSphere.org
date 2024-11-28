@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { GroupsSidebar, HeaderImg, ProfileSidebar, Spinner } from "@/components";
+import { Spinner } from "@/components";
 import { useAuth0 } from "@auth0/auth0-react";
 import customFetch from "@/utils/customFetch";
 import { Form, useLoaderData, useActionData, Link } from "react-router-dom";

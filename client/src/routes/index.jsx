@@ -1,5 +1,3 @@
-// src/routes.js or src/AppRoutes.js
-
 import React, { lazy, Suspense } from 'react';
 import { homeRoutes } from './homeRoutes';
 import { userRoutes } from './userRoutes';
@@ -28,16 +26,5 @@ export const routes = [
   },
   ...authRoutes,
 
-  // {
-  //   path: '/admin',
-  //   element: (
-  //     <Suspense fallback={<LoadingSpinner />}>
-  //       <AdminLayout />
-  //     </Suspense>
-  //   ),
-  //   children: [
-  //     ...adminRoutes,
-  //   ],
-  // },
 
 ];
