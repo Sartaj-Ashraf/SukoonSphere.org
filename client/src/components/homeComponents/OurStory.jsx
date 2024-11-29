@@ -1,6 +1,6 @@
 import React from "react";
 import SectionTitle from "../sharedComponents/SectionTitle";
-import IntroVideo from "../../assets/videos/Story Video.mp4";
+import IntroVideo from "../../assets/videos/ourstory.mp4";
 import { Link } from "react-router-dom";
 import bgImg from "../../assets/images/teams-bg.png";
 import { MdOutlineReadMore } from "react-icons/md";

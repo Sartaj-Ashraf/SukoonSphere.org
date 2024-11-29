@@ -30,9 +30,9 @@ const Home = () => {
       <Suspense fallback={<LoadingSpinner />}>
         <Infography />
       </Suspense>
-      <Suspense fallback={<LoadingSpinner />}>
+      {/* <Suspense fallback={<LoadingSpinner />}>
         <TrendingArticles />
-      </Suspense>
+      </Suspense> */}
       <Suspense fallback={<LoadingSpinner />}>
         <TodaysQuiz />
       </Suspense>

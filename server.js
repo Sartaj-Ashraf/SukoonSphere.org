@@ -55,6 +55,9 @@ app.use("/api/v1/articles", ArticleRouter);
 
 app.use("/public", express.static(path.resolve(__dirname, "./public")));
 
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "./public", "index.html"));
+});
 //not founds
 app.use("*", (req, res) => {
   res.status(404).json({ msg: "route not found " });
