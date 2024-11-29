@@ -107,10 +107,10 @@ const Articles = () => {
     });
   };
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className=" mx-auto lg:py-8">
       {/* Create Article Button Section */}
       {user?.role === "contributor" && currentUser?._id === ParamId && (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 lg:mb-8">
           <h2 className="text-2xl font-bold text-gray-900">Your Articles</h2>
           <button
             onClick={() => setShowModal(true)}
@@ -255,7 +255,7 @@ const Articles = () => {
                 user?.role === "contributor" && currentUser?._id === ParamId &&(
                   <div className="flex flex-wrap items-center justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
                   <Link
-                    className="btn-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm"
+                    className="bg-blue-500 text-white inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-[6px] hover:bg-blue-600 hover:scale-105 transition-all duration-300"
                     to={`/articles/article/${article._id}`}
                   >
                     <FiEye className="w-4 h-4" />

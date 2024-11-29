@@ -48,9 +48,9 @@ const UserQuestions = () => {
     );
 
     return (
-        <div className="p-6 bg-white rounded-xl shadow-sm">
+        <div className="lg:p-6 bg-white rounded-xl shadow-sm">
             {/* Search Bar */}
-            <div className="mb-8">
+            <div className="mb-4 lg:mb-8">
                 <div className="relative max-w-md mx-auto">
                     <input
                         type="text"
@@ -64,7 +64,7 @@ const UserQuestions = () => {
             </div>
 
             {/* Questions Count */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-4 lg:mb-8">
                 <h2 className="text-2xl font-bold text-gray-800">
                     Questions <span className="text-blue-500 ml-2">{filteredQuestions.length}</span>
                 </h2>

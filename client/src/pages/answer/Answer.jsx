@@ -5,6 +5,8 @@ import { Form, useLoaderData, useActionData, Link } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
 import { toast } from "react-toastify";
 import UserAvatar from "@/components/shared/UserAvatar";
+import { FiEdit } from "react-icons/fi";
+import { IoCloseOutline, IoChatboxOutline } from "react-icons/io5";
 
 export const answerAction = async ({ request }) => {
   const formData = await request.formData();
@@ -16,7 +18,10 @@ export const answerAction = async ({ request }) => {
   }
 
   try {
-    const { data } = await customFetch.post(`/qa-section/question/${questionId}/add-answer`, { context });
+    const { data } = await customFetch.post(
+      `/qa-section/question/${questionId}/add-answer`,
+      { context }
+    );
     return { success: data.msg };
   } catch (error) {
     console.log(error);
@@ -38,7 +43,6 @@ const Answer = () => {
       setNewAnswer("");
     }
   }, [actionData]);
-
 
   const handleAnswerButtonClick = (questionId) => {
     if (!user) {
@@ -100,12 +104,17 @@ const Answer = () => {
               <h3 className="text-lg font-semibold mb-4">Coming Soon</h3>
               <div className="space-y-4">
                 {groups.map((group) => (
-                  <div key={group.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
+                  <div
+                    key={group.id}
+                    className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                  >
                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                       {group.name.charAt(0)}
                     </div>
                     <div>
-                      <p className="font-medium text-sm text-gray-900">{group.name}</p>
+                      <p className="font-medium text-sm text-gray-900">
+                        {group.name}
+                      </p>
                       <p className="text-xs text-gray-500">Starting soon</p>
                     </div>
                   </div>
@@ -116,10 +125,14 @@ const Answer = () => {
 
           {/* Main Content */}
           <div className="col-span-1 md:col-span-6">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6 border-b pb-3">Questions</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6 border-b pb-3">
+              Questions
+            </h2>
             {allQuestions?.length === 0 ? (
               <div className="text-center p-4 md:p-8 bg-white rounded-lg shadow-md">
-                <p className="text-gray-600">No questions available at the moment.</p>
+                <p className="text-gray-600">
+                  No questions available at the moment.
+                </p>
               </div>
             ) : (
               allQuestions?.map((question) => (
@@ -134,11 +147,12 @@ const Answer = () => {
                     createdAt={question?.createdAt}
                   />
 
-
                   <h3 className="text-base md:text-xl mb-2 font-bold text-[var(--grey--900)] hover:text-[var(--ternery)] transition-colors duration-200s">
                     {question?.questionText}
                   </h3>
-                  <p className="text-base mb-2 leading-relaxed text-[var(--grey--800)]">{question.context}</p>
+                  <p className="text-base mb-2 leading-relaxed text-[var(--grey--800)]">
+                    {question.context}
+                  </p>
 
                   <div className="flex flex-wrap gap-2 mb-4">
                     {question?.tags?.map((tag, index) => (
@@ -152,51 +166,63 @@ const Answer = () => {
                   </div>
 
                   <p className="text-xs md:text-sm text-gray-500 mb-3 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
                     </svg>
                     Total Answers: {question.answers?.length || 0}
                   </p>
                   <div className="flex flex-wrap md:flex-nowrap gap-2">
                     <button
                       onClick={() => handleAnswerButtonClick(question._id)}
-                      className={`flex-1 md:flex-none inline-flex items-start justify-center gap-2 py-2 md:py-2.5 px-3 md:px-4 rounded-xl font-medium text-sm transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] ${selectedQuestionId === question._id
-                        ? "bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-200"
-                        : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md hover:shadow-lg"
-                        }`}
+                      className={`flex-1 md:flex-none inline-flex items-center justify-center gap-2 py-2 md:py-2.5 px-3 md:px-4 rounded-xl font-medium text-sm transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] ${
+                        selectedQuestionId === question._id
+                          ? "bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
+                          : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md hover:shadow-lg"
+                      }`}
                     >
                       {selectedQuestionId === question._id ? (
                         <>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 md:h-5 w-4 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
+                          <IoCloseOutline className="h-5 w-5" />
                           Cancel
                         </>
                       ) : (
                         <>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 md:h-5 w-4 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                          </svg>
+                          <FiEdit className="h-5 w-5" />
                           Answer
                         </>
                       )}
                     </button>
                     <Link
                       to={`/QA-section/question/${question._id}`}
-                      className={`flex-1 md:flex-none inline-flex items-center justify-center gap-2 py-2 md:py-2.5 px-3 md:px-4 rounded-xl font-medium text-sm bg-gray-50 text-gray-700 hover:bg-gray-100 transition-all duration-300 ${question.answers?.length === 0 ? 'opacity-50 pointer-events-none cursor-not-allowed' : 'hover:scale-[1.02] active:scale-[0.98]'
-                        }`}
+                      className={`flex-1 md:flex-none inline-flex items-center justify-center gap-2 py-2 md:py-2.5 px-3 md:px-4 rounded-xl font-medium text-sm transition-all duration-300 ${
+                        question.answers?.length === 0
+                          ? "bg-gray-100 text-gray-400 opacity-50 pointer-events-none cursor-not-allowed"
+                          : "bg-gray-50 text-gray-700 hover:bg-gray-100 hover:scale-[1.02] active:scale-[0.98]"
+                      }`}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 md:h-5 w-4 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      See Answers ({question.answers?.length || 0})
+                      <IoChatboxOutline className="h-5 w-5" />
+                      View Answers
                     </Link>
                   </div>
 
                   {selectedQuestionId === question._id && (
                     <Form method="post" className="mt-4">
-                      <input type="hidden" name="questionId" value={question._id} />
+                      <input
+                        type="hidden"
+                        name="questionId"
+                        value={question._id}
+                      />
                       <textarea
                         name="context"
                         placeholder="Write your answer..."
@@ -208,8 +234,19 @@ const Answer = () => {
                       />
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 md:gap-0">
                         <span className="text-xs md:text-sm text-gray-500 flex items-center gap-1">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                            />
                           </svg>
                           {newAnswer.length}/500 characters
                         </span>
@@ -224,7 +261,7 @@ const Answer = () => {
                               Submitting...
                             </>
                           ) : (
-                            'Submit Answer'
+                            "Submit Answer"
                           )}
                         </button>
                       </div>

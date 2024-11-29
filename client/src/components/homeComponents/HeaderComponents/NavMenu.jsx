@@ -23,7 +23,8 @@ function NavMenu() {
   const toggleSublink = (index) => {
     setActiveSublink(index === activeSublink ? null : index);
   };
-
+  const { user: loggedInUser } = useUser();
+  
   React.useEffect(() => {
     const handleClickOutside = (event) => {
       if (activeSublink !== null) {
@@ -44,26 +45,27 @@ function NavMenu() {
       console.error("Logout failed:", error);
     }
   };
-
-  const settingsLinks = user
-    ? [
-      {
-        name: "Become a contributor",
-        address: '/user/request-contributor',
-        icon: <CiMedal />,
-      },
+  const settingsLinks = user 
+  ? [
+      ...(loggedInUser?.role !== "contributor" || loggedInUser?.role === "admin" 
+        ? [{
+            name: "Become a contributor",
+            address: '/user/request-contributor',
+            icon: <CiMedal />,
+          }] 
+        : []),
       {
         name: "Change Password",
-        address: "/user/change-passowrd",
+        address: "/user/change-password",
         icon: <MdOutlinePassword />,
       },
       {
         name: "Logout",
         icon: <RxCross2 />,
         onClick: handleLogout,
-      },
-    ]
-    : [
+      }
+    ] 
+  : [
       {
         name: "Sign Up",
         address: "/auth/sign-up",
@@ -73,7 +75,7 @@ function NavMenu() {
         name: "Login",
         address: "/auth/sign-in",
         icon: <BiLogIn />,
-      },
+      }
     ];
 
   return (

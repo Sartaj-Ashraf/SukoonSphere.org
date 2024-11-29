@@ -35,8 +35,8 @@ const Posts = () => {
     <div className="relative w-full max-w-7xl mx-auto px-2 sm:px-4 py-4">
       <div className="grid grid-cols-12 gap-2">
         {/* Left Sidebar - Groups */}
-        <div className="rounded-lg shadow-sm hidden lg:block lg:col-span-3 h-screen overflow-y-auto">
-          <div className="bg-white p-4 rounded-lg">
+        <div className="rounded-lg shadow-sm hidden lg:block lg:col-span-3 ">
+          <div className="bg-white p-4 rounded-lg sticky top-20">
             <h3 className="text-lg font-semibold mb-4">Coming Soon</h3>
             <div className="space-y-4">
               {groups.map((group) => (
@@ -57,7 +57,7 @@ const Posts = () => {
         {/* Main Content */}
         <div className="col-span-12 lg:col-span-6 space-y-4">
           {/* Add Post Card */}
-          <div className="overflow-y-auto max-h-screen no-scrollbar rounded-lg">
+          <div >
             <Outlet />
           </div>
         </div>
