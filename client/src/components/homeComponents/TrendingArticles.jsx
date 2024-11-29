@@ -2,8 +2,8 @@ import React from "react";
 import { Link, useLoaderData } from "react-router-dom";
 
 const TrendingArticles = () => {
-  const { mostLikedArticles } = useLoaderData()
-  console.log(mostLikedArticles)
+  const data = useLoaderData()
+  console.log(data)
   return (
     <div className="max-w-7xl mx-auto px-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-8">Recent Articles</h2>

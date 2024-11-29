@@ -13,7 +13,6 @@ import { useUser } from '../../../context/UserContext';
 
 const GetAKey = () => {
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { user } = useUser();
@@ -28,16 +27,14 @@ const GetAKey = () => {
 
         try {
             setIsLoading(true);
-            const response = await customFetch.patch('/user/verify-contributor/' + user._id, {
+            const response = await customFetch.post('/user/verify-contributor/', {
                 fullname: name,
-                email,
                 message
             });
 
             toast.success(response.data.msg);
             // Clear form
             setName('');
-            setEmail('');
             setMessage('');
         } catch (error) {
             console.error('Error:', error);
@@ -125,20 +122,6 @@ const GetAKey = () => {
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-gray-700 mb-2 font-semibold">
-                                    Email Address
-                                </label>
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="your.email@example.com"
-                                    className="w-full px-3 bg-[var(--white-color)] py-2 md:px-4 md:py-3 rounded-lg border-2 border-gray-100 focus:border-[var(--green)] transition duration-300"
-                                    required
-                                    disabled={isLoading}
-                                />
-                            </div>
 
                             <div>
                                 <label className="block text-gray-700 mb-2 font-semibold">

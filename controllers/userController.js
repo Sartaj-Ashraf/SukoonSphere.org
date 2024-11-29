@@ -5,10 +5,11 @@ import { formatImage } from "../middleware/multer.js";
 import { deleteFile } from '../utils/fileUtils.js';
 import RequestContribute from "../models/requestContribute/requestContributeModel.js";
 import sendContributorKeyEmail from "../utils/sendContributorKeyEmail.js";
-import Article from "../models/articles/articleModel.js";
+import ArticleModel from "../models/articles/articleModel.js";
 import Post from "../models/postModel.js";
 import Question from "../models/qaSection/questionModel.js";
 import Answer from "../models/qaSection/answerModel.js";
+import UserSuggestion from "../models/UserSuggestion.js";
 
 export const getUserProfile = async (req, res) => {
   const user = await User.findById(req.user.userId).select(
@@ -95,7 +96,7 @@ export const followOrUnfollowUser = async (req, res) => {
       targetUser.followers.push(currentUserId);
     }
 
-    await Promise.all([currentUser.save(), targetUser.save()]);
+    await Promise.all([currentUser.save(), targetUser.save()]);s
 
     res.status(StatusCodes.OK).json({
       success: true,
@@ -228,8 +229,8 @@ export const requestContributor = async (req, res) => {
 };
 
 export const verifyContributor = async (req, res) => {
-  const { fullname, email, message } = req.body;
-  const { userId } = req.user; 
+  const { fullname,  message } = req.body;
+  const { userId , email} = req.user; 
 
   try {
     // Check if user already has any request in the system
@@ -353,7 +354,7 @@ export const AcceptContributorsRequest = async (req, res) => {
   }
 };
 
-export const getAllContributors = async (req, res) => {
+export const  getAllContributors = async (req, res) => {
   try {
     const contributors = await User.find({ role: "contributor" }).select(
       "-password -__v -contributerKey"
@@ -366,10 +367,10 @@ export const getAllContributors = async (req, res) => {
   }
 };
 
-export const getMostLikedContent = async (req, res) => {
+export const  getMostLikedContent = async (req, res) => {
   try {
     // Get 4 most liked articles (based on views)
-    const mostLikedArticles = await Article.find({ 
+    const mostLikedArticles = await ArticleModel.find({ 
       deleted: false,
       status: "published" 
     })
@@ -445,16 +446,21 @@ export const getMostLikedContent = async (req, res) => {
       {
         $addFields: {
           mostLikedAnswer: {
-            $let: {
-              vars: {
-                sortedAnswers: {
-                  $sortArray: {
-                    input: '$answersData',
-                    sortBy: { $size: '$$this.likes' }
-                  }
+            $reduce: {
+              input: '$answersData',
+              initialValue: null,
+              in: {
+                $cond: {
+                  if: {
+                    $or: [
+                      { $eq: ['$$value', null] },
+                      { $gt: [{ $size: { $ifNull: ['$$this.likes', []] } }, { $size: { $ifNull: ['$$value.likes', []] } }] }
+                    ]
+                  },
+                  then: '$$this',
+                  else: '$$value'
                 }
-              },
-              in: { $arrayElemAt: ['$$sortedAnswers', -1] }
+              }
             }
           }
         }
@@ -535,4 +541,115 @@ export const getMostLikedContent = async (req, res) => {
       error: error.message
     });
   }
+};
+
+export const userSuggestions = async (req, res) => {
+    try {
+        const suggestions = await UserSuggestion.find()
+            .populate('user', 'name email')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            suggestions
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching suggestions',
+            error: error.message
+        });
+    }
+};
+
+export const createSuggestion = async (req, res) => {
+    const { message } = req.body;
+    const { userId } = req.user;
+
+    try {
+        const suggestion = await UserSuggestion.create({
+            user: userId,
+            message
+        });
+
+        await suggestion.populate('user', 'name email');
+
+        res.status(201).json({
+            success: true,
+            message: 'Suggestion submitted successfully',
+            suggestion
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error submitting suggestion',
+            error: error.message
+        });
+    }
+};
+
+export const deleteSuggestion = async (req, res) => {
+    const { suggestionId } = req.params;
+
+    try {
+        const suggestion = await UserSuggestion.findById(suggestionId);
+
+        if (!suggestion) {
+            return res.status(404).json({
+                success: false,
+                message: 'Suggestion not found'
+            });
+        }
+
+        await suggestion.deleteOne();
+
+        res.status(200).json({
+            success: true,
+            message: 'Suggestion deleted successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting suggestion',
+            error: error.message
+        });
+    }
+};
+
+export const updateSuggestionStatus = async (req, res) => {
+    const { suggestionId } = req.params;
+    const { status } = req.body;
+
+    try {
+        const suggestion = await UserSuggestion.findById(suggestionId);
+
+        if (!suggestion) {
+            return res.status(404).json({
+                success: false,
+                message: 'Suggestion not found'
+            });
+        }
+
+        if (!['pending', 'reviewed', 'implemented'].includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid status value'
+            });
+        }
+
+        suggestion.status = status;
+        await suggestion.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Suggestion status updated successfully',
+            suggestion
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error updating suggestion status',
+            error: error.message
+        });
+    }
 };

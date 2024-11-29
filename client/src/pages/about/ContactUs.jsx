@@ -1,63 +1,14 @@
-import React from 'react';
-import contactImg from "../../assets/images/ContactImg.jpg"
-import call_Icon from "../../assets/icons/call.png"
-import chat_Icon from "../../assets/icons/chat.png"
-import crisis_Icon from "../../assets/icons/crisis.png"
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import customFetch from '@/utils/customFetch';
+import { useUser } from '../../context/UserContext';
+import { FaLightbulb, FaBug } from 'react-icons/fa';
 
 const ContactUs = () => {
-    return (
-        <>
-            <div className="flex flex-col lg:flex-row text-white rounded-lg overflow-hidden  max-w-7xl mx-auto " data-aos="fade" data-aos-duration="1500">
-                <div className="lg:w-1/2 px-4 py-8 space-y-6">
-                    <h2 className=" font-bold text-[1.6rem] md:text-[2.5rem] lg:text-[3rem] sm:leading-[3.5rem] text-[var(--grey--900)]">SukoonSphere HelpLine</h2>
-                    <p className="text-base text-[var(--grey--800)]  md:block">The SukoonSphere HelpLine provides the one-on-one help and information necessary to tackle tough challenges that you, your family or friends are facing.</p>
-                    <div className="space-y-6">
-                        <div className="flex items-center">
-                            <img src={call_Icon} alt="" />
-                            <div className="ml-4">
-                                <h2 className="text-xl font-bold text-[var(--grey--900)] ">Call</h2>
-                                <p className='text-[var(--grey--800)]'>+91 7889662700</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center">
-                            <img src={chat_Icon} alt="" />
-                            <div className="ml-4">
-                                <h2 className="text-xl font-bold text-[var(--grey--900)] ">Chat or Text</h2>
-                                <p className='text-[var(--grey--800)]'>Text 'helpline' to +91 7051679659</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center">
-                            <img src={crisis_Icon} alt="" />
-
-                            <div className="ml-4">
-                                <h2 className="text-xl font-bold text-[var(--grey--900)] ">In a crisis?</h2>
-                                <p className='text-[var(--grey--800)]'>Call or Text 988</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right Section: Image */}
-                <div className="lg:w-1/2 rounded-[20px]" >
-                    <ContactForm />
-                </div>
-            </div>
-        </>
-    );
-};
-
-export default ContactUs;
-
-const ContactForm = () => {
-    const [formData, setFormData] = React.useState({
-        name: '',
-        email: '',
-        phone: '',
-        message: ''
+    const { user } = useUser();
+    const [formData, setFormData] = useState({
+        message: '',
+        type: 'suggestion' // or 'issue'
     });
 
     const handleChange = (e) => {
@@ -70,91 +21,138 @@ const ContactForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!user) {
+            toast.error('Please login to submit suggestions or report issues');
+            return;
+        }
+
         try {
-            // const response = await customFetch.post('/contact', formData);
-            toast.success('Your response has been recorded!');
+            const response = await customFetch.post('/user/suggestions', {
+                message: formData.message
+            });
+            
+            toast.success(response.data.message);
             setFormData({
-                name: '',
-                email: '',
-                phone: '',
-                message: ''
+                message: '',
+                type: 'suggestion'
             });
         } catch (error) {
-            toast.error(error?.response?.data?.msg || 'Something went wrong!');
+            toast.error(error?.response?.data?.error || 'Failed to submit. Please try again.');
         }
     };
 
     return (
-        <div className="flex justify-center  items-center p-4">
-            <div className="bg-[var(--primary)] shadow-lg px-4  lg:px-8 py-8 w-full rounded-[20px]">
-                <h2 className="text-2xl font-semibold mb-4 text-[var(--white-color)] ">Tell us about your situations</h2>
-                <form onSubmit={handleSubmit} className="space-y-2 text-[var(--grey--800)]  ">
-                    <div className="form-control ">
-                        <label className="label">
-                            <span className="label-text ">Your name</span>
-                        </label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            placeholder="Your name"
-                            className="input input-bordered w-full bg-gray-100 text-[var(--black-color)]"
-                        />
-                    </div>
+        <div className="min-h-screen bg-[var(--grey-50)] py-8">
+            <div className="max-w-4xl mx-auto px-4">
+                {/* Header Section */}
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-bold text-[var(--grey-900)] mb-4">
+                        Help Us Improve
+                    </h1>
+                    <p className="text-lg text-[var(--grey-600)] max-w-2xl mx-auto">
+                        Your feedback is valuable! Share your suggestions or report issues to help us make SukoonSphere better for everyone.
+                    </p>
+                </div>
 
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text ">Your email address</span>
-                        </label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="Your email address"
-                            className="input input-bordered w-full bg-gray-100 text-[var(--black-color)]"
-                        />
-                    </div>
+                {/* Main Content */}
+                <div className="bg-white rounded-2xl shadow-xl p-8">
+                    {/* Type Selection Cards */}
+                    <div className="grid md:grid-cols-2 gap-6 mb-8">
+                        <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, type: 'suggestion' }))}
+                            className={`p-6 rounded-xl border-2 transition-all ${
+                                formData.type === 'suggestion'
+                                ? 'border-[var(--primary)] bg-[var(--primary-50)]'
+                                : 'border-gray-200 hover:border-[var(--primary)] hover:bg-[var(--primary-50)]'
+                            }`}
+                        >
+                            <div className="flex items-center space-x-4">
+                                <div className={`p-3 rounded-full ${
+                                    formData.type === 'suggestion'
+                                    ? 'bg-[var(--primary)] text-white'
+                                    : 'bg-gray-100 text-gray-600'
+                                }`}>
+                                    <FaLightbulb size={24} />
+                                </div>
+                                <div className="text-left">
+                                    <h3 className="text-lg font-semibold text-[var(--grey-900)]">
+                                        Share a Suggestion
+                                    </h3>
+                                    <p className="text-[var(--grey-600)]">
+                                        Help us improve with your ideas
+                                    </p>
+                                </div>
+                            </div>
+                        </button>
 
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text">Your phone number</span>
-                        </label>
-                        <input
-                            type="text"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            placeholder="Your phone number"
-                            className="input input-bordered w-full bg-gray-100 text-[var(--black-color)]"
-                        />
-                    </div>
-
-                    <div className="form-control">
-                        <label className="label">
-                            <span className="label-text ">Your message</span>
-                        </label>
-                        <textarea
-                            name="message"
-                            value={formData.message}
-                            onChange={handleChange}
-                            placeholder="Your message"
-                            className="textarea textarea-bordered w-full bg-gray-100 text-[var(--black-color)]"
-                        />
-                    </div>
-
-                    <div className="mt-6">
-                        <button type="submit" className="btn w-full action-button">
-                            SEND MESSAGE
+                        <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, type: 'issue' }))}
+                            className={`p-6 rounded-xl border-2 transition-all ${
+                                formData.type === 'issue'
+                                ? 'border-[var(--primary)] bg-[var(--primary-50)]'
+                                : 'border-gray-200 hover:border-[var(--primary)] hover:bg-[var(--primary-50)]'
+                            }`}
+                        >
+                            <div className="flex items-center space-x-4">
+                                <div className={`p-3 rounded-full ${
+                                    formData.type === 'issue'
+                                    ? 'bg-[var(--primary)] text-white'
+                                    : 'bg-gray-100 text-gray-600'
+                                }`}>
+                                    <FaBug size={24} />
+                                </div>
+                                <div className="text-left">
+                                    <h3 className="text-lg font-semibold text-[var(--grey-900)]">
+                                        Report an Issue
+                                    </h3>
+                                    <p className="text-[var(--grey-600)]">
+                                        Let us know about any problems
+                                    </p>
+                                </div>
+                            </div>
                         </button>
                     </div>
 
-                    <p className="mt-4 text-gray-500 text-sm text-center">
-                        We usually reply within a day. We may need more details from you. We will be in touch by phone or email if required.
-                    </p>
-                </form>
+                    {/* Form Section */}
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div>
+                            <label className="block text-[var(--grey-900)] text-lg font-medium mb-2">
+                                {formData.type === 'suggestion' ? 'Your Suggestion' : 'Issue Description'}
+                            </label>
+                            <textarea
+                                name="message"
+                                value={formData.message}
+                                onChange={handleChange}
+                                placeholder={formData.type === 'suggestion' 
+                                    ? "Share your ideas on how we can improve SukoonSphere..."
+                                    : "Describe the issue you've encountered in detail..."}
+                                className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary min-h-[100px] resize-none"
+                                required
+                            />
+                        </div>
+
+                        <button 
+                            type="submit"
+                            className="w-full bg-[var(--primary)] text-white py-4 px-6 rounded-xl text-lg  hover:bg-opacity-90 transition-colors flex items-center justify-center space-x-2"
+                        >
+                            <span>
+                                {formData.type === 'suggestion' ? 'Submit Suggestion' : 'Submit Report'}
+                            </span>
+                        </button>
+
+                        <p className="text-center text-[var(--grey-600)]">
+                            {formData.type === 'suggestion' 
+                                ? "Your suggestions help us create a better experience for everyone."
+                                : "We appreciate you taking the time to report this issue."}
+                        </p>
+                    </form>
+                </div>
             </div>
         </div>
     );
 };
+
+export default ContactUs;
