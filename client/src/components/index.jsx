@@ -64,3 +64,6 @@ export const UserQuestions = createOptimizedComponent(() => import("./user/userP
 export const UserFollowers = createOptimizedComponent(() => import("./user/userProfile/UserFollowers"));
 export const UserFollowing = createOptimizedComponent(() => import("./user/userProfile/UserFollowing"));
 
+
+// Media Library
+export const YoutubeEmbed = createOptimizedComponent(() => import("./mediaLibrary/videos/YoutubeEmbed"));

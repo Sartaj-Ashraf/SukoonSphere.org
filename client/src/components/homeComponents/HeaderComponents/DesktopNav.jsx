@@ -32,7 +32,7 @@ const SubLinks = ({ sublinks }) => (
     <BsFillTriangleFill className="text-lg absolute -top-3 left-5 text-white" />
     {sublinks.map((sublink) => {
       // Check if the sublink is for videos or podcasts
-      if (sublink.name === "Videos" || sublink.name === "Podcasts") {
+      if (sublink.name === "Podcasts") {
         return (
           <li key={sublink.name} className="relative transition-opacity duration-300 ease-in-out border-b-[2px] border-gray-500] last-of-type:border-none opacity-50 cursor-not-allowed">
             <div className="flex items-center gap-2 px-2 py-2">

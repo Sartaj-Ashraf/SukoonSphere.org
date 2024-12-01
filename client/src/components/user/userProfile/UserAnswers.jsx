@@ -3,7 +3,7 @@ import customFetch from '@/utils/customFetch';
 import React, { useEffect, useState } from 'react'
 import { FaSearch } from 'react-icons/fa';
 import { useOutletContext } from 'react-router-dom';
-import Answer from '@/pages/QaSection/components/Answer';
+import Answer from '@/pages/stories&discussions/qaSection/components/Answer';
 
 const UserAnswers = () => {
     const user = useOutletContext();
@@ -85,9 +85,9 @@ const UserAnswers = () => {
             ) : (
                 <div className="space-y-6">
                     {filteredAnswers.map((answer) => (
-                        <Answer 
-                            key={answer._id} 
-                            answer={answer} 
+                        <Answer
+                            key={answer._id}
+                            answer={answer}
                             user={loggedUser}
                             answerCount={filteredAnswers.length}
                             onDelete={updateAnswersList}

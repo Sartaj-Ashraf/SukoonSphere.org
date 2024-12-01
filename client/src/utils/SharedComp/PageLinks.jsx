@@ -73,7 +73,7 @@ const links = [
       },
       {
         name: "Videos",
-        address: 'media/all-videos',
+        address: 'all-videos',
         description: "Visual media content",
         // icon: <FaCaretRight />,
         icon: <MdVideoLibrary />,

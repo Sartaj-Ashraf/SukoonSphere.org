@@ -46,7 +46,7 @@ const Inbox = () => {
 
     const filteredRequests = () => {
         if (!searchTerm) return requests;
-        
+
         const term = searchTerm.toLowerCase();
         return requests.filter(request => {
             if (searchBy === 'name') {
@@ -68,9 +68,15 @@ const Inbox = () => {
     const displayedRequests = filteredRequests();
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
-                <h1 className="text-2xl md:text-3xl font-bold">Contributor Requests</h1>
+        <div className="">
+            <div className="space-y-4 p-4">
+                {/* <h2 className="text-xl md:text-2xl font-bold text-[var(--grey--900)]">Contributor Requests</h2> */}
+                <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-semibold text-gray-800">Contributor Requests</h2>
+                    <span className="text-sm text-gray-500">
+                        {displayedRequests.length} Request{displayedRequests.length !== 1 ? 's' : ''}
+                    </span>
+                </div>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
                     <div className="relative flex-1 min-w-0 sm:min-w-[300px]">
                         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -92,7 +98,7 @@ const Inbox = () => {
                     </select>
                 </div>
             </div>
-            
+
             {displayedRequests.length === 0 ? (
                 <div className="text-center text-gray-500 py-8 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                     {searchTerm ? 'No matching requests found' : 'No pending requests'}
@@ -100,7 +106,7 @@ const Inbox = () => {
             ) : (
                 <div className="grid gap-4">
                     {displayedRequests.map((request) => (
-                        <div 
+                        <div
                             key={request._id}
                             className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all duration-200"
                         >
@@ -131,11 +137,10 @@ const Inbox = () => {
                             </div>
                             <div className="mt-4 flex flex-wrap items-center gap-2">
                                 <span className="text-sm text-gray-500">Status:</span>
-                                <span className={`text-sm font-medium px-2.5 py-1 rounded-full ${
-                                    request.status === 'pending' 
-                                        ? 'bg-yellow-100 text-yellow-800' 
-                                        : 'bg-green-100 text-green-800'
-                                }`}>
+                                <span className={`text-sm font-medium px-2.5 py-1 rounded-full ${request.status === 'pending'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-green-100 text-green-800'
+                                    }`}>
                                     {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                                 </span>
                             </div>

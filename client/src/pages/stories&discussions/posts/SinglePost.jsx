@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLoaderData } from "react-router-dom";
-import customFetch from "../../utils/customFetch";
+import customFetch from "../../../utils/customFetch";
 import PostCard from "@/components/posts/PostCard";
 import { useUser } from "@/context/UserContext";
 import { toast } from "react-toastify";
