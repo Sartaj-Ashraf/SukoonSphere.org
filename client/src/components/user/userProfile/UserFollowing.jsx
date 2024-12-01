@@ -1,20 +1,8 @@
 import React, { useState } from "react";
-import customFetch from "@/utils/customFetch";
 import { useLoaderData, Link } from "react-router-dom";
-import { toast } from "react-toastify";
-import { useUser } from "@/context/UserContext";
 import { FaUserPlus, FaUserMinus, FaSearch } from "react-icons/fa";
 
-export const userFollowingLoader = async ({ params }) => {
-  try {
-    const { data } = await customFetch.get(`/user/following/${params.id}`);
-    return data;
-  } catch (error) {
-    console.error("Error fetching following:", error);
-    toast.error(error.response?.data?.msg || "Error fetching following");
-    return { success: false, following: [] };
-  }
-};
+
 
 const UserFollowing = () => {
   const data = useLoaderData();

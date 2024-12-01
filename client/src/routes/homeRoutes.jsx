@@ -1,24 +1,26 @@
 import React, { lazy, Suspense } from "react";
 const Home = lazy(() => import("../pages/Home"));
-const QaSection = lazy(() => import("../pages/QaSection/QaSection"));
-const Articles = lazy(() => import("../pages/articles/Articles"));
-const Posts = lazy(() => import("../pages/posts/Posts"));
-const Answer = lazy(() => import("../pages/answer/Answer"));
-const Article = lazy(() => import("../pages/articles/Article"));
+const Articles = lazy(() => import("../pages/articles&resources/articles/Articles"));
+const Posts = lazy(() => import("../pages/stories&discussions/posts/Posts"));
+const Answer = lazy(() => import("../pages/stories&discussions/qaSection/answer/Answer"));
+const Article = lazy(() => import("../pages/articles&resources/articles/Article"));
 
 // Keep the loader as 
 import LoadingSpinner from "@/components/loaders/LoadingSpinner";
-import { questionsAction } from "@/pages/QaSection/QaSection";
-import { answerAction } from "@/pages/answer/Answer";
-import AllPosts from "@/pages/posts/AllPosts";
-import SinglePost from "@/pages/posts/SinglePost";
-import CommentsOutlet from "@/pages/posts/CommentsOutlet";
-import RepliesOutlet from "@/pages/posts/RepliesOutlet";
-import QaOutlet from "@/pages/QaSection/QaOutlet";
-import AllQuestionAnswers from "@/pages/QaSection/AllQuestionAnswers";
-import SingleAnswerOutlet from "@/pages/QaSection/SingleAnswerOutlet";
-import QaCommentOutlet from "@/pages/QaSection/QaCommentOutlet";
-import QaRepliesOutlet from "@/pages/QaSection/QaRepliesOutlet";
+
+import { answerAction } from "@/pages/stories&discussions/qaSection/answer/Answer";
+import AllPosts from "@/pages/stories&discussions/posts/AllPosts";
+import SinglePost from "@/pages/stories&discussions/posts/SinglePost";
+import CommentsOutlet from "@/pages/stories&discussions/posts/CommentsOutlet";
+import RepliesOutlet from "@/pages/stories&discussions/posts/RepliesOutlet";
+
+
+import QaSection, { questionsAction } from "@/pages/stories&discussions/qaSection/QaSection";
+
+import QaCommentOutlet from "@/pages/stories&discussions/qaSection/QaCommentOutlet";
+import QaRepliesOutlet from "@/pages/stories&discussions/qaSection/QaRepliesOutlet";
+import { AllQuestionAnswers, QaOutlet, SingleAnswerOutlet } from "@/pages";
+
 import { SingleAnswerOutletloader } from "@/loaders/SingleAnswerOutletloader";
 import { questionsLoader } from "@/loaders/questionsLoader";
 import { answersLoader } from "@/loaders/answersLoader";

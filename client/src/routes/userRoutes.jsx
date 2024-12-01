@@ -10,8 +10,10 @@ const UserFollowers = lazy(() => import('../components/user/userProfile/UserFoll
 const UserFollowing = lazy(() => import('../components/user/userProfile/UserFollowing'));
 
 // Import the loader functions
-import { userFollowersLoader } from '../components/user/userProfile/UserFollowers';
-import { userFollowingLoader } from '../components/user/userProfile/UserFollowing';
+
+import { userFollowersLoader } from '@/loaders/userFollowersLoader';
+import { userFollowingLoader } from '@/loaders/userFollowingLoader';
+import Videos from '@/pages/contributors/videos/Videos';
 
 export const userRoutes = [
     {
@@ -78,6 +80,14 @@ export const userRoutes = [
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
                         <Articles />
+                    </Suspense>
+                ),
+            },
+            {
+                path: 'videos',
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Videos />
                     </Suspense>
                 ),
             },

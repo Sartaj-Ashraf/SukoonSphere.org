@@ -35,8 +35,8 @@ const UserSuggestions = () => {
             await customFetch.patch(`/user/suggestions/${suggestionId}/status`, {
                 status: newStatus
             });
-            setSuggestions(suggestions.map(suggestion => 
-                suggestion._id === suggestionId 
+            setSuggestions(suggestions.map(suggestion =>
+                suggestion._id === suggestionId
                     ? { ...suggestion, status: newStatus }
                     : suggestion
             ));
@@ -87,7 +87,7 @@ const UserSuggestions = () => {
         // Apply search filter
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
-            filtered = filtered.filter(s => 
+            filtered = filtered.filter(s =>
                 s.message.toLowerCase().includes(term) ||
                 s.user?.name?.toLowerCase().includes(term)
             );
@@ -163,7 +163,7 @@ const UserSuggestions = () => {
                     </select>
                 </div>
             </div>
-            
+
             {filteredSuggestions.length === 0 ? (
                 <div className="bg-white rounded-lg shadow p-6 text-center">
                     <p className="text-gray-600">No suggestions found</p>

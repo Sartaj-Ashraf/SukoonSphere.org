@@ -164,7 +164,6 @@ function NavMenu() {
                       {link.sublinks.map((sublink) => {
                         // Check if the sublink is for videos or podcasts
                         if (
-                          sublink.name === "Videos" ||
                           sublink.name === "Podcasts"
                         ) {
                           return (

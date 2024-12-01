@@ -1,20 +1,11 @@
 import React, { useState } from "react";
-import customFetch from "@/utils/customFetch";
+
 import { useLoaderData, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useUser } from "@/context/UserContext";
 import { FaUserPlus, FaUserMinus, FaSearch } from "react-icons/fa";
 
-export const userFollowersLoader = async ({ params }) => {
-  try {
-    const { data } = await customFetch.get(`/user/followers/${params.id}`);
-    return data;
-  } catch (error) {
-    console.error("Error fetching followers:", error);
-    toast.error(error.response?.data?.msg || "Error fetching followers");
-    return { success: false, followers: [] };
-  }
-};
+
 
 const UserFollowers = () => {
   const data = useLoaderData();
@@ -44,7 +35,7 @@ const UserFollowers = () => {
       setIsLoading((prev) => ({ ...prev, [followerId]: false }));
     }
   };
-  
+
   const filteredFollowers = followers.filter((follower) =>
     follower.name.toLowerCase().includes(searchQuery.toLowerCase())
   );

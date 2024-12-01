@@ -1,5 +1,3 @@
-import { useUser } from "@/context/UserContext";
-import { ProfileNavigationLinks } from "@/utils/SharedComp/ProfileNavigationLinks";
 import React from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import RenderProfileLinks from "./RenderProfileLinks";
@@ -10,8 +8,10 @@ const ProfileDetails = ({ user }) => {
     <>
       <div className="flex gap-2 sm:gap-4 items-center justify-start flex-wrap p-2 sm:p-4">
         {user?.role === "contributor" && (
-          <RenderProfileLinks name="Articles" link="articles" />
-
+          <>
+            <RenderProfileLinks name="Articles" link="articles" />
+            <RenderProfileLinks name="Videos" link="videos" />
+          </>
         )}
 
         <RenderProfileLinks name="Post" link="." />

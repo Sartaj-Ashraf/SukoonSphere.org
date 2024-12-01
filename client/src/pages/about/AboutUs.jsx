@@ -1,10 +1,36 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { OurTeam } from '..'
 import img_2 from "../../assets/images/About-usPage-img.png";
 import { Link } from 'react-router-dom';
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { FaLongArrowAltRight } from 'react-icons/fa';
 function AboutUs() {
+    const [activeIndex, setActiveIndex] = useState(null);
+
+    const handleAccordionToggle = (index) => {
+        setActiveIndex(activeIndex === index ? null : index);
+    };
+
+    const accordionData = [
+        {
+            title: 'How can this platform help improve my mental health?',
+            content: 'Our platform offers a variety of tools, including guided meditations, curated articles, mental health challenges, and access to support groups. We aim to provide resources and a supportive community to help you manage stress, improve emotional well-being, and foster personal growth.'
+        },
+        {
+            title: 'Can I talk to a mental health professional through this platform?',
+            content: 'Yes, we provide access to licensed mental health professionals. You can book sessions, attend workshops, and get personalized support to address your concerns.'
+        },
+        {
+            title: 'Why should I trust this platform for my mental health needs?',
+            content: 'We prioritize your privacy and mental well-being. Our resources are developed and vetted by professionals, ensuring reliable and effective support. Additionally, we provide a safe space for individuals to share their experiences and seek help.'
+        },
+        {
+            title: 'Is this platform free to use?',
+            content: 'Yes, this platform is completely free to use. We believe that mental health support should be accessible to everyone, which is why all our resources, tools, and features are available at no cost.'
+        }
+
+    ];
+
     const points = [
         { text: "We offer a personalized approach to mental health and wellness, recognizing that there’s no one-size-fits-all solution." },
         { text: "Our platform supports you in all aspects of life, from managing mental health conditions to everyday stress and relationships." },
@@ -100,11 +126,82 @@ function AboutUs() {
                     </div>
                 </div>
             </div>
-            <div>
-                <div className='max-w-7xl mx-auto '>
 
+
+
+
+            {/* FAQ's */}
+            <div>
+                <div className='max-w-7xl mx-auto mt-4  '>
+                    <div className=" py-12 px-4 sm:px-6 lg:px-8 rounded-lg border border-grey-600">
+                        <div className="max-w-7xl mx-auto">
+                            <div className="text-center">
+                                <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                                    SukoonSphere
+                                </h2>
+                                <p className="mt-4 text-lg text-gray-500">
+                                    FAQs around wellness, how and what benifits your mental health?
+                                </p>
+                            </div>
+
+                            <div className="mt-8 space-y-4">
+                                {accordionData.map((item, index) => (
+                                    <div
+                                        key={index}
+                                        className={`border rounded-lg ${activeIndex === index ? 'border-blue-500' : 'border-gray-300'
+                                            } overflow-hidden`}
+                                    >
+                                        <button
+                                            className="w-full px-6 py-4 text-left font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                            onClick={() => handleAccordionToggle(index)}
+                                        >
+                                            <div className="flex justify-between items-center">
+                                                <span>{item.title}</span>
+                                                <span>
+                                                    {activeIndex === index ? (
+                                                        <svg
+                                                            className="h-6 w-6 text-blue-500"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M5 15l7-7 7 7"
+                                                            />
+                                                        </svg>
+                                                    ) : (
+                                                        <svg
+                                                            className="h-6 w-6 text-gray-400"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M19 9l-7 7-7-7"
+                                                            />
+                                                        </svg>
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </button>
+                                        {activeIndex === index && (
+                                            <div className="px-6 py-4 border-t border-gray-300">
+                                                <p className="text-gray-700">{item.content}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <OurTeam></OurTeam>
+                {/* <OurTeam></OurTeam> */}
             </div>
         </>
     )
