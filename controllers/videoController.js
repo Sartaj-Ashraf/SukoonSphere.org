@@ -67,3 +67,19 @@ export const getUserVideos = async (req, res) => {
     const videos = await Video.find({ author: userId });
     res.status(StatusCodes.OK).json({ videos });
 }
+
+export const getSingleVideos = async (req, res) => {
+  const video = await Video.find({ type: "single" });
+  if (!video) {
+    throw new BadRequestError("Video not found");
+  }
+  res.status(StatusCodes.OK).json({ video });
+}   
+
+export const getPlaylistVideos = async (req, res) => {
+  const video = await Video.find({ type: "playlist" });
+  if (!video) {
+    throw new BadRequestError("Video not found");
+  }
+  res.status(StatusCodes.OK).json({ video });
+}

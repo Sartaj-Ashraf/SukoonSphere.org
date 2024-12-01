@@ -6,7 +6,8 @@ import { getUserVideos,
     deleteVideo,
     updateVideo,
     createVideo,
-    getAllVideos }
+    getAllVideos,
+    getSingleVideos,getPlaylistVideos }
      from "../controllers/videoController.js";
 
 const router = Router();
@@ -17,5 +18,7 @@ router.get("/video/:id", getSingleVideo);
 router.patch("/update-video/:id", authenticateUser, updateVideo);
 router.delete("/delete-video/:id", authenticateUser, deleteVideo);
 router.get("/all-videos", getAllVideos);
+router.get("/single-videos", getSingleVideos);
+router.get("/playlist-videos", getPlaylistVideos);
 
 export default router;
