@@ -1,18 +1,29 @@
 import { YoutubeEmbed } from "@/components";
+import customFetch from "@/utils/customFetch";
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 
 const Video = () => {
-    const { id: embedId } = useParams();
+    const {id: videoId} = useParams();
+    const [video,setVideo]=useState()
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const fetchVideo = async () => {
+        try {
+            const {data} = await customFetch.get(`/videos/video/${videoId}`);
+            setVideo(data.video);
+        } catch (error) {
+            setError(error.message);
+        }
+    };
     useEffect(() => {
         setIsLoading(true);
+        fetchVideo();
         setTimeout(() => {
             setIsLoading(false);
         }, 1000);
-    }, [embedId]);
+    }, []);
 
     if (error) {
         return (
@@ -58,7 +69,7 @@ const Video = () => {
                                     </div>
                                 ) : (
                                     <div className="absolute inset-0">
-                                        <YoutubeEmbed embedId={embedId} />
+                                        <YoutubeEmbed embedId={video?.videoUrl} />
                                     </div>
                                 )}
                             </div>

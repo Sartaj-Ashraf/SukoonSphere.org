@@ -5,12 +5,9 @@ import { toast } from "react-toastify";
 import { FaImage, FaTimes, FaVideo, FaPlus } from "react-icons/fa";
 
 const EditVideoModel = ({ video, setShowModal, refetchVideos }) => {
-    const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [coverImageFile, setCoverImageFile] = useState(null);
     const [previewImage, setPreviewImage] = useState(video.coverImage);
-    const [tags, setTags] = useState(video.tags || []);
-    const [tagInput, setTagInput] = useState("");
     const [type, setType] = useState(video.type || "single");
 
     const handleImageChange = (e) => {
@@ -39,16 +36,41 @@ const EditVideoModel = ({ video, setShowModal, refetchVideos }) => {
         if (fileInput) fileInput.value = '';
     };
 
-    const handleAddTag = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-            setTags([...tags, tagInput.trim()]);
-            setTagInput("");
-        }
-    };
+        if (isSubmitting) return;
 
-    const removeTag = (tagToRemove) => {
-        setTags(tags.filter((tag) => tag !== tagToRemove));
+        try {
+            setIsSubmitting(true);
+            const formData = new FormData(e.target);
+
+            // Handle type
+            formData.append('type', type);
+
+            // Handle cover image
+            if (coverImageFile) {
+                formData.append('coverImage', coverImageFile);
+            }
+
+            if (!previewImage) {
+                formData.append('removeCoverImage', 'true');
+            }
+
+            await customFetch.patch(`/videos/update-video/${video._id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            toast.success('Video updated successfully');
+            refetchVideos();
+            setShowModal(false);
+        } catch (error) {
+            console.error('Error updating video:', error);
+            toast.error(error?.response?.data?.msg || 'Error updating video');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -71,46 +93,7 @@ const EditVideoModel = ({ video, setShowModal, refetchVideos }) => {
                     method="PATCH"
                     className="space-y-4"
                     encType="multipart/form-data"
-                    onSubmit={async (e) => {
-                        e.preventDefault();
-                        if (isSubmitting) return;
-
-                        try {
-                            setIsSubmitting(true);
-                            const formData = new FormData(e.target);
-
-                            // Handle tags
-                            formData.delete('tags');
-                            formData.append('tags', JSON.stringify(tags));
-
-                            // Handle type
-                            formData.append('type', type);
-
-                            // Handle cover image
-                            if (coverImageFile) {
-                                formData.append('coverImage', coverImageFile);
-                            }
-
-                            if (!previewImage) {
-                                formData.append('removeCoverImage', 'true');
-                            }
-
-                            await customFetch.patch(`/videos/update-video/${video._id}`, formData, {
-                                headers: {
-                                    'Content-Type': 'multipart/form-data',
-                                },
-                            });
-
-                            toast.success('Video updated successfully');
-                            refetchVideos();
-                            setShowModal(false);
-                        } catch (error) {
-                            console.error('Error updating video:', error);
-                            toast.error(error?.response?.data?.msg || 'Error updating video');
-                        } finally {
-                            setIsSubmitting(false);
-                        }
-                    }}
+                    onSubmit={handleSubmit}
                 >
                     <div>
                         <input
@@ -199,43 +182,6 @@ const EditVideoModel = ({ video, setShowModal, refetchVideos }) => {
                         )}
                     </div>
 
-                    <div>
-                        <div className="flex gap-2 mb-2">
-                            <input
-                                type="text"
-                                value={tagInput}
-                                onChange={(e) => setTagInput(e.target.value)}
-                                placeholder="Add a tag..."
-                                className="flex-1 px-3 py-1.5 bg-[var(--pure)] rounded-lg border border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        e.preventDefault();
-                                        handleAddTag(e);
-                                    }
-                                }}
-                            />
-                            <button
-                                type="button"
-                                onClick={handleAddTag}
-                                className="px-3 py-1.5 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200"
-                            >
-                                <FaPlus />
-                            </button>
-                        </div>
-                        {tags.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                                {JSON.parse(tags[0]).map((tag, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded-full text-sm"
-                                    >
-                                        {tag}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
                     <div className="flex justify-end gap-2 pt-4">
                         <button
                             type="button"
@@ -258,5 +204,4 @@ const EditVideoModel = ({ video, setShowModal, refetchVideos }) => {
         </div>
     );
 };
-
-export default EditVideoModel;
+export default EditVideoModel

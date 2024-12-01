@@ -1,9 +1,9 @@
+import DeleteModal from "@/components/shared/DeleteModal";
+import EditVideoModel from "@/pages/contributors/models/EditVideoModel";
+import customFetch from "@/utils/customFetch";
 import React, { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
-import customFetch from "../../../utils/customFetch";
-import EditVideoModel from "@/pages/contributors/models/EditVideoModel";
-import DeleteModal from "@/components/shared/DeleteModal";
 
 const ContributorVideoCard = ({ video, refetchVideos }) => {
     const [showEditModal, setShowEditModal] = useState(false);
@@ -58,7 +58,7 @@ const ContributorVideoCard = ({ video, refetchVideos }) => {
                         Created: {formatDate(video.createdAt)}
                     </p>
                     <div className="flex flex-wrap gap-2">
-                        {JSON.parse(video.tags).map((tag, index) => (
+                        {video?.tags?.map((tag, index) => (
                             <span
                                 key={index}
                                 className="px-2 py-1 bg-gray-100 text-sm text-gray-600 rounded-full"
