@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { FiFileText, FiEye, FiSearch } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import UserAvatar from '@/components/shared/UserAvatar';
-import { formatDistanceToNow } from "date-fns";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const Articles = () => {

@@ -6,7 +6,7 @@ import { deleteFile } from '../utils/fileUtils.js';
 export const getAllVideos = async (req, res) => {
     const videos = await Video.find();
     res.status(StatusCodes.OK).json({ videos });
-};     
+};
 
 export const createVideo = async (req, res) => {
     const { userId } = req.user;
@@ -21,8 +21,10 @@ export const createVideo = async (req, res) => {
 
       const coverImagePath = `${process.env.BACKEND_URL}/public/uploads/${req.file.filename}`;
       
+      const videoData = { ...req.body };
+      
       const video = await Video.create({
-        ...req.body,
+        ...videoData,
         author: userId,
         coverImage: coverImagePath
       });
@@ -51,6 +53,25 @@ export const updateVideo = async (req, res) => {
 
     try {
       const updateData = { ...req.body };
+      
+      // Handle tags from FormData for updates
+      if (Array.isArray(req.body.tags)) {
+        updateData.tags = req.body.tags.map(tag => tag.trim()).filter(Boolean);
+      } else if (req.body['tags[]']) {
+        // Handle tags sent as tags[]
+        updateData.tags = Array.isArray(req.body['tags[]']) 
+          ? req.body['tags[]'].map(tag => tag.trim()).filter(Boolean)
+          : [req.body['tags[]']].map(tag => tag.trim()).filter(Boolean);
+      } else if (typeof req.body.tags === 'string') {
+        // Fallback for string format
+        updateData.tags = req.body.tags
+          .replace(/[\[\]"]/g, '') // Remove brackets and quotes
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(Boolean);
+      } else if (updateData.tags) {
+        updateData.tags = [];
+      }
 
       if (req.file) {
         // Delete old cover image if it exists

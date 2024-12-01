@@ -10,10 +10,6 @@ const videoSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    tags: {
-      type: [String],
-      default: [],
-    },
     coverImage: {
       type: String,
     },

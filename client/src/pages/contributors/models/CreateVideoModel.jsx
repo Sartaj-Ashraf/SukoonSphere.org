@@ -5,34 +5,15 @@ import { useNavigate } from "react-router-dom";
 import customFetch from "../../../utils/customFetch";
 
 const CreateVideoModel = ({ setShowModal }) => {
-    const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [videoUrl, setVideoUrl] = useState("");
     const [coverImage, setCoverImage] = useState("");
     const [type, setType] = useState("single");
-    const [tags, setTags] = useState([]);
-    const [tagInput, setTagInput] = useState("");
-
-    const handleAddTag = (e) => {
-        e.preventDefault();
-        if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-            setTags([...tags, tagInput.trim()]);
-            setTagInput("");
-        }
-    };
-
-    const removeTag = (tagToRemove) => {
-        setTags(tags.filter(tag => tag !== tagToRemove));
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!title.trim() || !videoUrl.trim() || !coverImage) {
-            toast.error("Please fill in all required fields");
-            return;
-        }
 
         try {
             setIsSubmitting(true);
@@ -41,7 +22,6 @@ const CreateVideoModel = ({ setShowModal }) => {
             formData.append('description', description.trim());
             formData.append('videoUrl', videoUrl.trim());
             formData.append('type', type);
-            formData.append('tags', JSON.stringify(tags));
             formData.append('coverImage', coverImage);
 
             const response = await customFetch.post("/videos/create-video", formData, {
@@ -52,7 +32,8 @@ const CreateVideoModel = ({ setShowModal }) => {
             
             if (response.status === 201) {
                 toast.success("Video created successfully!");
-                window.location.reload();
+                // window.location.reload();
+                
                 setShowModal(false);
                
             }
@@ -71,10 +52,7 @@ const CreateVideoModel = ({ setShowModal }) => {
                 toast.error("File size should be less than 5MB");
                 return;
             }
-            if (!file.type.startsWith('image/')) {
-                toast.error("Please upload an image file");
-                return;
-            }
+       
             setCoverImage(file);
         }
     };
@@ -103,7 +81,7 @@ const CreateVideoModel = ({ setShowModal }) => {
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="Enter video title..."
                             className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary"
-                            required
+                            
                         />
                     </div>
 
@@ -134,7 +112,7 @@ const CreateVideoModel = ({ setShowModal }) => {
                             onChange={(e) => setVideoUrl(e.target.value)}
                             placeholder="Enter video URL..."
                             className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary"
-                            required
+                            
                         />
                     </div>
 
@@ -147,45 +125,8 @@ const CreateVideoModel = ({ setShowModal }) => {
                             accept="image/*"
                             onChange={handleFileChange}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            required
+                            
                         />
-                    </div>
-
-                    <div>
-                        <div className="flex gap-2 mb-2">
-                            <input
-                                type="text"
-                                value={tagInput}
-                                onChange={(e) => setTagInput(e.target.value)}
-                                placeholder="Add a tag..."
-                                className="flex-1 px-3 py-1.5 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                                onKeyPress={(e) => e.key === 'Enter' && handleAddTag(e)}
-                            />
-                            <button
-                                onClick={handleAddTag}
-                                type="button"
-                                className="px-3 py-1.5 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200"
-                            >
-                                <FaPlus />
-                            </button>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {tags.map((tag, index) => (
-                                <div
-                                    key={index}
-                                    className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded-full text-sm"
-                                >
-                                    {tag}
-                                    <button
-                                        type="button"
-                                        onClick={() => removeTag(tag)}
-                                        className="hover:text-red-500"
-                                    >
-                                        <FaTimes size={12} />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
                     </div>
 
                     <div className="flex justify-end gap-3 pt-3 border-t">

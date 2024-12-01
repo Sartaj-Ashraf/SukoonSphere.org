@@ -4,6 +4,7 @@ import VideoCard from '../../../components/mediaLibrary/videos/VideoCard';
 
 const SingleVideos = () => {
   const {videos} = useLoaderData();
+  console.log(videos)
 
   return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
