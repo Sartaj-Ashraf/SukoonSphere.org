@@ -7,11 +7,13 @@ import { GrLogin } from "react-icons/gr";
 import { InputComponent } from "@/components/sharedComponents/FormRow";
 import { useUser } from '@/context/UserContext';
 import { toast } from "react-toastify";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const SignIn = () => {
   const { login, isLoading } = useUser();
   const navigate = useNavigate();
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,7 +54,20 @@ const SignIn = () => {
             <h1 className="font-bold text-[var(--white-color)] text-center text-2xl">Sign In</h1>
 
             <InputComponent type="email" name="email" placeholder="Enter an email.." />
-            <InputComponent type="password" name="password" placeholder="Enter password.." />
+            <div className="relative">
+              <InputComponent 
+                type={showPassword ? "text" : "password"} 
+                name="password" 
+                placeholder="Enter password.." 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+              </button>
+            </div>
             <button
               type="submit"
               className="btn-2 w-full flex items-center justify-center gap-2"
@@ -61,16 +76,19 @@ const SignIn = () => {
               {isLoading ? 'Signing in...' : 'Sign In'}
               <GrLogin />
             </button>
-            <Link to="/auth/sign-up" className="text-[var(--white-color)] text-center">
+            <p className="text-[var(--white-color)] text-center">
               Create an account
+            <Link to="/auth/sign-up" className="text-blue-500 text-center ml-2 hover:underline">
+            Sign up
             </Link>
-            <Link to="/user/forget-password" className="text-[var(--white-color)] text-center">
+            </p>
+            <Link to="/user/forget-password" className="text-[var(--white-color)] text-center hover:text-blue-500">
               Forget Password
             </Link>
           </Form>
         </div>
         {/* Image Section - Right Half */}
-        <div className="w-full sm:w-1/2 p-4 pt-12 sm:flex flex-col justify-center items-center hidden bg-gray-50 ">
+        <div className="w-full sm:w-1/2 p-4 pt-12 sm:flex flex-col justify-center items-center  bg-gray-50 ">
           <h2 className="font-bold text-[2.5rem] text-[var(--gray--900)] text-center mb-4">
             SukoonSphere
           </h2>

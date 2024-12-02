@@ -30,7 +30,7 @@ const Videos = () => {
 
 
 
-    useEffect(() => {    
+    useEffect(() => {
         getUploadedVideos();
     }, []);
 
@@ -38,7 +38,16 @@ const Videos = () => {
         <div className="mx-auto lg:py-8">
             {user?.role === "contributor" && currentUser?._id === ParamId && (
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 lg:mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900">Your Videos</h2>
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900">Your Videos</h2>
+                        <p className="text-[var(--grey--800)]">
+                          Dont know how to upload a video? Check out our{" "}
+                          <Link to={"/user-manual/create-video"} className="text-blue-500 hover:underline">
+                            user manual
+                          </Link>{" "}
+                          for a step-by-step guide.
+                        </p>
+                    </div>
                     <button
                         onClick={() => setShowModal(true)}
                         className="btn-primary inline-flex items-center gap-2 px-3 py-1.5 text-sm"
@@ -46,6 +55,7 @@ const Videos = () => {
                         <FiPlus className="w-4 h-4" />
                         Create video
                     </button>
+
                 </div>
             )}
 
