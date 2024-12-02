@@ -46,9 +46,9 @@ const Articles = () => {
   const [publishedArticles, setPublishedArticles] = useState([]);
   const [articleId, setArticleId] = useState(null);
   const [showDeleteArticleModal, setShowDeleteArticleModal] = useState(false);
-  const {id: ParamId} = useParams()
+  const { id: ParamId } = useParams()
   const user = useOutletContext();
-  const {user : currentUser} = useUser();
+  const { user: currentUser } = useUser();
 
   const fetchArticles = async () => {
     try {
@@ -111,13 +111,22 @@ const Articles = () => {
       {/* Create Article Button Section */}
       {user?.role === "contributor" && currentUser?._id === ParamId && (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 lg:mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">Your Articles</h2>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Your Articles</h2>
+            <p className="text-[var(--grey--800)]">
+              Need help creating an article? Check out our{" "}
+              <Link to={"/user-manual/create-article"} className="text-blue-500 hover:underline">
+                user manual
+              </Link>{" "}
+              for a step-by-step guide.
+            </p>
+          </div>
           <button
             onClick={() => setShowModal(true)}
             className="btn-primary inline-flex items-center gap-2 px-3 py-1.5 text-sm"
           >
             <FiPlus className="w-4 h-4" />
-            Create New Article
+            Create New Video
           </button>
         </div>
       )}
@@ -251,29 +260,29 @@ const Articles = () => {
                   </div>
                 </div>
 
-               {
-                user?.role === "contributor" && currentUser?._id === ParamId &&(
-                  <div className="flex flex-wrap items-center justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
-                  <Link
-                    className="bg-blue-500 text-white inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-[6px] hover:bg-blue-600 hover:scale-105 transition-all duration-300"
-                    to={`/articles/article/${article._id}`}
-                  >
-                    <FiEye className="w-4 h-4" />
-                    Preview
-                  </Link>
-                  <button
-                    onClick={() => {
-                      setArticleId(article._id);
-                      setShowDeleteArticleModal(true);
-                    }}
-                    className="btn-red inline-flex items-center gap-1.5 px-3 py-1.5 text-sm"
-                  >
-                    <FiTrash2 className="w-4 h-4" />
-                    Delete
-                  </button>
-                </div>
-                ) 
-               }  
+                {
+                  user?.role === "contributor" && currentUser?._id === ParamId && (
+                    <div className="flex flex-wrap items-center justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
+                      <Link
+                        className="bg-blue-500 text-white inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-[6px] hover:bg-blue-600 hover:scale-105 transition-all duration-300"
+                        to={`/articles/article/${article._id}`}
+                      >
+                        <FiEye className="w-4 h-4" />
+                        Preview
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setArticleId(article._id);
+                          setShowDeleteArticleModal(true);
+                        }}
+                        className="btn-red inline-flex items-center gap-1.5 px-3 py-1.5 text-sm"
+                      >
+                        <FiTrash2 className="w-4 h-4" />
+                        Delete
+                      </button>
+                    </div>
+                  )
+                }
 
                 {article.pages && article.pages.length > 0 && (
                   <div className="mt-4 pt-4 border-t border-gray-100">
@@ -299,12 +308,12 @@ const Articles = () => {
       )}
 
       {/* No Articles Message */}
-      {(!pendingArticles || pendingArticles.length === 0) && 
-       (!publishedArticles || publishedArticles.length === 0) && (
-        <div className="text-center py-8">
-          <h3 className="text-lg text-gray-600">No articles found</h3>
-        </div>
-      )}
+      {(!pendingArticles || pendingArticles.length === 0) &&
+        (!publishedArticles || publishedArticles.length === 0) && (
+          <div className="text-center py-8">
+            <h3 className="text-lg text-gray-600">No articles found</h3>
+          </div>
+        )}
 
       {/* Modals */}
       {showModal && (

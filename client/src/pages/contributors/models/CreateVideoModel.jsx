@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { FaVideo, FaTimes, FaPlus } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { FaVideo, FaTimes, FaPlus, FaTimesCircle } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
 import customFetch from "../../../utils/customFetch";
 
 const CreateVideoModel = ({ setShowModal }) => {
@@ -29,13 +29,13 @@ const CreateVideoModel = ({ setShowModal }) => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            
+
             if (response.status === 201) {
                 toast.success("Video created successfully!");
                 // window.location.reload();
-                
+
                 setShowModal(false);
-               
+
             }
         } catch (error) {
             console.error('Error creating video:', error);
@@ -52,14 +52,14 @@ const CreateVideoModel = ({ setShowModal }) => {
                 toast.error("File size should be less than 5MB");
                 return;
             }
-       
+
             setCoverImage(file);
         }
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-10">
-            <div className="bg-[var(--body)] rounded-2xl p-6 w-[600px] shadow-2xl transform transition-all duration-300">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-12 bg-black bg-opacity-50 backdrop-blur-sm">
+            <div className="p-4 bg-white w-full max-w-lg rounded-xl shadow-2xl transform transition-all relative z-50">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-[var(--primary)] flex items-center gap-2">
                         <FaVideo className="text-primary" />
@@ -81,7 +81,7 @@ const CreateVideoModel = ({ setShowModal }) => {
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="Enter video title..."
                             className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary"
-                            
+
                         />
                     </div>
 
@@ -110,9 +110,9 @@ const CreateVideoModel = ({ setShowModal }) => {
                             type="text"
                             value={videoUrl}
                             onChange={(e) => setVideoUrl(e.target.value)}
-                            placeholder="Enter video URL..."
+                            placeholder="Enter video embedded URL..."
                             className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary"
-                            
+
                         />
                     </div>
 
@@ -125,27 +125,35 @@ const CreateVideoModel = ({ setShowModal }) => {
                             accept="image/*"
                             onChange={handleFileChange}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            
+
                         />
                     </div>
 
-                    <div className="flex justify-end gap-3 pt-3 border-t">
+                    <div className="flex justify-start gap-3 pt-3 border-t">
                         <button
                             type="button"
                             onClick={() => setShowModal(false)}
-                            className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                            className="btn-red flex items-center justify-center gap-2"
                         >
+                            <FaTimesCircle />
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2"
+                            className="btn-2"
                         >
-                            <FaVideo />
+                            <FaVideo className="mr-2" />
                             {isSubmitting ? "Creating..." : "Create Video"}
                         </button>
                     </div>
+                    <p className="text-[var(--grey--800)] text-sm">
+                        Dont know how to upload a video? Check out our{" "}
+                        <Link to={"/user-manual/create-video"} className="text-blue-500 hover:underline">
+                            user manual
+                        </Link>{" "}
+                        for a step-by-step guide.
+                    </p>
                 </form>
             </div>
         </div>
