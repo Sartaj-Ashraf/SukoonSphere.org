@@ -17,7 +17,6 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
   const [isLiked, setIsLiked] = useState(reply.likes.includes(user?._id));
   const [likesCount, setLikesCount] = useState(reply.totalLikes || 0);
   const [showReplyForm, setShowReplyForm] = useState(false);
-  const isEdited = reply.createdAt !== reply.updatedAt;
 
   const deleteReply = async () => {
     try {
@@ -55,15 +54,12 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
     setIsEditing(false);
   };
 
-  const handleReplyClick = () => {
-    // Close any other open reply forms first
-    const allReplyForms = document.querySelectorAll('.reply-form');
-    allReplyForms.forEach(form => {
-      if (form !== event.currentTarget.closest('.reply-container')) {
-        form.style.display = 'none';
-      }
-    });
+  const handleReplySubmit = (e) => {
+    handleSubmit(e);
+    setShowReplyForm(false);
+  };
 
+  const handleReplyClick = () => {
     setShowReplyForm(!showReplyForm);
   };
 
@@ -94,10 +90,15 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
             />
           ) : (
             <div className="relative">
-              <p className="text-gray-600 text-xs md:text-sm mb-0">{reply.content}</p>
-              {isEdited && (
+              <p className="text-gray-600 text-xs md:text-sm mb-0">
+                <Link to={`/profile/${reply.commentUserId}`} className="text-[var(--primary)]">
+                  @{reply.commentUsername}
+                </Link>{' '}
+                {reply.content}
+              </p>
+              {reply.editedAt && (
                 <span className="absolute bottom-0 right-0 text-[10px] text-gray-400 italic">
-                  Edited {formatDistanceToNow(new Date(reply.updatedAt), { addSuffix: true })}
+                  Edited {formatDistanceToNow(new Date(reply.editedAt), { addSuffix: true })}
                 </span>
               )}
             </div>
@@ -106,10 +107,9 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
         {!isEditing && (
           <div className="flex items-center gap-3 my-1">
             <button
-              className={`flex items-center gap-2 px-2 py-1 rounded-full transition-all duration-200 ${isLiked
-                ? "text-red-500 bg-red-50 hover:bg-red-100"
-                : "text-gray-500 hover:bg-gray-100"
-                }`}
+              className={`flex items-center gap-2 px-2 py-1 rounded-full transition-all duration-200 ${
+                isLiked ? "text-red-500 bg-red-50 hover:bg-red-100" : "text-gray-500 hover:bg-gray-100"
+              }`}
               onClick={likeReply}
             >
               <FaRegHeart className="w-3 h-3 md:w-4 md:h-4" />
@@ -127,11 +127,11 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
       </div>
       {showReplyForm && (
         <div className="reply-form ml-13">
-          <Form onSubmit={handleSubmit} className="space-y-4">
+          <Form onSubmit={handleReplySubmit} className="space-y-4">
             <div>
               <textarea
                 name="content"
-                placeholder="Write a reply..."
+                placeholder={`Reply to ${reply.username}...`}
                 className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary min-h-[100px] resize-none"
               />
             </div>

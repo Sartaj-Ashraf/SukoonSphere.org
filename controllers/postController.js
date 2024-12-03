@@ -244,6 +244,7 @@ export const createReply = async (req, res) => {
     content,
     createdBy: req.user.userId,
     parentId,
+    commentId: comment ? comment._id : parentReply.commentId,
     replyTo: comment ? comment.createdBy : parentReply.createdBy
   });
 
@@ -303,9 +304,18 @@ export const createReply = async (req, res) => {
 
 export const getAllRepliesByCommentId = async (req, res) => {
   const { id: commentId } = req.params;
+  
+  // Convert string ID to ObjectId
+  const objectId = new mongoose.Types.ObjectId(commentId);
+  
   const replies = await PostReplies.aggregate([
     {
-      $match: { parentId: new mongoose.Types.ObjectId(commentId) }
+      $match: { 
+        $or: [
+          { commentId: objectId },
+          { parentId: objectId }
+        ]
+      }
     },
     {
       $lookup: {
@@ -559,7 +569,12 @@ export const updatePost = async (req, res) => {
 
   const updatedPost = await Post.findByIdAndUpdate(
     postId,
-    { $set: req.body },
+    { 
+      $set: { 
+        ...req.body, 
+        editedAt: new Date() 
+      } 
+    },
     { new: true }
   );
 
@@ -589,9 +604,13 @@ export const updatePostComment = async (req, res) => {
 
   const updatedComment = await PostComments.findByIdAndUpdate(
     commentId,
-    { content },
+    { 
+      content,
+      editedAt: new Date()
+    },
     { new: true }
-  ).populate('createdBy', 'name avatar');
+  )
+  .populate('createdBy', 'name avatar');
 
   res.status(StatusCodes.OK).json({
     message: "Comment updated successfully",
@@ -628,6 +647,7 @@ export const updatePostCommentReply = async (req, res) => {
   }
 
   reply.content = content;
+  reply.editedAt = new Date();
   await reply.save();
 
   res.status(StatusCodes.OK).json({

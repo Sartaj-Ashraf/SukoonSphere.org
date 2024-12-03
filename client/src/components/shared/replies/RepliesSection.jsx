@@ -4,10 +4,12 @@ import { Reply } from "../Comments";
 import { toast } from "react-toastify";
 import { useUser } from "@/context/UserContext";
 import { FaReply } from "react-icons/fa";
+
 const RepliesSection = ({ addReply, replies, fetchReplies, deleteReply, likeReply }) => {
   const { user } = useUser();
   const { commentId } = useParams();
-  const handleSubmit = (e) => {
+
+  const handleSubmit = (e, replyToId = null) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const content = formData.get("content");
@@ -15,19 +17,20 @@ const RepliesSection = ({ addReply, replies, fetchReplies, deleteReply, likeRepl
       toast.error("Please login to add a reply!");
       return;
     }
-    addReply(commentId, content);
+    const parentId = replyToId || commentId;
+    addReply(parentId, content);
     fetchReplies();
     e.target.reset();
   };
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-4">
-      <Form onSubmit={handleSubmit} className="relative">
+      <Form onSubmit={(e) => handleSubmit(e)} className="relative">
         <p className="font-md px-4 text-[var(--grey--700)] ">Replies</p>
         <textarea
           name="content"
           placeholder="Write a reply..."
-          className="w-full p-3 pr-14 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none   text-gray-700"
+          className="w-full p-3 pr-14 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none text-gray-700"
           rows='1'
         />
         <button
@@ -36,19 +39,19 @@ const RepliesSection = ({ addReply, replies, fetchReplies, deleteReply, likeRepl
           <FaReply className="w-2 h-2 md:w-3 md:h-3" />
         </button>
       </Form>
-      <div className="space-y-4 mt-3 px-4  max-h-[400px] overflow-y-auto no-scrollbar">
-        {replies &&
-          replies.map((reply) => (
-            <Reply
-              key={reply._id}
-              reply={reply}
-              handleDeleteReply={deleteReply}
-              handleLikeReply={likeReply}
-              handleSubmit={handleSubmit}
-            />
-          ))}
+      <div className="space-y-4 mt-3 px-4 max-h-[400px] overflow-y-auto no-scrollbar">
+        {replies && replies.map((reply) => (
+          <Reply
+            key={reply._id}
+            reply={reply}
+            handleDeleteReply={deleteReply}
+            handleLikeReply={likeReply}
+            handleSubmit={(e) => handleSubmit(e, reply._id)}
+          />
+        ))}
       </div>
     </div>
   );
 };
-export default RepliesSection
+
+export default RepliesSection;

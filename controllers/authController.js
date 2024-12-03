@@ -7,7 +7,7 @@ import {
   hashString,
 } from "../utils/passwordUtils.js";
 import { UnauthenticatedError } from "../errors/customErors.js";
-import { createJWT, attachCookiesToResponse } from "../utils/tokenUtils.js";
+import { createJWT, attachCookiesToResponse, verifyJWT } from "../utils/tokenUtils.js";
 import crypto from "crypto";
 import sendVerificationEmail from "../utils/sendVerificationEmail.js";
 import sendResetPasswordEmail from "../utils/sendResetPasswordEmail.js";
@@ -94,10 +94,40 @@ export const login = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: "user logged in", user });
 };
 
+export const refreshToken = async (req, res) => {
+  const { refreshToken } = req.signedCookies;
+
+  if (!refreshToken) {
+    throw new UnauthenticatedError("Authentication invalid");
+  }
+
+  try {
+    const payload = verifyJWT(refreshToken);
+    const existingToken = await RefreshToken.findOne({
+      user: payload.user._id,
+      refreshToken: payload.refreshToken,
+    });
+
+    if (!existingToken || !existingToken?.isValid) {
+      throw new UnauthenticatedError("Authentication invalid");
+    }
+
+    attachCookiesToResponse({
+      res,
+      user: payload.user,
+      refreshToken: existingToken.refreshToken,
+    });
+
+    res.status(StatusCodes.OK).json({ msg: "Access token refreshed" });
+  } catch (error) {
+    throw new UnauthenticatedError("Authentication invalid");
+  }
+};
+
 export const changePassword = async (req, res) => {
   const user = await User.findById(req.user.userId);
 
-  if (!user) throw new BadRequestError("Password reset request failed.");
+  if (!user) throw new UnauthenticatedError("Password reset request failed.");
 
   const isValidUser =
     user && (await comparePassword(req.body.password, user.password));
@@ -105,7 +135,7 @@ export const changePassword = async (req, res) => {
   if (!isValidUser) throw new UnauthenticatedError("invalid Credentials");
 
   if (req.body.newPassword !== req.body.confirmNewPassword) {
-    throw new BadRequestError("New passwords do not match.");
+    throw new UnauthenticatedError("New passwords do not match.");
   }
 
   if (!user.isVerified)
@@ -178,4 +208,3 @@ export const logout = async (req, res) => {
   });
   res.status(StatusCodes.OK).json({ msg: "user logged out!" });
 };
-  

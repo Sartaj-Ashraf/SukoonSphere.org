@@ -12,15 +12,13 @@ const EditReply = ({ reply, onClose, onUpdate }) => {
     }
 
     try {
-      // Check if it's a QA reply by checking for commentId (QA specific field)
-      const isQAReply = Boolean(reply.commentId);
+      // Determine the correct endpoint based on the URL
+      const currentPath = window.location.pathname;
+      const isQAReply = currentPath.includes('/QA-section/') || currentPath.includes('/qa-section/');
+      
       const endpoint = isQAReply
-        ? `/qa-section/answer/comments/replies/${reply._id}`  // QA reply
-        : `/posts/comments/replies/${reply._id}`;  // Post reply
-
-      console.log('Using endpoint:', endpoint);
-      console.log('Is QA Reply:', isQAReply);
-      console.log('Reply data:', reply);
+        ? `/qa-section/answer/comments/replies/${reply._id}`
+        : `/posts/comments/replies/${reply._id}`;
 
       const response = await customFetch.patch(endpoint, { content: editedContent });
       
@@ -28,23 +26,23 @@ const EditReply = ({ reply, onClose, onUpdate }) => {
       const updatedReply = {
         ...reply,
         ...response.data.reply,
-        createdBy: reply.createdBy, // Preserve the createdBy field
+        content: editedContent,
+        editedAt: new Date(),
+        createdBy: reply.createdBy,
         likes: response.data.reply.likes || reply.likes,
         totalLikes: response.data.reply.totalLikes || reply.likes?.length || 0,
         username: response.data.reply.username || reply.username,
         userAvatar: response.data.reply.userAvatar || reply.userAvatar,
         commentUsername: response.data.reply.commentUsername || reply.commentUsername,
         commentUserAvatar: response.data.reply.commentUserAvatar || reply.commentUserAvatar,
-        commentUserId: response.data.reply.commentUserId || reply.commentUserId,
-        commentId: reply.commentId // Preserve the commentId for QA replies
+        commentUserId: response.data.reply.commentUserId || reply.commentUserId
       };
 
       onUpdate(updatedReply);
       onClose();
       toast.success("Reply updated successfully");
     } catch (error) {
-      console.log('Error updating reply:', error);
-      console.log('Reply data that caused error:', reply);
+      console.error('Error updating reply:', error);
       toast.error(error.response?.data?.msg || "Failed to update reply");
     }
   };

@@ -17,7 +17,6 @@ const Comment = ({ comment: initialComment, handleDeleteComment, handleLikeComme
   const [comment, setComment] = useState(initialComment);
   const [isLiked, setIsLiked] = useState(comment.likes.includes(user?._id));
   const [likesCount, setLikesCount] = useState(comment.totalLikes || 0);
-  const isEdited = comment.createdAt !== comment.updatedAt;
 
   const replyLink = toggleReply
     ? `/QA-section/question/answer/${comment.answerId}/comments/${comment._id}/reply`
@@ -78,9 +77,9 @@ const Comment = ({ comment: initialComment, handleDeleteComment, handleLikeComme
           ) : (
             <div className="relative">
               <p className="text-gray-600 text-xs md:text-sm mb-0">{comment.content}</p>
-              {isEdited && (
+              {comment.editedAt && (
                 <span className="absolute bottom-0 right-0 text-[10px] text-gray-400 italic">
-                  Edited {formatDistanceToNow(new Date(comment.updatedAt), { addSuffix: true })}
+                  Edited {formatDistanceToNow(new Date(comment.editedAt), { addSuffix: true })}
                 </span>
               )}
             </div>

@@ -71,7 +71,6 @@ const PostCard = ({
     }
   };
 
-  const isEdited = currentPost.createdAt !== currentPost.updatedAt;
 
   return (
     <>
@@ -148,9 +147,9 @@ const PostCard = ({
             </button>
           )}
           
-          {isEdited && (
+          {currentPost.editedAt && (
             <span className="text-xs text-gray-400 ml-auto">
-              edited {formatDistanceToNow(new Date(currentPost.updatedAt), { addSuffix: true })}
+              edited {formatDistanceToNow(new Date(currentPost.editedAt), { addSuffix: true })}
             </span>
           )}
         </div>

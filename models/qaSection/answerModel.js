@@ -23,6 +23,10 @@ const Answer = new mongoose.Schema(
       ref: "Question", 
       required: true,
     },
+    editedAt: {
+      type: Date,
+      default: null
+    },
   },
   { timestamps: true }
 );

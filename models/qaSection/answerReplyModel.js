@@ -26,6 +26,10 @@ const AnswerReplySchema = new mongoose.Schema(
       required: true
     },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    editedAt: {
+      type: Date,
+      default: null
+    },
     deleted: {
       type: Boolean,
       default: false,

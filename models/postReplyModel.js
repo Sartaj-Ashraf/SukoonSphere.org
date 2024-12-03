@@ -7,6 +7,11 @@ const replySchema = new mongoose.Schema(
       ref: "Comment",
       required: true,
     },
+    commentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment",
+      required: true,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -15,6 +20,10 @@ const replySchema = new mongoose.Schema(
     content: {
       type: String,
       required: true,
+    },
+    editedAt: {
+      type: Date,
+      default: null
     },
     replyTo: {
       type: mongoose.Schema.Types.ObjectId,

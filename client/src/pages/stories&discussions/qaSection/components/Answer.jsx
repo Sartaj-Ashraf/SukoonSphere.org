@@ -18,7 +18,6 @@ const Answer = ({ answer: initialAnswer, user, answerCount }) => {
   const [editedContext, setEditedContext] = useState(answer.context);
   const [isEditing, setIsEditing] = useState(false);
 
-  const isEdited = answer.createdAt !== answer.updatedAt;
 
   const handleDeleteAnswer = async () => {
     try {
@@ -140,9 +139,9 @@ const Answer = ({ answer: initialAnswer, user, answerCount }) => {
           <FaRegComment />
           <span>{answer.totalComments}</span>
         </Link>
-        {isEdited && (
+        {answer.editedAt && (
           <span className="text-xs text-gray-400 ml-auto">
-            edited {formatDistanceToNow(new Date(answer.updatedAt), { addSuffix: true })}
+            edited {formatDistanceToNow(new Date(answer.editedAt), { addSuffix: true })}
           </span>
         )}
       </div>

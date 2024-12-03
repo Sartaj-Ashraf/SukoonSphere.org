@@ -9,6 +9,7 @@ import {
   register,
   resetPassword,
   verifyEmail,
+  refreshToken,
 } from "../controllers/authController.js";
 import {
   validateChangePasswordInput,
@@ -25,6 +26,7 @@ router.post("/register", validateRegisterInput, register);
 router.post("/login", validateLoginInput, login);
 router.delete("/logout", authenticateUser, logout);
 router.post("/verify-email", verifyEmail);
+router.get("/refresh-token", refreshToken);
 router.post(
   "/change-password",
   authenticateUser,

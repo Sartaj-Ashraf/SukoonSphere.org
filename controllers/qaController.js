@@ -956,7 +956,10 @@ export const editAnswer = async (req, res) => {
   // Update the answer
   const updatedAnswer = await Answer.findByIdAndUpdate(
     answerId,
-    { context },
+    { 
+      context,
+      editedAt: new Date()
+    },
     { new: true, runValidators: true }
   );
 
@@ -1015,7 +1018,10 @@ export const editAnswerComment = async (req, res) => {
 
   const updatedComment = await Comment.findByIdAndUpdate(
     commentId,
-    { content },
+    { 
+      content,
+      editedAt: new Date()
+    },
     { new: true }
   ).populate('createdBy', 'name avatar');
 
@@ -1051,7 +1057,10 @@ export const editAnswerReply = async (req, res) => {
 
   const updatedReply = await Replies.findByIdAndUpdate(
     replyId,
-    { content },
+    { 
+      content,
+      editedAt: new Date()
+    },
     { new: true }
   )
   .populate('createdBy', 'name avatar')

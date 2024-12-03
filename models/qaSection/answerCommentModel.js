@@ -16,6 +16,10 @@ const QaCommentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    editedAt: {
+      type: Date,
+      default: null
+    },
     replies: [
       {
         type: mongoose.Schema.Types.ObjectId,
