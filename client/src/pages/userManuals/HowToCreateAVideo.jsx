@@ -7,8 +7,10 @@ import {
   FaCheckCircle,
   FaShareAlt,
 } from "react-icons/fa";
-import methodimg1 from "../../assets/images/Method1Img.png"
-import methodimg2 from "../../assets/images/Method2Img.png"
+import methodimg1 from "../../assets/images/Method1Img.png";
+import Share1 from "../../assets/images/Share1.png";
+import Share2 from "../../assets/images/Share2.png";
+import methodimg2 from "../../assets/images/Method2Img.png";
 const HowToCreateAVideo = () => {
   return (
     <div className="max-w-4xl mx-auto px-2 md:px-4 py-8">
@@ -82,12 +84,24 @@ const HowToCreateAVideo = () => {
                       <li>Go to your YouTube video</li>
                       <li>Click the "Share" button below the video</li>
                       <li>Copy the URL that appears in the share dialog</li>
+                    </ol>
+                    <div className="grid lg:grid-cols-3 grid-cols-1 gap-2 items-center">
+                      <img
+                        src={Share1}
+                        alt="YouTube share button"
+                        className="mt-2 rounded-lg border shadow-sm"
+                      />
+                      <img
+                        src={Share2}
+                        alt="YouTube share button"
+                        className="mt-2 rounded-lg border shadow-sm "
+                      />
                       <img
                         src={methodimg1}
                         alt="YouTube share button"
-                        className="mt-2 rounded-lg border shadow-sm md:w-2/4"
+                        className="mt-2 rounded-lg border shadow-sm "
                       />
-                    </ol>
+                    </div>
                   </div>
 
                   <div className="border rounded-lg p-4 bg-white">
@@ -174,7 +188,6 @@ const HowToCreateAVideo = () => {
               <p>• Click the "Create Video" button</p>
               <p>• Wait for the success message</p>
               <p>• Your video will appear in your videos dashboard</p>
-             
             </div>
           </div>
         </div>
