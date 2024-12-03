@@ -72,7 +72,7 @@ const Inbox = () => {
             <div className="space-y-4 p-4">
                 {/* <h2 className="text-xl md:text-2xl font-bold text-[var(--grey--900)]">Contributor Requests</h2> */}
                 <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-semibold text-gray-800">Contributor Requests</h2>
+                    <h2 className="text-base md:text-2xl font-semibold text-gray-800">Contributor Requests</h2>
                     <span className="text-sm text-gray-500">
                         {displayedRequests.length} Request{displayedRequests.length !== 1 ? 's' : ''}
                     </span>

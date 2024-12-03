@@ -59,7 +59,7 @@ const UserPosts = () => {
     );
 
     return (
-        <div className="lg:p-6 bg-white rounded-xl shadow-sm">
+        <div className="lg:p-6 bg-white rounded-xl">
             {/* Search Bar */}
             <div className="mb-4 lg:mb-8">
                 <div className="relative max-w-md mx-auto">

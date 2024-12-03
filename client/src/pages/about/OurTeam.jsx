@@ -17,7 +17,7 @@ function OurTeam() {
     return (
         <div className="container mx-auto px-4 py-12">
             <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold text-[var(--grey--900)] mb-2 tracking-tight">
+                <h2 className="text-2xl md:text-4xl font-bold text-[var(--grey--900)] mb-2 tracking-tight">
                     SukoonSphere Contributors
                 </h2>
                 <p className="text-xl text-[var(--grey--800)] max-w-3xl mx-auto">

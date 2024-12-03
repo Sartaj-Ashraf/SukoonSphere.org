@@ -75,11 +75,11 @@ const Comment = ({ comment: initialComment, handleDeleteComment, handleLikeComme
               onUpdate={handleUpdateComment}
             />
           ) : (
-            <div className="relative">
+            <div className="">
               <p className="text-gray-600 text-xs md:text-sm mb-0">{comment.content}</p>
-              {comment.editedAt && (
-                <span className="absolute bottom-0 right-0 text-[10px] text-gray-400 italic">
-                  Edited {formatDistanceToNow(new Date(comment.editedAt), { addSuffix: true })}
+              {isEdited && (
+                <span className="text-[10px] text-gray-400 italic flex flex-row-reverse">
+                  Edited {formatDistanceToNow(new Date(comment.updatedAt), { addSuffix: true })}
                 </span>
               )}
             </div>

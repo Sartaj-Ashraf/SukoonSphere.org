@@ -1,16 +1,53 @@
-import VideoCard from '@/components/mediaLibrary/videos/VideoCard';
-import React from 'react'
-import { useLoaderData } from 'react-router-dom';
+import VideoCard from "@/components/mediaLibrary/videos/VideoCard";
+import React, { useState, useEffect } from "react";
+import { useLoaderData } from "react-router-dom";
+import { FaFilm, FaPlusCircle } from "react-icons/fa";
+
 const PlaylistVideos = () => {
-    const { videos } = useLoaderData();
-    console.log({videos})
+  const { videos } = useLoaderData();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (videos) {
+      setIsLoading(false);
+    }
+  }, [videos]);
+
+  const hasVideos = videos && videos.length > 0;
+
+  if (isLoading) {
     return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {videos?.map((video) => (
-                    <VideoCard key={video._id} video={video} />
-                ))}
-            </div>  
-    )
-}
+      <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[var(--primary-color)] border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4">
+      {hasVideos ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {videos.map((video) => (
+            <VideoCard key={video._id} video={video} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] bg-gray-50 rounded-xl p-8 space-y-6 text-center">
+          <div className="bg-blue-100 p-6 rounded-full">
+            <FaFilm className="w-16 h-16 text-blue-600 animate-pulse" />
+          </div>
+          <div className="max-w-md">
+            <h2 className="text-2xl font-bold text-gray-800 mb-3">
+              Empty Playlist
+            </h2>
+            <p className="text-gray-600 mb-6">
+              No playlist found. This collection is currently empty.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default PlaylistVideos;

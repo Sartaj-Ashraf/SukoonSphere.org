@@ -8,7 +8,7 @@ import CompanyLogo from "../../../assets/images/SukoonSphere_Logo.png";
 import links from "@/utils/SharedComp/PageLinks";
 import DesktopNav from "./DesktopNav";
 import UserMenu from "./UserMenu";
-import { MdOutlinePassword } from "react-icons/md";
+import { MdOutlineNotificationsActive, MdOutlinePassword } from "react-icons/md";
 import { BiLogIn } from "react-icons/bi";
 import { FiUserPlus } from "react-icons/fi";
 import { BiMessageSquareAdd } from "react-icons/bi";
@@ -52,7 +52,14 @@ function NavMenu() {
             name: "Become a contributor",
             address: '/user/request-contributor',
             icon: <CiMedal />,
-          }] 
+          },
+          
+        {
+          name:"Notifications",
+          address:'/admin',
+          icon: <MdOutlineNotificationsActive />
+        }
+        ] 
         : []),
       {
         name: "Change Password",
