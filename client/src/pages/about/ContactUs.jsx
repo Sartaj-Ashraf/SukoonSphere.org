@@ -49,10 +49,10 @@ const ContactUs = () => {
       <div className="max-w-4xl mx-auto px-4">
         {/* Header Section */}
         <div className="text-center mb-12">
-          <h1 className="text-2xl md:text-4xl font-bold text-[var(--grey-900)] mb-4">
+          <h2 className="text-2xl md:text-4xl font-bold text-[var(--grey--900)] mb-4">
             Help Us Improve
-          </h1>
-          <p className="text-sm md:text-lg text-[var(--grey-600)] max-w-2xl mx-auto">
+          </h2>
+          <p className="text-sm md:text-lg text-[var(--grey--800)] max-w-2xl mx-auto">
             Your feedback is valuable! Share your suggestions or report issues
             to help us make SukoonSphere better for everyone.
           </p>
@@ -84,10 +84,10 @@ const ContactUs = () => {
                   <FaLightbulb size={24} />
                 </div>
                 <div className="text-left">
-                  <h3 className=" text-base md:text-lg font-semibold text-[var(--grey-900)]">
+                  <h3 className=" text-base md:text-lg font-semibold text-[var(--grey--900)]">
                     Share a Suggestion
                   </h3>
-                  <p className="text-xs md:text-lg text-[var(--grey-600)]">
+                  <p className="text-xs md:text-base text-[var(--grey--800)]">
                     Help us improve with your ideas
                   </p>
                 </div>
@@ -116,10 +116,10 @@ const ContactUs = () => {
                   <FaBug size={24} />
                 </div>
                 <div className="text-left">
-                  <h3 className="text-base md:text-lg font-semibold text-[var(--grey-900)]">
+                  <h3 className="text-base md:text-lg font-semibold text-[var(--grey--900)]">
                     Report an Issue
                   </h3>
-                  <p className="text-xs md:text-lg text-[var(--grey-600)]">
+                  <p className="text-xs md:text-base text-[var(--grey--800)]">
                     Let us know about any problems
                   </p>
                 </div>

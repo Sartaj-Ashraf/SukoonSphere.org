@@ -4,36 +4,38 @@ import { FaPlay } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 const VideoCard = ({ video }) => {
-  const { coverImage, title, description, createdAt, videoUrl, _id } = video;
+  const { coverImage, title, description, createdAt, _id } = video;
+
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
-      <div className="relative h-48">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
+      {/* Video Cover Section */}
+      <div className="relative ">
         <img
           src={coverImage}
           alt={title}
-          className="w-full h-full object-cover"
+          className="w-full rounded-lg h-40 md:h-64 object-cover transition-transform duration-300 hover:scale-105  "
         />
-      </div>
-      <div className="p-4">
-      <Link to={`/all-videos/video/${_id}`}>
-        <h3 className="text-xl font-bold text-[var(--grey--900)] hover:text-[var(--ternery)] mb-2 line-clamp-2">
-          {title}
-        </h3>
-        </Link>
-        <p className="text-[var(--grey--800)] mb-3 line-clamp-2">
-          {description.length > 100 ? `${description.substring(0, 100)}...` : description}
-        </p>
-        
-        <p className="text-sm text-[var(--grey--600)] mb-4">
-          Created on: {format(new Date(createdAt), 'MMM dd, yyyy')}
-        </p>
+        {/* Play Button */}
         <Link
           to={`/all-videos/video/${_id}`}
-          className="w-full btn-2"
+          className="absolute  -bottom-6 right-4 bg-white p-4 rounded-full border-2 hover:border-2 hover:border-[var(--secondary)] shadow-md transition-all duration-200 hover:-translate-y-1 hover:scale-110"
         >
-          <FaPlay className="text-sm mr-2" /> Watch Video
+          <FaPlay className="text-[var(--secondary)] text-lg animate-pulse animate-ping" />
         </Link>
-      </div>    
+      </div>
+
+      {/* Video Details Section */}
+      <div className="p-4">
+        <Link to={`/all-videos/video/${_id}`} className="block">
+          <h3 className="text-lg font-bold line-clamp-2 text-gray-800 hover:text-blue-600 transition-colors duration-300">
+            {title}
+          </h3>
+        </Link>
+        <p className="text-gray-600 text-sm mt-1 line-clamp-2">{description}</p>
+        <div className="flex items-center justify-between mt-2">
+          <p className="text-gray-500 text-sm">Created on: {format(new Date(createdAt), 'MMM dd, yyyy')}</p>
+        </div>
+      </div>
     </div>
   );
 };

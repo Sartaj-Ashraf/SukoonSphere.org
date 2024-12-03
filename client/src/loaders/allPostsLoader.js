@@ -1,4 +1,5 @@
 import customFetch from "@/utils/customFetch";
+import { toast } from "react-toastify";
 
 export const allPostsLoader = async () => {
     try {
