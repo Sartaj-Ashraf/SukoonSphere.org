@@ -89,7 +89,7 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
               onUpdate={handleUpdateReply}
             />
           ) : (
-            <div className="relative">
+            <div >
               <p className="text-gray-600 text-xs md:text-sm mb-0">
                 <Link to={`/profile/${reply.commentUserId}`} className="text-[var(--primary)]">
                   @{reply.commentUsername}
@@ -97,7 +97,7 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
                 {reply.content}
               </p>
               {reply.editedAt && (
-                <span className="absolute bottom-0 right-0 text-[10px] text-gray-400 italic">
+                <span className=" text-[10px] text-gray-400 italic flex flex-row-reverse">
                   Edited {formatDistanceToNow(new Date(reply.editedAt), { addSuffix: true })}
                 </span>
               )}

@@ -8,8 +8,8 @@ function Quiz() {
   const { quiz, quizDetails, quizQuestions } = useLoaderData();
   return (
     <>
-      <div className="max-w-full mx-auto px-4 py-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="max-w-full mx-auto px-8 py-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 ">
           {/* Sidebar */}
           <div
             className="hidden lg:flex lg:col-span-3 bg-slate-100 p-4 flex-col gap-8 rounded-xl lg:sticky lg:top-20 order-1 lg:order-3"
@@ -22,14 +22,14 @@ function Quiz() {
           </div>
 
           {/* Quiz Questions Section */}
-          <div className="lg:col-span-4 lg:sticky top-16 h-[450px] grid gap-6 rounded-[20px] bg-[var(--white-color)] order-2  lg:mt-0">
+          <div className="lg:col-span-3 lg:sticky top-16 h-[500px] grid gap-6 rounded-[20px] bg-[var(--white-color)] order-2  lg:mt-0">
             <div>
               <QuizQuestions quizQuestionsList={quizQuestions} />
             </div>
           </div>
 
           {/* Quiz Summary Section */}
-          <div className="lg:col-span-5 grid gap-6 rounded lg:sticky lg:top-20 order-3 lg:order-2 mt-10 lg:mt-0">
+          <div className="lg:col-span-6 grid gap-6 rounded lg:sticky lg:top-20 order-3 lg:order-2 mt-10 lg:mt-0">
             <QuizSummary data={quizDetails} />
           </div>
         </div>
