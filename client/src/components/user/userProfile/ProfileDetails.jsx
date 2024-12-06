@@ -6,11 +6,12 @@ const ProfileDetails = ({ user }) => {
 
   return (
     <>
-      <div className="flex gap-2 sm:gap-4 items-center justify-start flex-wrap p-2 sm:p-4">
+      <div className="flex gap-2 sm:gap-4 items-center justify-start flex-wrap p-1 sm:p-2">
         {user?.role === "contributor" && (
           <>
             <RenderProfileLinks name="Articles" link="articles" />
             <RenderProfileLinks name="Videos" link="videos" />
+            <RenderProfileLinks name="Podcast" link="podcasts" />
           </>
         )}
 

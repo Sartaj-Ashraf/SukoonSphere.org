@@ -148,10 +148,10 @@ const CreateVideoModel = ({ setShowModal }) => {
                         </button>
                     </div>
                     <p className="text-[var(--grey--800)] text-sm">
-                        Dont know how to upload a video? Check out our{" "}
+                        Dont know how to upload a video? Check out our
                         <Link to={"/user-manual/create-video"} className="text-blue-500 hover:underline">
                             user manual
-                        </Link>{" "}
+                        </Link>
                         for a step-by-step guide.
                     </p>
                 </form>

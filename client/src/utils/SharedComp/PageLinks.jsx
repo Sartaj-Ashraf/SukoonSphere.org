@@ -1,3 +1,4 @@
+import React from "react";
 import { FaHome, FaCaretRight, FaBrain } from "react-icons/fa";
 import { BiQuestionMark } from "react-icons/bi";
 import { BsChatDots } from "react-icons/bs";

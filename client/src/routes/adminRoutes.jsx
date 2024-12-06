@@ -1,3 +1,4 @@
+import React from 'react';
 import AdminOutlet from '../pages/admin/AdminOutlet';
 import Inbox from '../pages/admin/Inbox';
 import UserSuggestions from '../pages/admin/UserSuggestions';

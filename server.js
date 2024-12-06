@@ -19,6 +19,7 @@ import UserRouter from "./routes/userRouter.js";
 import QaSectionRouter from "./routes/qaRouter.js";
 import ArticleRouter from "./routes/articleRouter.js";
 import VideoRouter from "./routes/videoRouter.js";
+import PodcastRouter from "./routes/podcastRouter.js";
 
 //public
 import path, { dirname } from "path";
@@ -54,6 +55,7 @@ app.use("/api/v1/posts", PostRouter);
 app.use("/api/v1/qa-section", QaSectionRouter);
 app.use("/api/v1/articles", ArticleRouter);
 app.use("/api/v1/videos", VideoRouter);
+app.use("/api/v1/podcasts", PodcastRouter);
 
 app.use("/public", express.static(path.resolve(__dirname, "./public")));
 

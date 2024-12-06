@@ -7,12 +7,17 @@ const Quiz = lazy(() => import('../pages/articles&resources/quiz/Quiz'));
 // Import loaders as usual
 import { AllQuizzesLoader } from '@/loaders/AllQuizzesLoader';
 import { QuizDetailsLoader } from '@/loaders/QuizDetailsLoader';
-import { AllVideos } from '@/pages';
 import SingleVideos from '@/pages/mediaLibrary/videos/SingleVideos';
 import { singleVideosLoader } from '@/loaders/singleVideosLoader';
 import Video from '@/pages/mediaLibrary/videos/Video';
 import PlaylistVideos from '@/pages/mediaLibrary/videos/PlaylistVideos';
 import { playlistVideosLoader } from '@/loaders/playlistVideosLoader';
+import AllVideos from '@/pages/mediaLibrary/videos/AllVideos';
+import { PodcastHome } from '@/pages';
+import AllPodcasts from '@/pages/mediaLibrary/podcasts/AllPodcasts';
+import PodcastEpisodes from '@/pages/mediaLibrary/podcasts/PodcastEpisodes';
+import SingleEpisode from '@/pages/mediaLibrary/podcasts/SingleEpisode';
+
 export const mediaRoutes = [
     {
         path: '/quiz',
@@ -52,23 +57,115 @@ export const mediaRoutes = [
         children: [
             {
                 index: true,
-                element: <SingleVideos/>,
-                loader:singleVideosLoader
+                element: <SingleVideos />,
+                loader: singleVideosLoader
             },
             {
                 path: 'playlists',
-                element: <PlaylistVideos/>,
-                loader:playlistVideosLoader
+                element: <PlaylistVideos />,
+                loader: playlistVideosLoader
             },
         ],
-       
+
     },
     {
         path: '/all-videos/video/:id',
         element: (
             <Suspense fallback={<LoadingSpinner />}>
-                <Video/>
+                <Video />
             </Suspense>
         ),
-    }
+    },
+
+    {
+        path: '/podcasts',
+        element: (
+            <Suspense fallback={<LoadingSpinner />}>
+                <PodcastHome />
+            </Suspense>
+        ),
+        children: [
+            {
+                index: true,
+                element: <AllPodcasts />,
+                loader: async () => {
+                    // Add your loader logic here
+                    return { podcasts: [
+                        {
+                            id: 1,
+                            title: 'Podcast 1',
+                            description: 'Description of Podcast 1',
+                            image: 'https://example.com/podcast1.jpg',
+                            episodes: [
+                                {
+                                    id: 1,
+                                    title: 'Episode 1',
+                                    description: 'Description of Episode 1',
+                                    audio: 'https://example.com/episode1.mp3',
+                                },
+                                {
+                                    id: 2,
+                                    title: 'Episode 2',
+                                    description: 'Description of Episode 2',
+                                    audio: 'https://example.com/episode2.mp3',
+                                },
+                            ],
+                        },
+                        {
+                            id: 1,
+                            title: 'Podcast 1',
+                            description: 'Description of Podcast 1',
+                            image: 'https://example.com/podcast1.jpg',
+                            episodes: [
+                                {
+                                    id: 1,
+                                    title: 'Episode 1',
+                                    description: 'Description of Episode 1',
+                                    audio: 'https://example.com/episode1.mp3',
+                                },
+                                {
+                                    id: 2,
+                                    title: 'Episode 2',
+                                    description: 'Description of Episode 2',
+                                    audio: 'https://example.com/episode2.mp3',
+                                },
+                            ],
+                        },
+                    ] };
+                },
+            },
+            {
+                path: 'episodes/:podcastId',
+                element: <PodcastEpisodes />,
+                loader: async ({ params }) => {
+                    // Add your loader logic here
+                    return {
+                        podcast: {
+                            id: 1,
+                            title: 'Podcast 1',
+                            description: 'Description of Podcast 1',
+                            image: 'https://example.com/podcast1.jpg',
+                            host: {
+                                id: 1,
+                                name: 'Host 1',
+                                avatar: 'https://example.com/host1.jpg',
+                            },
+                        },
+                        episodes: []
+                    };
+                },
+            },
+            {
+                path: 'episode/:episodeId',
+                element: <SingleEpisode />,
+                loader: async ({ params }) => {
+                    // Add your loader logic here
+                    return {
+                        episode: {},
+                        podcast: {}
+                    };
+                },
+            },
+        ],
+    },
 ];
