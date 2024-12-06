@@ -1,43 +1,59 @@
 import { useUser } from '@/context/UserContext';
 import customFetch from '@/utils/customFetch';
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInView } from 'react-intersection-observer';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { FaSearch } from 'react-icons/fa';
 import DeleteModal from '@/components/shared/DeleteModal';
 import { Link, useOutletContext } from 'react-router-dom';
 import UserAvatar from '@/components/shared/UserAvatar';
 import PostCard from '@/components/posts/PostCard';
+import { all } from 'axios';
 
 const UserPosts = () => {
     const user = useOutletContext();
-    const {user: loggedUser} = useUser();
-    const [posts, setPosts] = useState([]);
+    const { user: loggedUser } = useUser();
     const [searchQuery, setSearchQuery] = useState('');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [showActionModal, setShowActionModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [selectedPostId, setSelectedPostId] = useState(null);
+    const { ref, inView } = useInView();
 
-    const fetchUserPosts = async () => {
-        try {
-            const { data } = await customFetch.get(`/posts/user/${user._id}`);
-            setPosts(data.posts);
-        } catch (error) {
-            console.log(error);
-        }
-    };
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        status,
+        refetch
+    } = useInfiniteQuery({
+        queryKey: ['userPosts', user?._id],
+        enabled: !!user?._id,
+        queryFn: async ({ pageParam = 1 }) => {
+            const response = await customFetch.get(`/posts/user/${user._id}?page=${pageParam}&limit=10`);
+            return response.data;
+        },
+        getNextPageParam: (lastPage) => {
+            return lastPage.pagination.hasNextPage ? lastPage.pagination.currentPage + 1 : undefined;
+        },
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        cacheTime: 5 * 60 * 1000, // Cache for 5 minutes
+    });
 
+    // Fetch next page when last element is in view
     useEffect(() => {
-        if (user?._id) {
-            fetchUserPosts();
+        if (inView && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
         }
-    }, [user?._id]);
+    }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     const handlePostDelete = async () => {
         setIsDeleting(true);
         try {
             await customFetch.delete(`/posts/${selectedPostId}`);
-            setPosts(posts.filter(post => post._id !== selectedPostId));
+            await refetch(); // Refetch all posts after deletion
             setShowDeleteModal(false);
         } catch (error) {
             console.log(error);
@@ -45,18 +61,25 @@ const UserPosts = () => {
         setIsDeleting(false);
     };
 
-    const handlePostUpdate = (updatedPost) => {
-        setPosts(currentPosts =>
-            currentPosts.map(post =>
-                post._id === updatedPost._id ? updatedPost : post
-            )
-        );
+    const handlePostUpdate = async (updatedPost) => {
+        await refetch(); // Refetch all posts to ensure consistency
     };
-
-    const filteredPosts = posts.filter(post => 
+    // Get all posts from all pages
+    const allPosts = data?.pages.flatMap(page => page.posts) || [];
+    
+    // Filter posts based on search query
+    const filteredPosts = allPosts.filter(post => 
         (post.description?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
         post.tags?.some(tag => (tag?.toLowerCase() || '').includes(searchQuery.toLowerCase()))
     );
+    
+    if (status === 'loading') {
+        return <div className="text-center py-4">Loading posts...</div>;
+    }
+    
+    if (status === 'error') {
+        return <div className="text-center text-red-500 py-4">Error loading posts</div>;
+    }
 
     return (
         <div className="lg:p-6 bg-white rounded-xl">
@@ -77,7 +100,7 @@ const UserPosts = () => {
             {/* Posts Count */}
             <div className="flex items-center justify-between mb-4 lg:mb-8">
                 <h2 className="text-2xl font-bold text-gray-800">
-                    Posts <span className="text-blue-500 ml-2">{filteredPosts.length}</span>
+                    Posts <span className="text-blue-500 ml-2">{data?.pages[0]?.pagination?.totalPosts }</span>
                 </h2>
             </div>
 
@@ -96,20 +119,32 @@ const UserPosts = () => {
                         {searchQuery 
                             ? 'Try searching with different keywords'
                             : 'Share your thoughts and experiences with the community!'}
-
                     </p>
                 </div>
             ) : (
                 <div className="space-y-6">
-                    {filteredPosts.map((post) => (
+                    {filteredPosts.map((post, index) => (
                         <PostCard
-                            key={post._id}
+                            key={`${post._id}-${index}`}
                             post={post}
                             user={loggedUser}
                             onPostDelete={handlePostDelete}
                             onPostUpdate={handlePostUpdate}
                         />
                     ))}
+
+                    {/* Loading indicator */}
+                    <div ref={ref} className="py-4 text-center">
+                        {isFetchingNextPage && (
+                            <div className="text-gray-500">Loading more posts...</div>
+                        )}
+                        {!isFetchingNextPage && hasNextPage && (
+                            <div className="text-gray-400">Scroll for more</div>
+                        )}
+                        {!isFetchingNextPage && !hasNextPage && filteredPosts.length > 0 && (
+                            <div className="text-gray-400">That's all folks! You've reached the end of the posts.</div>
+                        )}
+                    </div>
                 </div>
             )}
 

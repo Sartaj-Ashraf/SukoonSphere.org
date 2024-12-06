@@ -68,6 +68,14 @@ export const addQuestion = async (req, res) => {
 };
 
 export const getAllQuestions = async (req, res) => {
+  // Get pagination parameters from query with defaults
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  // Get total count for pagination info
+  const totalCount = await Question.countDocuments();
+
   const questions = await Question.aggregate([
     {
       $lookup: {
@@ -94,12 +102,25 @@ export const getAllQuestions = async (req, res) => {
     },
     {
       $sort: { createdAt: -1 }
+    },
+    {
+      $skip: skip
+    },
+    {
+      $limit: limit
     }
   ]);
 
-  res.status(StatusCodes.OK).json({ questions });
-};
+  const totalPages = Math.ceil(totalCount / limit);
 
+  res.status(StatusCodes.OK).json({ 
+    questions,
+    currentPage: page,
+    totalPages,
+    totalQuestions: totalCount,
+    hasMore: page < totalPages
+  });
+};
 
 export const getUserQuestions = async (req, res) => {
   const { id: userId } = req.params;
@@ -136,6 +157,16 @@ export const getUserQuestions = async (req, res) => {
 };
 
 export const getAllQuestionsWithAnswer = async (req, res) => {
+  // Get pagination parameters from query with defaults
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  // Get total count for pagination info
+  const totalCount = await Question.countDocuments({
+    answers: { $exists: true, $not: { $size: 0 } }
+  });
+
   const questions = await Question.aggregate([
     {
       $match: {
@@ -257,10 +288,24 @@ export const getAllQuestionsWithAnswer = async (req, res) => {
     },
     {
       $sort: { createdAt: -1 }
+    },
+    {
+      $skip: skip
+    },
+    {
+      $limit: limit
     }
   ]);
 
-  res.status(StatusCodes.OK).json({ questions });
+  const totalPages = Math.ceil(totalCount / limit);
+
+  res.status(StatusCodes.OK).json({
+    questions,
+    currentPage: page,
+    totalPages,
+    totalQuestions: totalCount,
+    hasMore: page < totalPages
+  });
 };
 
 // answer controllers

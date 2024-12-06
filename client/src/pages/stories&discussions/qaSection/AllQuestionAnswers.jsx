@@ -7,26 +7,46 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Answer from "./components/Answer";
 import { toast } from "react-toastify";
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInView } from 'react-intersection-observer';
 
 const AllQuestionAnswers = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [answers, setAnswers] = useState([]);
-  const [question, setQuestion] = useState({});
   const { id } = useParams();
+  const { ref, inView } = useInView();
 
-  const fetchAnswers = async () => {
-    try {
-      const { data } = await customFetch.get(`qa-section/question/${id}/answers`);
-      setAnswers(data.answers);
-      setQuestion(data.question);
-    } catch (error) {
-      console.log(error);
+  // Set up infinite query for answers
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status,
+    refetch
+  } = useInfiniteQuery({
+    queryKey: ['answers', id],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await customFetch.get(`/qa-section/question/${id}/answers?page=${pageParam}&limit=10`);
+      return response.data;
+    },
+    getNextPageParam: (lastPage) => {
+      return lastPage.hasMore ? lastPage.currentPage + 1 : undefined;
+    },
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    cacheTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  // Fetch next page when last element is in view
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
-  };
-  const handleDeleteQuestion = async () => {
+  }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
+  const handleDeleteQuestion = async () => {
     try {
       await customFetch.delete(`/qa-section/question/${id}`);
       toast.success("Question deleted successfully");
@@ -36,9 +56,18 @@ const AllQuestionAnswers = () => {
       console.log(error);
     }
   };
-  useEffect(() => {
-    fetchAnswers()
-  }, [id]);
+
+  if (status === 'loading') {
+    return <div className="text-center py-4">Loading answers...</div>;
+  }
+
+  if (status === 'error') {
+    return <div className="text-center text-red-500 py-4">Error loading answers</div>;
+  }
+
+  const question = data?.pages[0]?.question || {};
+  const allAnswers = data?.pages.flatMap(page => page.answers) || [];
+console.log("hello from all question answers")
   return (
     <div className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 mb-3 border border-gray-100">
       {/* question  */}
@@ -51,8 +80,8 @@ const AllQuestionAnswers = () => {
         />
         <div className="flex items-center gap-4">
           <span className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium">
-            {question?.totalAnswers}{" "}
-            {question?.totalAnswers === 1 ? "Answer" : "Answers"}
+            {allAnswers.length}{" "}
+            {allAnswers.length === 1 ? "Answer" : "Answers"}
           </span>
           {user && question?.author?.userId === user?._id && (
             <PostActions handleDelete={() => setShowDeleteModal(true)} />
@@ -75,9 +104,29 @@ const AllQuestionAnswers = () => {
           ))}
         </div>
       </div>
-      {answers?.map((answer) => (
-        <Answer answer={answer} key={answer._id} user={user} answerCount={answers.length} />
-      ))}
+
+      {/* Answers List */}
+      <div className="space-y-4">
+        {allAnswers.map((answer) => (
+          <Answer 
+            key={answer._id} 
+            answer={answer} 
+            user={user} 
+            answerCount={allAnswers.length} 
+          />
+        ))}
+
+        {/* Loading indicator */}
+        <div ref={ref} className="py-4 text-center">
+          {isFetchingNextPage && (
+            <div className="text-gray-500">Loading more answers...</div>
+          )}
+          {!isFetchingNextPage && hasNextPage && (
+            <div className="text-gray-400">Scroll for more</div>
+          )}
+        </div>
+      </div>
+
       <DeleteModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -89,4 +138,5 @@ const AllQuestionAnswers = () => {
     </div>
   );
 }
-export default AllQuestionAnswers
+
+export default AllQuestionAnswers;

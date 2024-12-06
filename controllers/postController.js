@@ -22,6 +22,14 @@ export const createPost = async (req, res) => {
 };
 
 export const getAllPosts = async (req, res) => {
+  // Get pagination parameters from query with defaults
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  // Get total count for pagination info
+  const totalCount = await Post.countDocuments({ deleted: { $ne: true } });
+
   const posts = await Post.aggregate([
     {
       $match: {
@@ -53,16 +61,53 @@ export const getAllPosts = async (req, res) => {
     },
     {
       $sort: { createdAt: -1 }
+    },
+    {
+      $skip: skip
+    },
+    {
+      $limit: limit
     }
   ]);
-  res.status(StatusCodes.OK).json({ posts });
+
+  // Calculate pagination metadata
+  const totalPages = Math.ceil(totalCount / limit);
+  const hasNextPage = page < totalPages;
+  const hasPrevPage = page > 1;
+
+  res.status(StatusCodes.OK).json({
+    posts,
+    pagination: {
+      currentPage: page,
+      totalPages,
+      totalPosts: totalCount,
+      hasNextPage,
+      hasPrevPage,
+      limit
+    }
+  });
 };
 
 export const getAllPostsByUserId = async (req, res) => {
   const { id: userId } = req.params;
+  
+  // Get pagination parameters from query with defaults
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  // Get total count for pagination info
+  const totalCount = await Post.countDocuments({ 
+    createdBy: new mongoose.Types.ObjectId(userId),
+    deleted: { $ne: true }
+  });
+
   const posts = await Post.aggregate([
     {
-      $match: { createdBy: new mongoose.Types.ObjectId(userId) }
+      $match: { 
+        createdBy: new mongoose.Types.ObjectId(userId),
+        deleted: { $ne: true }
+      }
     },
     {
       $lookup: {
@@ -88,10 +133,31 @@ export const getAllPostsByUserId = async (req, res) => {
     },
     {
       $sort: { createdAt: -1 }
+    },
+    {
+      $skip: skip
+    },
+    {
+      $limit: limit
     }
   ]);
 
-  res.status(StatusCodes.OK).json({ posts });
+  // Calculate pagination metadata
+  const totalPages = Math.ceil(totalCount / limit);
+  const hasNextPage = page < totalPages;
+  const hasPrevPage = page > 1;
+
+  res.status(StatusCodes.OK).json({
+    posts,
+    pagination: {
+      currentPage: page,
+      totalPages,
+      totalPosts: totalCount,
+      hasNextPage,
+      hasPrevPage,
+      limit
+    }
+  });
 };
 
 export const getPostById = async (req, res) => {
