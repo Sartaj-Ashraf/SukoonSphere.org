@@ -1,6 +1,5 @@
 import React, { Fragment, lazy, Suspense } from "react";
 import LoadingSpinner from "@/components/loaders/LoadingSpinner";
-import { TrendingArticles } from "@/components";
 
 // Lazy load components
 const TopIntro = lazy(() => import("../components/homeComponents/TopIntro"));

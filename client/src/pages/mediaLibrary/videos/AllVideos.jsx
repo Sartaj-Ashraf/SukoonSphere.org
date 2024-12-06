@@ -9,7 +9,7 @@ const AllVideos = () => {
                          <div className="rounded-lg">
                              <div className='hidden md:block'>
                                  <h2 className="text-3xl font-bold text-[var(--grey--900)] text-center">
-                                     SukoonSphere Videos
+                                     SukoonSphere Video Gallery
                                  </h2>
                                  <p className="mt-2 text-center text-[var(--grey--800)]">
                                      Explore our collection of healing and mindfulness videos

@@ -14,6 +14,8 @@ const UserFollowing = lazy(() => import('../components/user/userProfile/UserFoll
 import { userFollowersLoader } from '@/loaders/userFollowersLoader';
 import { userFollowingLoader } from '@/loaders/userFollowingLoader';
 import Videos from '@/pages/contributors/videos/Videos';
+import { PodcastHome } from '@/pages';
+import ContributorPodcasts from '@/pages/contributors/podcasts/ContributorPodcasts';
 
 export const userRoutes = [
     {
@@ -88,6 +90,14 @@ export const userRoutes = [
                 element: (
                     <Suspense fallback={<LoadingSpinner />}>
                         <Videos />
+                    </Suspense>
+                ),
+            },
+            {
+                path: 'podcasts',
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <ContributorPodcasts />
                     </Suspense>
                 ),
             },

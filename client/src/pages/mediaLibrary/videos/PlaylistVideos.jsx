@@ -32,15 +32,15 @@ const PlaylistVideos = () => {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] bg-gray-50 rounded-xl p-8 space-y-6 text-center">
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)]  rounded-xl p-8 space-y-6 text-center">
           <div className="bg-blue-100 p-6 rounded-full">
             <FaFilm className="w-16 h-16 text-blue-600 animate-pulse" />
           </div>
           <div className="max-w-md">
-            <h2 className="text-2xl font-bold text-gray-800 mb-3">
+            <h2 className="text-2xl font-bold text-[var(--grey--900)] mb-3">
               Empty Playlist
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-[var(--grey--800)] mb-6">
               No playlist found. This collection is currently empty.
             </p>
           </div>
