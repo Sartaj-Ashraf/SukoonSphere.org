@@ -283,3 +283,70 @@ export const deletePodcast = async (req, res) => {
         throw new BadRequestError(error.message || 'Error deleting podcast');
     }
 };
+
+export const editPodcast = async (req, res) => {
+    try {
+        const { id: podcastId } = req.params;
+        const { title, description } = req.body;
+        
+        // Find the podcast
+        const podcast = await Podcast.findById(podcastId);
+        
+        if (!podcast) {
+            throw new NotFoundError('Podcast not found');
+        }
+
+        // Check if the user is authorized to edit this podcast
+        if (podcast.userId.toString() !== req.user.userId) {
+            throw new UnauthorizedError('Not authorized to edit this podcast');
+        }
+
+        // Update the podcast fields
+        const updatedFields = {
+            title: title || podcast.title,
+            description: description || podcast.description
+        };
+
+        // Handle image update if new image is uploaded
+        if (req.files && req.files.image) {
+            // Delete old image if it exists
+            if (podcast.imageUrl) {
+                const oldImagePath = path.join(process.cwd(), podcast.imageUrl);
+                try {
+                    await unlinkAsync(oldImagePath);
+                } catch (error) {
+                    console.error('Error deleting old image:', error);
+                }
+            }
+
+            const imageFile = req.files.image;
+            const imageFileName = `${Date.now()}-${imageFile.name}`;
+            const imagePath = path.join('uploads', 'podcasts', 'images', imageFileName);
+            
+            // Ensure directory exists
+            const imageDir = path.join(process.cwd(), 'uploads', 'podcasts', 'images');
+            if (!fs.existsSync(imageDir)) {
+                fs.mkdirSync(imageDir, { recursive: true });
+            }
+
+            // Move the new image
+            await imageFile.mv(path.join(process.cwd(), imagePath));
+            updatedFields.imageUrl = imagePath;
+        }
+
+        // Update the podcast
+        const updatedPodcast = await Podcast.findByIdAndUpdate(
+            podcastId,
+            updatedFields,
+            { new: true, runValidators: true }
+        );
+
+        res.status(StatusCodes.OK).json({ 
+            message: 'Podcast updated successfully',
+            podcast: updatedPodcast 
+        });
+    } catch (error) {
+        console.error('Error updating podcast:', error);
+        throw new BadRequestError(error.message || 'Error updating podcast');
+    }
+};
