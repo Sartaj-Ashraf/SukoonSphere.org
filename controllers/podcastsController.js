@@ -1,4 +1,4 @@
-import { StatusCodes } from "http-status-codes";
+    import { StatusCodes } from "http-status-codes";
 import { BadRequestError, UnauthorizedError } from "../errors/customErors.js";
 import Podcast from "../models/podcasts/podcastsModel.js";
 import PodcastPlaylist from "../models/podcasts/podcastsModel.js";
@@ -27,34 +27,29 @@ export const getAllPodcasts = async (req, res) => {
     if (!req.files || !req.files.image || !req.files.audio) {
       throw new BadRequestError('Please provide both image and audio files');
     }
-
+  
     const newPodcast = {
       title,
       description,
       episodeNo,
       userId: req.user.userId,
     };
-
-    // Handle image file
-    if (!req.file) {
-      throw new BadRequestError('Please provide podcast image and audio files');
-    }
-
-    const imageUrl = `${process.env.BACKEND_URL}/public/podcasts/images/${req.files.image[0].filename}`;
-    const audioUrl = `${process.env.BACKEND_URL}/public/podcasts/episodes/${req.files.audio[0].filename}`;
+  
+    // Handle files
+    const imageFile = req.files.image[0];
+    const audioFile = req.files.audio[0];
     
-    newPodcast.imageUrl = imageUrl;
-    newPodcast.audioUrl = audioUrl;
-
+    newPodcast.imageUrl = `${process.env.BACKEND_URL}/public/podcasts/images/${imageFile.filename}`;
+    newPodcast.audioUrl = `${process.env.BACKEND_URL}/public/podcasts/episodes/${audioFile.filename}`;
+  
     const podcast = await Podcast.create(newPodcast);
     
-    // Add podcast reference to user's podcasts array
     await User.findByIdAndUpdate(
       req.user.userId,
       { $push: { podcasts: podcast._id } },
       { new: true }
     );
-
+  
     res.status(StatusCodes.CREATED).json({
       msg: "Podcast created successfully",
       podcast
