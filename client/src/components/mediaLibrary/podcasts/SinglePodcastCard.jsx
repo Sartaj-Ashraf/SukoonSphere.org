@@ -28,9 +28,9 @@ const SinglePodcastCard = ({ podcast, fetchData }) => {
     if (time && !isNaN(time)) {
       const minutes = Math.floor(time / 60);
       const seconds = Math.floor(time % 60);
-      return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+      return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
     }
-    return '0:00';
+    return "0:00";
   };
 
   const handleTimeUpdate = () => {
@@ -47,7 +47,9 @@ const SinglePodcastCard = ({ podcast, fetchData }) => {
 
   const handleProgressClick = (e) => {
     const progressBar = e.currentTarget;
-    const clickPosition = (e.pageX - progressBar.getBoundingClientRect().left) / progressBar.offsetWidth;
+    const clickPosition =
+      (e.pageX - progressBar.getBoundingClientRect().left) /
+      progressBar.offsetWidth;
     const newTime = clickPosition * duration;
     if (audioRef.current) {
       audioRef.current.currentTime = newTime;
@@ -67,47 +69,47 @@ const SinglePodcastCard = ({ podcast, fetchData }) => {
   const deletePodcast = async () => {
     try {
       await customFetch.delete(`/podcasts/${podcast._id}`);
-      toast.success('Podcast deleted successfully');
+      toast.success("Podcast deleted successfully");
       await fetchData();
     } catch (error) {
-      console.error('Error deleting podcast:', error);
-      toast.error(error?.response?.data?.msg || 'Failed to delete podcast');
+      console.error("Error deleting podcast:", error);
+      toast.error(error?.response?.data?.msg || "Failed to delete podcast");
     } finally {
       setShowDeleteModal(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow w-full mb-4">
-      <div className="flex">
+    <div className="bg-white rounded-lg  overflow-hidden hover:shadow-lg transition-shadow w-full mb-4">
+      <div className="flex bg-white rounded-xl  mx-auto transition-all duration-300">
         {/* Left side - Image */}
-        <div className="relative group w-64 min-w-[256px]">
+        <div className="w-64 flex-shrink-0">
           <img
             src={podcast.imageUrl}
             alt={podcast.title}
-            className="w-[200px] h-[180px] object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </div>
 
         {/* Right side - Content */}
-        <div className="flex-1 p-6">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+        <div className="flex-1 p-4 space-y-4">
+          <div className="flex justify-between items-start">
+            <div className="flex-1 pr-4">
+              <h3 className="text-xl font-bold text-gray-900 mb-2 truncate">
                 {podcast.title}
               </h3>
-              
+
               {/* Creator Info */}
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center space-x-2 mb-3">
                 {podcast.userId?.profileImage ? (
-                  <img 
-                    src={podcast.userId.profileImage} 
+                  <img
+                    src={podcast.userId.profileImage}
                     alt={podcast.userId.name}
-                    className="w-6 h-6 rounded-full object-cover"
+                    className="w-7 h-7 rounded-full object-cover border-2 border-gray-200"
                   />
                 ) : (
-                  <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                    <FaUser className="w-3 h-3 text-gray-500" />
+                  <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center">
+                    <FaUser className="w-4 h-4 text-gray-500" />
                   </div>
                 )}
                 <span className="text-sm text-gray-600">
@@ -119,28 +121,31 @@ const SinglePodcastCard = ({ podcast, fetchData }) => {
                 {podcast.description}
               </p>
             </div>
-
-            {/* Play Button */}
-            <button 
-              onClick={togglePlay}
-              className="p-3 bg-[var(--primary)] rounded-full text-white hover:bg-[var(--primary-dark)] transition-colors"
-            >
-              {isPlaying ? <FaPause className="w-4 h-4" /> : <FaPlay className="w-4 h-4" />}
-            </button>
+            <PostActions
+                handleEdit={handleEdit}
+                handleDelete={handleDelete}
+              />
+           
           </div>
 
-          <PostActions
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
-          />
           {/* Audio Progress Bar */}
-          <div className="space-y-2">
-            <div 
-              className="h-1 bg-gray-200 rounded-full cursor-pointer relative overflow-hidden"
+          <button
+              onClick={togglePlay}
+              className="bg-[var(--primary)] text-white p-3 rounded-full shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              {isPlaying ? (
+                <FaPause className="w-5 h-5" />
+              ) : (
+                <FaPlay className="w-5 h-5" />
+              )}
+            </button>
+          <div className="space-y-2 ">
+            <div
+              className="h-1.5 bg-gray-200 rounded-full cursor-pointer relative overflow-hidden"
               onClick={handleProgressClick}
             >
-              <div 
-                className="absolute h-full bg-[var(--primary)] rounded-full transition-all duration-100"
+              <div
+                className="absolute h-full bg-blue-500 rounded-full transition-all duration-100"
                 style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
               />
             </div>
@@ -151,17 +156,21 @@ const SinglePodcastCard = ({ podcast, fetchData }) => {
           </div>
 
           {/* Episode Info */}
-          <div className="flex items-center gap-4 text-sm text-gray-600 mt-3">
+          <div className="flex items-center space-x-4 text-sm text-gray-600">
             {podcast.episodeNo && (
-              <span>Episode {podcast.episodeNo}</span>
+              <span className="bg-gray-100 px-2 py-1 rounded-md">
+                Episode {podcast.episodeNo}
+              </span>
             )}
             {podcast.duration && (
-              <span>{podcast.duration}</span>
+              <span className="bg-gray-100 px-2 py-1 rounded-md">
+                {podcast.duration}
+              </span>
             )}
           </div>
 
-          {/* Hidden Audio Element */}
-          <audio 
+          {/* Audio Element */}
+          <audio
             ref={audioRef}
             src={podcast.audioUrl}
             onEnded={() => setIsPlaying(false)}

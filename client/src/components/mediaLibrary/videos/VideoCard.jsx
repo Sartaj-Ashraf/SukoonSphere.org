@@ -13,14 +13,14 @@ const VideoCard = ({ video }) => {
         <img
           src={coverImage}
           alt={title}
-          className="w-full rounded-lg h-40 md:h-64 object-cover transition-transform duration-300 hover:scale-105  "
+          className="w-full  h-40 md:h-64 object-cover transition-transform duration-300 hover:scale-105  "
         />
         {/* Play Button */}
         <Link
           to={`/all-videos/video/${_id}`}
-          className="absolute  -bottom-6 right-4 bg-white p-4 rounded-full border-2 hover:border-2 hover:border-[var(--secondary)] shadow-md transition-all duration-200 hover:-translate-y-1 hover:scale-110"
+          className="absolute  -bottom-6 right-4 bg-white p-4 rounded-full border-2 hover:border-2 hover:border-[var(--primary)] shadow-md transition-all duration-200 hover:-translate-y-1 hover:scale-110"
         >
-          <FaPlay className="text-[var(--secondary)] text-lg animate-pulse animate-ping" />
+          <FaPlay className="text-[var(--primary))] text-sm " />
         </Link>
       </div>
 
