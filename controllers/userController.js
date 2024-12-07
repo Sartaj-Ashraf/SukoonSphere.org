@@ -96,7 +96,7 @@ export const followOrUnfollowUser = async (req, res) => {
       targetUser.followers.push(currentUserId);
     }
 
-    await Promise.all([currentUser.save(), targetUser.save()]);s
+    await Promise.all([currentUser.save(), targetUser.save()]);
 
     res.status(StatusCodes.OK).json({
       success: true,

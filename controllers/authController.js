@@ -60,38 +60,44 @@ export const login = async (req, res) => {
     throw new UnauthenticatedError(
       "please verify your email, you have already recieved verification link, check your mail"
     );
-  // from here
-  // create refresh token
+
   let refreshToken = "";
-  // check if refresh token already exists
   const existingToken = await RefreshToken.findOne({ user: user._id });
+  
   if (existingToken) {
     const { isValid } = existingToken;
     if (!isValid) {
       throw new UnauthenticatedError("invalid credentials");
     }
-    // if refresh token is valid
     refreshToken = existingToken.refreshToken;
-    attachCookiesToResponse({
-      res,
-      user,
-      refreshToken,
-    });
-    res.status(StatusCodes.OK).json({ msg: "user logged in", user });
-    return;
+  } else {
+    refreshToken = crypto.randomBytes(50).toString("hex");
+    const userAgent = req.headers["user-agent"];
+    const ipAddress = req.ip;
+    const userToken = { refreshToken, ipAddress, userAgent, user: user._id };
+    await RefreshToken.create(userToken);
   }
-  // if refresh token does not exist
-  refreshToken = crypto.randomBytes(50).toString("hex");
-  const userAgent = req.headers["user-agent"];
-  const ipAddress = req.ip;
-  const userToken = { refreshToken, ipAddress, userAgent, user: user._id };
-  await RefreshToken.create(userToken);
+
+  // Get user profile data
+  const userProfile = {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar,
+    role: user.role
+  };
+
   attachCookiesToResponse({
     res,
     user,
     refreshToken,
   });
-  res.status(StatusCodes.OK).json({ msg: "user logged in", user });
+
+  res.status(StatusCodes.OK).json({ 
+    msg: "user logged in", 
+    user: userProfile,
+    isAuthenticated: true
+  });
 };
 
 export const refreshToken = async (req, res) => {
@@ -196,15 +202,27 @@ export const resetPassword = async (req, res) => {
 
 // logout
 export const logout = async (req, res) => {
-  await RefreshToken.findOneAndDelete({ user: req.user.userId });
+  // If user exists in request, delete their refresh token
+  if (req.user?.userId) {
+    await RefreshToken.findOneAndDelete({ user: req.user.userId });
+  }
 
+  // Clear cookies regardless of authentication state
   res.cookie("accessToken", "logout", {
     httpOnly: true,
     expires: new Date(Date.now()),
+    secure: process.env.NODE_ENV === "production",
+    signed: true
   });
   res.cookie("refreshToken", "logout", {
     httpOnly: true,
     expires: new Date(Date.now()),
+    secure: process.env.NODE_ENV === "production",
+    signed: true
   });
-  res.status(StatusCodes.OK).json({ msg: "user logged out!" });
+  
+  res.status(StatusCodes.OK).json({ 
+    msg: "user logged out!",
+    isAuthenticated: false
+  });
 };
