@@ -10,12 +10,11 @@ import { QuizDetailsLoader } from '@/loaders/QuizDetailsLoader';
 import SingleVideos from '@/pages/mediaLibrary/videos/SingleVideos';
 import { singleVideosLoader } from '@/loaders/singleVideosLoader';
 import Video from '@/pages/mediaLibrary/videos/Video';
-import PlaylistVideos from '@/pages/mediaLibrary/videos/PlaylistVideos';
-import { playlistVideosLoader } from '@/loaders/playlistVideosLoader';
 import AllVideos from '@/pages/mediaLibrary/videos/AllVideos';
 import { PodcastHome } from '@/pages';
-import AllPodcasts from '@/pages/mediaLibrary/podcasts/AllPodcasts';
-import PodcastEpisodes from '@/pages/mediaLibrary/podcasts/PodcastEpisodes';
+import AllsinglePodcasts from '@/pages/mediaLibrary/podcasts/AllsinglePodcasts';
+import AllPdocastPlaylists from '@/pages/mediaLibrary/podcasts/AllPdocastPlaylists';
+import PlaylistDetails from '@/pages/mediaLibrary/podcasts/PlaylistDetails';
 import SingleEpisode from '@/pages/mediaLibrary/podcasts/SingleEpisode';
 
 export const mediaRoutes = [
@@ -60,11 +59,7 @@ export const mediaRoutes = [
                 element: <SingleVideos />,
                 loader: singleVideosLoader
             },
-            {
-                path: 'playlists',
-                element: <PlaylistVideos />,
-                loader: playlistVideosLoader
-            },
+           
         ],
 
     },
@@ -87,85 +82,31 @@ export const mediaRoutes = [
         children: [
             {
                 index: true,
-                element: <AllPodcasts />,
-                loader: async () => {
-                    // Add your loader logic here
-                    return { podcasts: [
-                        {
-                            id: 1,
-                            title: 'Podcast 1',
-                            description: 'Description of Podcast 1',
-                            image: 'https://example.com/podcast1.jpg',
-                            episodes: [
-                                {
-                                    id: 1,
-                                    title: 'Episode 1',
-                                    description: 'Description of Episode 1',
-                                    audio: 'https://example.com/episode1.mp3',
-                                },
-                                {
-                                    id: 2,
-                                    title: 'Episode 2',
-                                    description: 'Description of Episode 2',
-                                    audio: 'https://example.com/episode2.mp3',
-                                },
-                            ],
-                        },
-                        {
-                            id: 1,
-                            title: 'Podcast 1',
-                            description: 'Description of Podcast 1',
-                            image: 'https://example.com/podcast1.jpg',
-                            episodes: [
-                                {
-                                    id: 1,
-                                    title: 'Episode 1',
-                                    description: 'Description of Episode 1',
-                                    audio: 'https://example.com/episode1.mp3',
-                                },
-                                {
-                                    id: 2,
-                                    title: 'Episode 2',
-                                    description: 'Description of Episode 2',
-                                    audio: 'https://example.com/episode2.mp3',
-                                },
-                            ],
-                        },
-                    ] };
-                },
+                element: <AllsinglePodcasts />,
             },
             {
-                path: 'episodes/:podcastId',
-                element: <PodcastEpisodes />,
-                loader: async ({ params }) => {
-                    // Add your loader logic here
-                    return {
-                        podcast: {
-                            id: 1,
-                            title: 'Podcast 1',
-                            description: 'Description of Podcast 1',
-                            image: 'https://example.com/podcast1.jpg',
-                            host: {
-                                id: 1,
-                                name: 'Host 1',
-                                avatar: 'https://example.com/host1.jpg',
-                            },
-                        },
-                        episodes: []
-                    };
-                },
+                path: 'playlists',
+                element: <AllPdocastPlaylists />,
+            },
+            {
+                path: 'playlist/:playlistId',
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <PlaylistDetails />
+                    </Suspense>
+                ),
             },
             {
                 path: 'episode/:episodeId',
-                element: <SingleEpisode />,
-                loader: async ({ params }) => {
-                    // Add your loader logic here
-                    return {
-                        episode: {},
-                        podcast: {}
-                    };
-                },
+                element: (
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <SingleEpisode />
+                    </Suspense>
+                ),
             },
+            {
+
+            }
         ],
     },
 ];

@@ -47,6 +47,9 @@ router.get("/user/:userId/singles", getUserSinglePodcasts);
 // Get user's playlist podcasts for a specific user 
 router.get("/user/:userId/playlists", getUserPlaylistPodcasts);
 
+// Get a single playlist by ID
+router.get("/playlist/:id", getPlaylistPodcast);
+
 //2,5 Get a single podcast by ID
 router.get("/:id", getSinglePodcast);
 
