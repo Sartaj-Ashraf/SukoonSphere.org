@@ -170,28 +170,7 @@ function NavMenu() {
                     <div className="flex flex-col space-y-3">
                       {link.sublinks.map((sublink) => {
                         // Check if the sublink is for videos or podcasts
-                        if (
-                          sublink.name === "Podcasts"
-                        ) {
-                          return (
-                            <div
-                              key={sublink.name}
-                              className="flex items-center gap-3 p-2 rounded-xl whitespace-nowrap opacity-50 cursor-not-allowed"
-                            >
-                              <div className="text-xl text-gray-400">
-                                {sublink.icon}
-                              </div>
-                              <div>
-                                <span className="text-sm text-gray-400">
-                                  {sublink.name}
-                                </span>
-                                <span className="block text-xs text-gray-400">
-                                  Coming Soon! 🎬
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        }
+                        
                         return (
                           <NavLink
                             key={sublink.name}

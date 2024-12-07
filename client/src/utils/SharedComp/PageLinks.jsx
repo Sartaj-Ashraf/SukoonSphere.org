@@ -67,7 +67,7 @@ const links = [
     sublinks: [
       {
         name: "Podcasts",
-        address: "podcast/playlists",
+        address: "/podcasts",
         description: "Audio-based discussions",
         // icon: <FaCaretRight />,
         icon: <GiPodium />,
