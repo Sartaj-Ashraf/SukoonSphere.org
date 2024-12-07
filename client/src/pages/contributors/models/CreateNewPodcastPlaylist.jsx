@@ -1,27 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { FaMicrophone, FaTimes, FaPlus, FaTimesCircle } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { FaList, FaTimes } from "react-icons/fa";
 import customFetch from "@/utils/customFetch";
 
-const CreateNewPodcast = ({ setShowModal, type = 'single', playlistId = null, fetchData }) => {
+const CreateNewPodcastPlaylist = ({ setShowModal }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [episodeNo, setEpisodeNo] = useState("");
-    const [audioFile, setAudioFile] = useState(null);
     const [coverImage, setCoverImage] = useState(null);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!title ) {
+        if (!title || !description) {
             toast.error("Please fill in all required fields");
-            return;
-        }
-
-        if (!audioFile) {
-            toast.error("Please upload an audio file");
             return;
         }
 
@@ -37,40 +29,35 @@ const CreateNewPodcast = ({ setShowModal, type = 'single', playlistId = null, fe
             // Append all fields
             formData.append('title', title.trim());
             formData.append('description', description.trim());
-            formData.append('episodeNo', episodeNo.toString());
-            formData.append('type', type);
             
-            // If this is a playlist episode, include the playlist ID
-            if (type === 'playlist' && playlistId) {
-                formData.append('playlistId', playlistId);
-            }
-            
-            // Append files
-            if (audioFile) {
-                formData.append('audio', audioFile);
-            }
+            // Append image file
             if (coverImage) {
                 formData.append('image', coverImage);
             }
 
-            const response = await customFetch.post("/podcasts", formData, {
+            // Log formData contents for debugging
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+
+            const response = await customFetch.post("/podcasts/playlist", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
 
             if (response.status === 201) {
-                toast.success(`${type === 'single' ? 'Podcast' : 'Playlist'} created successfully!`);
+                toast.success("Podcast playlist created successfully!");
                 setShowModal(false);
             }
         } catch (error) {
-            console.log('Error creating podcast:', error);
+            console.log('Error creating playlist:', error);
             if (error.response?.data?.error) {
                 toast.error(error.response.data.error);
             } else if (error.response?.data?.msg) {
                 toast.error(error.response.data.msg);
             } else {
-                toast.error("Error creating podcast. Please try again.");
+                toast.error("Error creating playlist. Please try again.");
             }
         } finally {
             setIsSubmitting(false);
@@ -88,24 +75,13 @@ const CreateNewPodcast = ({ setShowModal, type = 'single', playlistId = null, fe
         }
     };
 
-    const handleAudioChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            if (file.size > 50 * 1024 * 1024) { // 50MB limit
-                toast.error("Audio file size should be less than 50MB");
-                return;
-            }
-            setAudioFile(file);
-        }
-    };
-
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-12 bg-black bg-opacity-50 backdrop-blur-sm">
             <div className="p-4 bg-white w-full max-w-lg rounded-xl shadow-2xl transform transition-all relative z-50">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-[var(--primary)] flex items-center gap-2">
-                        <FaMicrophone className="text-primary" />
-                        {type === 'playlist' ? 'Add Episode to Playlist' : 'Create New Podcast'}
+                        <FaList className="text-primary" />
+                        Create New Podcast Playlist
                     </h2>
                     <button
                         onClick={() => setShowModal(false)}
@@ -121,7 +97,7 @@ const CreateNewPodcast = ({ setShowModal, type = 'single', playlistId = null, fe
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            placeholder="Enter podcast title..."
+                            placeholder="Enter playlist title..."
                             className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary"
                         />
                     </div>
@@ -130,20 +106,10 @@ const CreateNewPodcast = ({ setShowModal, type = 'single', playlistId = null, fe
                         <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            placeholder="Enter podcast description..."
+                            placeholder="Enter playlist description..."
                             className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary min-h-[100px]"
                         />
                     </div>
-
-                    {type === 'playlist' && <div>
-                        <input
-                            type="number"
-                            value={episodeNo}
-                            onChange={(e) => setEpisodeNo(e.target.value)}
-                            placeholder="Episode number..."
-                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary"
-                        />
-                    </div>}
 
                     <div className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">
@@ -153,18 +119,6 @@ const CreateNewPodcast = ({ setShowModal, type = 'single', playlistId = null, fe
                             type="file"
                             accept="image/*"
                             onChange={handleImageChange}
-                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">
-                            Audio File (Max 50MB)
-                        </label>
-                        <input
-                            type="file"
-                            accept="audio/*"
-                            onChange={handleAudioChange}
                             className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
                         />
                     </div>
@@ -182,13 +136,17 @@ const CreateNewPodcast = ({ setShowModal, type = 'single', playlistId = null, fe
                             disabled={isSubmitting}
                             className="px-6 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)] transition-colors disabled:opacity-50"
                         >
-                            {isSubmitting ? "Creating..." : type === 'playlist' ? "Add to Playlist" : "Create Podcast"}
+                            {isSubmitting ? "Creating..." : "Create Playlist"}
                         </button>
                     </div>
                 </form>
+
+                <div className="mt-4 text-sm text-gray-600">
+                    <p>After creating the playlist, you can add episodes to it from the podcast list.</p>
+                </div>
             </div>
         </div>
     );
 };
 
-export default CreateNewPodcast;
+export default CreateNewPodcastPlaylist;
