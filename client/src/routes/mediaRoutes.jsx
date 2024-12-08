@@ -11,11 +11,12 @@ import SingleVideos from '@/pages/mediaLibrary/videos/SingleVideos';
 import { singleVideosLoader } from '@/loaders/singleVideosLoader';
 import Video from '@/pages/mediaLibrary/videos/Video';
 import AllVideos from '@/pages/mediaLibrary/videos/AllVideos';
-import { PodcastHome } from '@/pages';
+import { PlaylistVideos, PodcastHome } from '@/pages';
 import AllsinglePodcasts from '@/pages/mediaLibrary/podcasts/AllsinglePodcasts';
 import AllPdocastPlaylists from '@/pages/mediaLibrary/podcasts/AllPdocastPlaylists';
 import PlaylistDetails from '@/pages/mediaLibrary/podcasts/PlaylistDetails';
 import SingleEpisode from '@/pages/mediaLibrary/podcasts/SingleEpisode';
+import { playlistVideosLoader } from '@/loaders/playlistVideosLoader';
 
 export const mediaRoutes = [
     {
@@ -59,9 +60,12 @@ export const mediaRoutes = [
                 element: <SingleVideos />,
                 loader: singleVideosLoader
             },
-           
+            {
+                path: 'playlists',
+                element: <PlaylistVideos />,
+                loader: playlistVideosLoader
+            },
         ],
-
     },
     {
         path: '/all-videos/video/:id',

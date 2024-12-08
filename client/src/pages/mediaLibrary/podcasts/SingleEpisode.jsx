@@ -87,7 +87,7 @@ const SingleEpisode = () => {
   if (!episode) return <div className="text-gray-500 text-center py-8">Episode not found</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
+    <div className="min-h-screen  py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Episode Header */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
