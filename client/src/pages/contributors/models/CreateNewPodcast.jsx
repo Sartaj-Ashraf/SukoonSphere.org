@@ -180,7 +180,7 @@ const CreateNewPodcast = ({ setShowModal, type = 'single', playlistId = null, fe
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="px-6 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)] transition-colors disabled:opacity-50"
+                            className="px-6 py-2 bg-[var(--primary)] text-white rounded-lg transition-colors disabled:opacity-50"
                         >
                             {isSubmitting ? "Creating..." : type === 'playlist' ? "Add to Playlist" : "Create Podcast"}
                         </button>
