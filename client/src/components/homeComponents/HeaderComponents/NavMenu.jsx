@@ -327,7 +327,7 @@ const UserSection = ({ user, miniMenu, toggleMiniMenu, handleLogout }) => {
 const AuthButtons = () => (
   <div className="flex gap-2">
     <Link to="/auth/sign-up">
-      <button className="hidden lg:flex bg-[var(--white-color)] items-center gap-1 rounded-[5px] shadow-[0_2px_0_0_rgba(0,0,0,0.04),_inset_0_0_0_2px_var(--grey--500)] transition-all ease-in-out duration-600 text-[var(--grey--900)] px-3 py-2 text-xs leading-[1.32] hover:bg-[var(--grey--200)]">
+      <button className="hidden lg:flex bg-[var(--white-color)] items-center gap-1 rounded-[5px] shadow-[0_2px_0_0_rgba(0,0,0,0.04),_inset_0_0_0_2px_var(--grey--400)] transition-all ease-in-out duration-600 text-[var(--grey--900)] px-3 py-2 text-xs leading-[1.32] hover:bg-[var(--grey--200)]">
         <span>Sign Up</span>
         <FaArrowRightLong />
       </button>

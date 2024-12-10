@@ -51,52 +51,68 @@ const PlaylistDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden transform hover:shadow-2xl transition-all duration-300">
-          <div className="relative h-64 md:h-80">
-            <img
-              src={playlist.imageUrl || '/default-playlist-image.jpg'}
-              alt={playlist.title}
-              className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent">
-              <div className="absolute bottom-8 left-8 text-white">
-                <h1 className="text-4xl font-bold mb-3 tracking-tight">{playlist.title}</h1>
-                <div className="flex items-center space-x-4 text-gray-200">
-                  <div className="flex items-center">
-                    <FaHeadphones className="mr-2" />
-                    <span className="text-sm font-medium">{playlist.userId?.name}</span>
-                  </div>
-                  <span>•</span>
-                  <div className="flex items-center">
-                    <FaPlay className="mr-2" />
-                    <span className="text-sm font-medium">{playlist.episodes?.length || 0} Episodes</span>
-                  </div>
+    <div className="min-h-screen ">
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-3xl">
+        {/* Hero Image Section */}
+        <div className="relative h-64 md:h-96 group">
+          <img
+            src={playlist.imageUrl || '/default-playlist-image.jpg'}
+            alt={playlist.title}
+            className="absolute inset-0 w-full h-full object-cover 
+              group-hover:scale-105 transition-transform duration-500 ease-in-out"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+            <div className="absolute bottom-8 left-8 right-8 text-white">
+              <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight 
+                text-shadow-lg line-clamp-2">{playlist.title}</h1>
+              <div className="flex flex-wrap items-center space-x-4 text-gray-200">
+                <div className="flex items-center space-x-2">
+                  <FaHeadphones className="text-indigo-300" />
+                  <span className="text-sm font-medium">
+                    {playlist.userId?.name || 'Unknown Creator'}
+                  </span>
+                </div>
+                <span className="text-gray-400">•</span>
+                <div className="flex items-center space-x-2">
+                  <FaPlay className="text-indigo-300" />
+                  <span className="text-sm font-medium">
+                    {playlist.episodes?.length || 0} Episodes
+                  </span>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+        
+        {/* Content Section */}
+        <div className="p-6 md:p-10">
+          {/* Description */}
+          <div className="prose max-w-none mb-8">
+            <p className="text-gray-600 leading-relaxed text-base md:text-lg">
+              {playlist.description || 'No description available'}
+            </p>
+          </div>
           
-          <div className="p-8">
-         
-
-            <div className="prose max-w-none mb-8">
-              <p className="text-gray-600 leading-relaxed">{playlist.description}</p>
-            </div>
-            
-            <div className="border-t border-gray-100 pt-6">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center">
-                <span className="border-b-2 border-indigo-600 pb-1">Episodes</span>
-              </h2>
-              <div className="space-y-6">
-                <PodcastsGrid podcasts={playlist.episodes} isPlayList={true} />
-              </div>
+          {/* Episodes Section */}
+          <div className="border-t border-gray-100 pt-8">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800 flex items-center">
+              <span className="relative">
+                Episodes
+                <span className="absolute bottom-0 left-0 w-full h-1 bg-indigo-500 rounded"></span>
+              </span>
+            </h2>
+            <div className="space-y-6">
+              <PodcastsGrid 
+                podcasts={playlist.episodes} 
+                isPlayList={true} 
+              />
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
   );
 };
 

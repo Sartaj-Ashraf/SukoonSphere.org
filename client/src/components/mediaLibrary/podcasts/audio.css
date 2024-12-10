@@ -1,0 +1,70 @@
+audio {
+  -webkit-appearance: none; /* Hide default controls */
+  width: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  background-color: #4B5563; /* Gray-600 */
+  border-radius: 9999px;
+  /* padding: 0 8px; */
+}
+
+audio::-webkit-media-controls-panel {
+  background-color: transparent;
+  color: white;
+  border-radius: 9999px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Play/Pause button */
+audio::-webkit-media-controls-play-button {
+  background-color: #2563EB; /* Blue-600 */
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  padding-left: 2px; /* Adjust for play icon */
+}
+
+/* Volume slider */
+audio::-webkit-media-controls-volume-slider {
+  display: none;
+}
+
+/* Volume slider thumb */
+audio::-webkit-media-controls-volume-slider-thumb {
+  background-color: white;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+}
+
+/* Timeline */
+audio::-webkit-media-controls-timeline {
+  display: none;
+}
+
+/* Timeline thumb */
+audio::-webkit-media-controls-timeline-thumb {
+  display: none;
+}
+
+/* Current time */
+audio::-webkit-media-controls-current-time-display {
+  color: white;
+  font-size: 14px;
+  margin-right: 8px;
+}
+
+/* Duration */
+audio::-webkit-media-controls-time-remaining-display {
+  display: none;
+}
