@@ -21,7 +21,7 @@ const AllQuestionAnswers = () => {
   const {
     data,
     fetchNextPage,
-    hasNextPage,
+    hasNextPage: queryHasNextPage,
     isFetchingNextPage,
     status,
     refetch
@@ -32,7 +32,8 @@ const AllQuestionAnswers = () => {
       return response.data;
     },
     getNextPageParam: (lastPage) => {
-      return lastPage.hasMore ? lastPage.currentPage + 1 : undefined;
+      if (!lastPage.pagination) return undefined;
+      return lastPage.pagination.hasNextPage ? lastPage.pagination.currentPage + 1 : undefined;
     },
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -41,10 +42,10 @@ const AllQuestionAnswers = () => {
 
   // Fetch next page when last element is in view
   useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
+    if (inView && queryHasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
+  }, [inView, fetchNextPage, queryHasNextPage, isFetchingNextPage]);
 
   const handleDeleteQuestion = async () => {
     try {
@@ -54,6 +55,7 @@ const AllQuestionAnswers = () => {
       navigate('/qa-section')
     } catch (error) {
       console.log(error);
+      toast.error("Failed to delete question");
     }
   };
 
@@ -67,7 +69,8 @@ const AllQuestionAnswers = () => {
 
   const question = data?.pages[0]?.question || {};
   const allAnswers = data?.pages.flatMap(page => page.answers) || [];
-console.log("hello from all question answers")
+  const pagination = data?.pages[data.pages.length - 1]?.pagination;
+
   return (
     <div className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 mb-3 border border-gray-100">
       {/* question  */}
@@ -80,8 +83,8 @@ console.log("hello from all question answers")
         />
         <div className="flex items-center gap-4">
           <span className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium">
-            {allAnswers.length}{" "}
-            {allAnswers.length === 1 ? "Answer" : "Answers"}
+            {pagination?.totalAnswers || 0}{" "}
+            {pagination?.totalAnswers === 1 ? "Answer" : "Answers"}
           </span>
           {user && question?.author?.userId === user?._id && (
             <PostActions handleDelete={() => setShowDeleteModal(true)} />
@@ -112,7 +115,7 @@ console.log("hello from all question answers")
             key={answer._id} 
             answer={answer} 
             user={user} 
-            answerCount={allAnswers.length} 
+            answerCount={pagination?.totalAnswers || 0} 
           />
         ))}
 
@@ -121,8 +124,14 @@ console.log("hello from all question answers")
           {isFetchingNextPage && (
             <div className="text-gray-500">Loading more answers...</div>
           )}
-          {!isFetchingNextPage && hasNextPage && (
-            <div className="text-gray-400">Scroll for more</div>
+          {!isFetchingNextPage && queryHasNextPage && (
+            <div className="text-gray-400">Scroll for more answers</div>
+          )}
+          {!queryHasNextPage && allAnswers.length > 0 && (
+            <div className="text-gray-400">No more answers to load</div>
+          )}
+          {!queryHasNextPage && allAnswers.length === 0 && (
+            <div className="text-gray-400">No answers yet</div>
           )}
         </div>
       </div>

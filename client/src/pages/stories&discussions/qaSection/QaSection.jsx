@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { FaQuestionCircle } from "react-icons/fa";
 import { AiOutlineComment } from "react-icons/ai";
-import { QuestionModal, Spinner } from "@/components";
-import { Link, Outlet, useLoaderData, useNavigation } from "react-router-dom";
+import { QuestionModal } from "@/components";
+import { Link, Outlet } from "react-router-dom";
 import customFetch from "@/utils/customFetch";
-import QuestionCard from "./components/QuestionCard";
 import { useUser } from "@/context/UserContext";
 import { toast } from "react-toastify";
 
@@ -21,12 +20,10 @@ export const questionsAction = async ({ request }) => {
     return { error: error?.response?.data?.msg || "An error occurred during posting question." };
   }
 };
-// start from here
 
 const QaSection = () => {
   const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { questions } = useLoaderData();
 
   const groups = [
     {
@@ -55,6 +52,7 @@ const QaSection = () => {
       image: "https://example.com/image_stress.jpg",
     },
   ];
+
   return (
     <>
       <div className="relative w-full max-w-7xl mx-auto p-2 sm:p-4">
@@ -109,8 +107,7 @@ const QaSection = () => {
             </div>
 
             {/* Questions List */}
-
-            <Outlet context={{ questions }} />
+            <Outlet />
           </div>
         </div>
 
@@ -119,7 +116,7 @@ const QaSection = () => {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
         />
-      </div >
+      </div>
     </>
   );
 };

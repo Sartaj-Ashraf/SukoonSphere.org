@@ -68,92 +68,166 @@ export const addQuestion = async (req, res) => {
 };
 
 export const getAllQuestions = async (req, res) => {
-  // Get pagination parameters from query with defaults
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const skip = (page - 1) * limit;
+  try {
+    // Get pagination parameters from query with defaults
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-  // Get total count for pagination info
-  const totalCount = await Question.countDocuments();
+    // Get total count for pagination info
+    const totalQuestions = await Question.countDocuments();
+    const totalPages = Math.ceil(totalQuestions / limit);
 
-  const questions = await Question.aggregate([
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "userDetails"
-      }
-    },
-    {
-      $addFields: {
-        author: {
-          userId: "$createdBy",
-          username: { $arrayElemAt: ["$userDetails.name", 0] },
-          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
-        },
-        totalAnswers: { $size: { $ifNull: ["$answers", []] } }
-      }
-    },
-    {
-      $project: {
-        userDetails: 0
-      }
-    },
-    {
-      $sort: { createdAt: -1 }
-    },
-    {
-      $skip: skip
-    },
-    {
-      $limit: limit
+    // Validate page number
+    if (page < 1 || (totalQuestions > 0 && page > totalPages)) {
+      throw new BadRequestError('Invalid page number');
     }
-  ]);
 
-  const totalPages = Math.ceil(totalCount / limit);
+    const questions = await Question.aggregate([
+      // First sort by createdAt to ensure consistent ordering
+      {
+        $sort: { createdAt: -1 }
+      },
+      // Then skip and limit for pagination
+      {
+        $skip: skip
+      },
+      {
+        $limit: limit
+      },
+      // Then do the lookups and transformations
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      {
+        $lookup: {
+          from: "answers",
+          localField: "answers",
+          foreignField: "_id",
+          as: "answers"
+        }
+      },
+      {
+        $addFields: {
+          author: {
+            userId: "$createdBy",
+            username: { $arrayElemAt: ["$userDetails.name", 0] },
+            userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+          },
+          totalAnswers: { $size: "$answers" }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          questionText: 1,
+          context: 1,
+          createdAt: 1,
+          tags: 1,
+          author: 1,
+          totalAnswers: 1
+        }
+      }
+    ]);
 
-  res.status(StatusCodes.OK).json({ 
-    questions,
-    currentPage: page,
-    totalPages,
-    totalQuestions: totalCount,
-    hasMore: page < totalPages
-  });
+    res.status(StatusCodes.OK).json({ 
+      questions,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalQuestions,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+        limit
+      }
+    });
+  } catch (error) {
+    if (error instanceof BadRequestError) {
+      res.status(StatusCodes.BAD_REQUEST).json({ msg: error.message });
+    } else {
+      console.error('Error in getAllQuestions:', error);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+        msg: 'Failed to fetch questions' 
+      });
+    }
+  }
 };
 
 export const getUserQuestions = async (req, res) => {
   const { id: userId } = req.params;
-  const questions = await Question.aggregate([
-    {
-      $match: { createdBy: new mongoose.Types.ObjectId(userId) }
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "userDetails"
-      }
-    },
-    {
-      $addFields: {
-        username: { $arrayElemAt: ["$userDetails.name", 0] },
-        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
-        totalAnswers: { $size: { $ifNull: ["$answers", []] } }
-      }
-    },
-    {
-      $project: {
-        userDetails: 0
-      }
-    },
-    {
-      $sort: { createdAt: -1 }
-    }
-  ]);
+  const { page = 1, limit = 4 } = req.query;
+  const skip = (page - 1) * limit;
 
-  res.status(StatusCodes.OK).json({ questions });
+  try {
+    // Get total count for pagination
+    const totalQuestions = await Question.countDocuments({ createdBy: userId });
+    const totalPages = Math.ceil(totalQuestions / limit);
+
+    const questions = await Question.aggregate([
+      {
+        $match: { createdBy: new mongoose.Types.ObjectId(userId) }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      {
+        $lookup: {
+          from: "answers",
+          localField: "_id",
+          foreignField: "answeredTo",
+          as: "answers"
+        }
+      },
+      {
+        $addFields: {
+          username: { $arrayElemAt: ["$userDetails.name", 0] },
+          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
+          totalAnswers: { $size: "$answers" }
+        }
+      },
+      {
+        $project: {
+          userDetails: 0,
+          answers: 0
+        }
+      },
+      {
+        $sort: { createdAt: -1 }
+      },
+      {
+        $skip: parseInt(skip)
+      },
+      {
+        $limit: parseInt(limit)
+      }
+    ]);
+
+    res.status(StatusCodes.OK).json({
+      questions,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages,
+        totalQuestions,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
+  } catch (error) {
+    console.error('Error in getUserQuestions:', error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+      msg: 'Failed to fetch user questions' 
+    });
+  }
 };
 
 export const getAllQuestionsWithAnswer = async (req, res) => {
@@ -463,99 +537,6 @@ export const getAnswerById = async (req, res) => {
           username: { $arrayElemAt: ["$userDetails.name", 0] },
           userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
         },
-        totalAnswers: { $size: "$answers" }
-      }
-    },
-    {
-      $project: {
-        userDetails: 0,
-        answers: 0
-      }
-    }
-  ]);
-
-  if (!question.length) {
-    throw new NotFoundError("Question not found");
-  }
-
-  res.status(StatusCodes.OK).json({
-    answer: answer[0],
-    question: question[0]
-  });
-};
-export const getAnswersByQuestionId = async (req, res) => {
-  const { id: questionId } = req.params;
-
-  // First get the question with user details
-  const question = await Question.aggregate([
-    {
-      $match: { _id: new mongoose.Types.ObjectId(questionId) }
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "userDetails"
-      }
-    },
-    {
-      $lookup: {
-        from: "answers",
-        localField: "answers",
-        foreignField: "_id",
-        as: "answers"
-      }
-    },
-    {
-      $addFields: {
-        author: {
-          userId: "$createdBy",
-          username: { $arrayElemAt: ["$userDetails.name", 0] },
-          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
-        },
-        totalAnswers: { $size: "$answers" }
-      }
-    },
-    {
-      $project: {
-        userDetails: 0
-      }
-    }
-  ]);
-
-  if (!question.length) {
-    throw new NotFoundError("Question not found");
-  }
-
-  // Then get all answers with user details
-  const answers = await Answer.aggregate([
-    {
-      $match: { answeredTo: new mongoose.Types.ObjectId(questionId) }
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "userDetails"
-      }
-    },
-    {
-      $lookup: {
-        from: "qacomments",
-        localField: "comments",
-        foreignField: "_id",
-        as: "comments"
-      }
-    },
-    {
-      $addFields: {
-        author: {
-          userId: "$createdBy",
-          username: { $arrayElemAt: ["$userDetails.name", 0] },
-          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
-        },
         totalLikes: { $size: { $ifNull: ["$likes", []] } },
         totalComments: { $size: { $ifNull: ["$comments", []] } }
       }
@@ -569,54 +550,208 @@ export const getAnswersByQuestionId = async (req, res) => {
       $sort: { createdAt: -1 }
     }
   ]);
+;
 
   res.status(StatusCodes.OK).json({
     question: question[0],
-    answers
+    answer: answer[0]
   });
+};
+export const getAnswersByQuestionId = async (req, res) => {
+  try {
+    const { id: questionId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // First get the question with user details
+    const question = await Question.aggregate([
+      {
+        $match: { _id: new mongoose.Types.ObjectId(questionId) }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      {
+        $lookup: {
+          from: "answers",
+          localField: "answers",
+          foreignField: "_id",
+          as: "answers"
+        }
+      },
+      {
+        $addFields: {
+          author: {
+            userId: "$createdBy",
+            username: { $arrayElemAt: ["$userDetails.name", 0] },
+            userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+          },
+          totalAnswers: { $size: "$answers" }
+        }
+      },
+      {
+        $project: {
+          userDetails: 0,
+          answers: 0
+        }
+      }
+    ]);
+
+    if (!question.length) {
+      throw new NotFoundError("Question not found");
+    }
+
+    // Get total count for pagination info
+    const totalAnswers = await Answer.countDocuments({ answeredTo: questionId });
+    const totalPages = Math.ceil(totalAnswers / limit);
+
+    // Then get paginated answers with user details
+    const answers = await Answer.aggregate([
+      {
+        $match: { answeredTo: new mongoose.Types.ObjectId(questionId) }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      {
+        $lookup: {
+          from: "qacomments",
+          localField: "comments",
+          foreignField: "_id",
+          as: "comments"
+        }
+      },
+      {
+        $addFields: {
+          author: {
+            userId: "$createdBy",
+            username: { $arrayElemAt: ["$userDetails.name", 0] },
+            userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+          },
+          totalLikes: { $size: { $ifNull: ["$likes", []] } },
+          totalComments: { $size: { $ifNull: ["$comments", []] } }
+        }
+      },
+      {
+        $project: {
+          userDetails: 0
+        }
+      },
+      {
+        $sort: { createdAt: -1 }
+      },
+      {
+        $skip: skip
+      },
+      {
+        $limit: limit
+      }
+    ]);
+
+    res.status(StatusCodes.OK).json({
+      question: question[0],
+      answers,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalAnswers,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
+  } catch (error) {
+    if (error instanceof NotFoundError) {
+      res.status(StatusCodes.NOT_FOUND).json({ msg: error.message });
+    } else {
+      console.error('Error in getAnswersByQuestionId:', error);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+        msg: 'Failed to fetch answers' 
+      });
+    }
+  }
 };
 export const getUserAnswers = async (req, res) => {
   const { id: userId } = req.params;
-  const answers = await Answer.aggregate([
-    {
-      $match: { createdBy: new mongoose.Types.ObjectId(userId) }
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "userDetails"
-      }
-    },
-    {
-      $lookup: {
-        from: "questions",
-        localField: "answeredTo",
-        foreignField: "_id",
-        as: "question"
-      }
-    },
-    {
-      $addFields: {
-        username: { $arrayElemAt: ["$userDetails.name", 0] },
-        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
-        totalLikes: { $size: { $ifNull: ["$likes", []] } },
-        totalComments: { $size: { $ifNull: ["$comments", []] } },
-        question: { $arrayElemAt: ["$question", 0] }
-      }
-    },
-    {
-      $project: {
-        userDetails: 0
-      }
-    },
-    {
-      $sort: { createdAt: -1 }
-    }
-  ]);
+  const { page = 1, limit = 4 } = req.query;
+  const skip = (page - 1) * limit;
 
-  res.status(StatusCodes.OK).json({ answers });
+  try {
+    // Get total count for pagination
+    const totalAnswers = await Answer.countDocuments({ createdBy: userId });
+    const totalPages = Math.ceil(totalAnswers / limit);
+
+    const answers = await Answer.aggregate([
+      {
+        $match: { createdBy: new mongoose.Types.ObjectId(userId) }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      {
+        $lookup: {
+          from: "questions",
+          localField: "answeredTo",
+          foreignField: "_id",
+          as: "question"
+        }
+      },
+      {
+        $addFields: {
+          username: { $arrayElemAt: ["$userDetails.name", 0] },
+          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
+          totalLikes: { $size: { $ifNull: ["$likes", []] } },
+          totalComments: { $size: { $ifNull: ["$comments", []] } },
+          question: { $arrayElemAt: ["$question", 0] }
+        }
+      },
+      {
+        $project: {
+          userDetails: 0
+        }
+      },
+      {
+        $sort: { createdAt: -1 }
+      },
+      {
+        $skip: parseInt(skip)
+      },
+      {
+        $limit: parseInt(limit)
+      }
+    ]);
+
+    res.status(StatusCodes.OK).json({
+      answers,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages,
+        totalAnswers,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
+  } catch (error) {
+    console.error('Error in getUserAnswers:', error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+      msg: 'Failed to fetch user answers' 
+    });
+  }
 };
 // answer comment controllers
 export const createAnswerComment = async (req, res) => {
