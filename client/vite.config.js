@@ -18,4 +18,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          pdfWorker: ['pdfjs-dist/build/pdf.worker.entry']
+        }
+      }
+    }
+  }
 });
