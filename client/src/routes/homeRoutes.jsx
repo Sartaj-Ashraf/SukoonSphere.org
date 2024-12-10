@@ -4,6 +4,7 @@ const Articles = lazy(() => import("../pages/articles&resources/articles/Article
 const Posts = lazy(() => import("../pages/stories&discussions/posts/Posts"));
 const Answer = lazy(() => import("../pages/stories&discussions/qaSection/answer/Answer"));
 const Article = lazy(() => import("../pages/articles&resources/articles/Article"));
+const AllQuestionAnswers = lazy(() => import("../pages/stories&discussions/qaSection/AllQuestionAnswers"));
 
 // Keep the loader as 
 import LoadingSpinner from "@/components/loaders/LoadingSpinner";
@@ -14,12 +15,11 @@ import SinglePost from "@/pages/stories&discussions/posts/SinglePost";
 import CommentsOutlet from "@/pages/stories&discussions/posts/CommentsOutlet";
 import RepliesOutlet from "@/pages/stories&discussions/posts/RepliesOutlet";
 
-
 import QaSection, { questionsAction } from "@/pages/stories&discussions/qaSection/QaSection";
-
+import QaOutlet from "@/pages/stories&discussions/qaSection/QaOutlet";
 import QaCommentOutlet from "@/pages/stories&discussions/qaSection/QaCommentOutlet";
 import QaRepliesOutlet from "@/pages/stories&discussions/qaSection/QaRepliesOutlet";
-import { AllQuestionAnswers, QaOutlet, SingleAnswerOutlet } from "@/pages";
+import { SingleAnswerOutlet } from "@/pages";
 
 import { SingleAnswerOutletloader } from "@/loaders/SingleAnswerOutletloader";
 import { questionsLoader } from "@/loaders/questionsLoader";
@@ -51,11 +51,15 @@ export const homeRoutes = [
         element: <QaOutlet />,
       },
       {
-        path: "/QA-section/question/:id",
-        element: <AllQuestionAnswers />,
+        path: "question/:id",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <AllQuestionAnswers />
+          </Suspense>
+        ),
       },
       {
-        path: "/QA-section/question/answer/:id/comments",
+        path: "question/answer/:id/comments",
         element: <SingleAnswerOutlet />,
         children: [
           {
@@ -63,7 +67,7 @@ export const homeRoutes = [
             element: <QaCommentOutlet />,
           },
           {
-            path: "/QA-section/question/answer/:id/comments/:commentId/reply",
+            path: "comments/:commentId/reply",
             element: <QaRepliesOutlet />,
           },
         ],
@@ -73,7 +77,6 @@ export const homeRoutes = [
     action: questionsAction,
     loader: questionsLoader,
   },
-
   {
     path: "/answer",
     element: (
@@ -118,7 +121,7 @@ export const homeRoutes = [
         loader: allPostsLoader,
       },
       {
-        path: "/posts/:id",
+        path: ":id",
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <SinglePost />
@@ -131,7 +134,7 @@ export const homeRoutes = [
             element: <CommentsOutlet />,
           },
           {
-            path: "/posts/:id/comment-id/:commentId",
+            path: "comment-id/:commentId",
             element: (
               <Suspense key={location.key} fallback={<LoadingSpinner />}>
                 <RepliesOutlet />
