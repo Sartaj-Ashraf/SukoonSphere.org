@@ -69,33 +69,14 @@ export const addQuestion = async (req, res) => {
 
 export const getAllQuestions = async (req, res) => {
   try {
-    // Get pagination parameters from query with defaults
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const sortBy = req.query.sortBy || 'newest';
+    const search = req.query.search || '';
     const skip = (page - 1) * limit;
 
-    // Get total count for pagination info
-    const totalQuestions = await Question.countDocuments();
-    const totalPages = Math.ceil(totalQuestions / limit);
-
-    // Validate page number
-    if (page < 1 || (totalQuestions > 0 && page > totalPages)) {
-      throw new BadRequestError('Invalid page number');
-    }
-
-    const questions = await Question.aggregate([
-      // First sort by createdAt to ensure consistent ordering
-      {
-        $sort: { createdAt: -1 }
-      },
-      // Then skip and limit for pagination
-      {
-        $skip: skip
-      },
-      {
-        $limit: limit
-      },
-      // Then do the lookups and transformations
+    // Base pipeline for questions
+    const pipeline = [
       {
         $lookup: {
           from: "users",
@@ -124,37 +105,90 @@ export const getAllQuestions = async (req, res) => {
       },
       {
         $project: {
-          _id: 1,
-          questionText: 1,
-          context: 1,
-          createdAt: 1,
-          tags: 1,
-          author: 1,
-          totalAnswers: 1
+          userDetails: 0
         }
       }
-    ]);
+    ];
 
-    res.status(StatusCodes.OK).json({ 
-      questions,
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalQuestions,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1,
-        limit
-      }
-    });
-  } catch (error) {
-    if (error instanceof BadRequestError) {
-      res.status(StatusCodes.BAD_REQUEST).json({ msg: error.message });
-    } else {
-      console.error('Error in getAllQuestions:', error);
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
-        msg: 'Failed to fetch questions' 
+    // Add search stage if search query exists
+    if (search) {
+      pipeline.unshift({
+        $match: {
+          $or: [
+            { questionText: { $regex: search, $options: 'i' } },
+            { context: { $regex: search, $options: 'i' } },
+            { tags: { $regex: search, $options: 'i' } }
+          ]
+        }
       });
     }
+
+    // Add filter stages based on sortBy
+    switch (sortBy) {
+      case 'oldest':
+        pipeline.push({ $sort: { createdAt: 1 } });
+        break;
+      case 'mostAnswered':
+        pipeline.push({ $sort: { totalAnswers: -1, createdAt: -1 } });
+        break;
+      case 'unanswered':
+        pipeline.unshift({
+          $match: {
+            $or: [
+              { answers: { $size: 0 } },
+              { answers: { $exists: false } }
+            ]
+          }
+        });
+        pipeline.push({ $sort: { createdAt: -1 } });
+        break;
+      default: // 'newest'
+        pipeline.push({ $sort: { createdAt: -1 } });
+    }
+
+    // Get total count for pagination info
+    const totalCount = await Question.aggregate([
+      ...(search ? [{
+        $match: {
+          $or: [
+            { questionText: { $regex: search, $options: 'i' } },
+            { context: { $regex: search, $options: 'i' } },
+            { tags: { $regex: search, $options: 'i' } }
+          ]
+        }
+      }] : []),
+      ...(sortBy === 'unanswered' ? [{
+        $match: {
+          $or: [
+            { answers: { $size: 0 } },
+            { answers: { $exists: false } }
+          ]
+        }
+      }] : [])
+    ]).count('total');
+
+    // Add pagination stages
+    pipeline.push(
+      { $skip: skip },
+      { $limit: limit }
+    );
+
+    const questions = await Question.aggregate(pipeline);
+    const total = totalCount[0]?.total || 0;
+    const totalPages = Math.ceil(total / limit);
+
+    res.status(StatusCodes.OK).json({
+      questions,
+      currentPage: page,
+      totalPages,
+      totalQuestions: total,
+      hasMore: page < totalPages
+    });
+  } catch (error) {
+    console.error('Error in getAllQuestions:', error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+      msg: 'Failed to fetch questions' 
+    });
   }
 };
 
@@ -235,13 +269,15 @@ export const getAllQuestionsWithAnswer = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
+  const sortBy = req.query.sortBy || 'newest';
 
   // Get total count for pagination info
   const totalCount = await Question.countDocuments({
     answers: { $exists: true, $not: { $size: 0 } }
   });
 
-  const questions = await Question.aggregate([
+  // Base pipeline for questions with answers
+  const pipeline = [
     {
       $match: {
         answers: { $exists: true, $not: { $size: 0 } }
@@ -351,6 +387,15 @@ export const getAllQuestionsWithAnswer = async (req, res) => {
               ]
             }
           }
+        },
+        totalAnswerLikes: {
+          $sum: {
+            $map: {
+              input: "$answers",
+              as: "answer",
+              in: { $size: { $ifNull: ["$$answer.likes", []] } }
+            }
+          }
         }
       }
     },
@@ -359,18 +404,28 @@ export const getAllQuestionsWithAnswer = async (req, res) => {
         userDetails: 0,
         answerUserDetails: 0
       }
-    },
-    {
-      $sort: { createdAt: -1 }
-    },
-    {
-      $skip: skip
-    },
-    {
-      $limit: limit
     }
-  ]);
+  ];
 
+  // Add sort stage based on filter
+  switch (sortBy) {
+    case 'oldest':
+      pipeline.push({ $sort: { createdAt: 1 } });
+      break;
+    case 'mostAnswered':
+      pipeline.push({ $sort: { totalAnswers: -1, createdAt: -1 } });
+      break;
+    default: // 'newest'
+      pipeline.push({ $sort: { createdAt: -1 } });
+  }
+
+  // Add pagination stages
+  pipeline.push(
+    { $skip: skip },
+    { $limit: limit }
+  );
+
+  const questions = await Question.aggregate(pipeline);
   const totalPages = Math.ceil(totalCount / limit);
 
   res.status(StatusCodes.OK).json({
@@ -387,7 +442,6 @@ export const createAnswer = async (req, res) => {
   const { userId } = req.user;
   const { id: questionId } = req.params;
   const { context } = req.body;
-
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -562,6 +616,7 @@ export const getAnswersByQuestionId = async (req, res) => {
     const { id: questionId } = req.params;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const sortBy = req.query.sortBy || 'newest';
     const skip = (page - 1) * limit;
 
     // First get the question with user details
@@ -612,7 +667,7 @@ export const getAnswersByQuestionId = async (req, res) => {
     const totalPages = Math.ceil(totalAnswers / limit);
 
     // Then get paginated answers with user details
-    const answers = await Answer.aggregate([
+    const pipeline = [
       {
         $match: { answeredTo: new mongoose.Types.ObjectId(questionId) }
       },
@@ -647,17 +702,28 @@ export const getAnswersByQuestionId = async (req, res) => {
         $project: {
           userDetails: 0
         }
-      },
-      {
-        $sort: { createdAt: -1 }
-      },
-      {
-        $skip: skip
-      },
-      {
-        $limit: limit
       }
-    ]);
+    ];
+
+    // Add sort stage based on filter
+    switch (sortBy) {
+      case 'oldest':
+        pipeline.push({ $sort: { createdAt: 1 } });
+        break;
+      case 'mostLiked':
+        pipeline.push({ $sort: { totalLikes: -1, createdAt: -1 } });
+        break;
+      default: // 'newest'
+        pipeline.push({ $sort: { createdAt: -1 } });
+    }
+
+    // Add pagination stages
+    pipeline.push(
+      { $skip: skip },
+      { $limit: limit }
+    );
+
+    const answers = await Answer.aggregate(pipeline);
 
     res.status(StatusCodes.OK).json({
       question: question[0],
@@ -1260,7 +1326,7 @@ export const editAnswerReply = async (req, res) => {
   });
 };
 
-// delete controllers
+// delete controllers 
 export const deleteQuestion = async (req, res) => {
   const { id: postId } = req.params;
   const session = await mongoose.startSession();

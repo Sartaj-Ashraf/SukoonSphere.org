@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Spinner } from "@/components";
 import customFetch from "@/utils/customFetch";
-import { Form, useActionData, Link } from "react-router-dom";
+import { Form, useActionData, Link, useSearchParams } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
 import { toast } from "react-toastify";
 import UserAvatar from "@/components/shared/UserAvatar";
@@ -37,8 +37,43 @@ const Answer = () => {
   const [newAnswer, setNewAnswer] = useState("");
   const actionData = useActionData();
   const { ref, inView } = useInView();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentFilter = searchParams.get('filter') || 'newest';
+  const searchQuery = searchParams.get('search') || '';
+  const [searchInput, setSearchInput] = useState(searchQuery);
 
-  // Fetch questions with pagination
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchInput !== searchQuery) {
+        setSearchParams(prev => {
+          const newParams = new URLSearchParams(prev);
+          if (searchInput) {
+            newParams.set('search', searchInput);
+          } else {
+            newParams.delete('search');
+          }
+          return newParams;
+        });
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput, searchQuery, setSearchParams]);
+
+  // Filter options
+  const filterOptions = [
+    { value: 'newest', label: 'Newest First' },
+    { value: 'oldest', label: 'Oldest First' },
+    { value: 'mostAnswered', label: 'Most Answered' },
+    { value: 'unanswered', label: 'Unanswered' },
+  ];
+
+  const handleFilterChange = (value) => {
+    setSearchParams({ filter: value });
+  };
+
+  // Fetch questions with pagination and filtering
   const {
     data,
     fetchNextPage,
@@ -48,26 +83,38 @@ const Answer = () => {
     error: loadError,
     refetch
   } = useInfiniteQuery({
-    queryKey: ['questions'],
+    queryKey: ['questions', currentFilter, searchQuery],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await customFetch.get(`/qa-section/all-questions?page=${pageParam}&limit=4`);
+      const params = new URLSearchParams({
+        page: pageParam,
+        limit: 10,
+        sortBy: currentFilter,
+        ...(searchQuery && { search: searchQuery })
+      });
+      const response = await customFetch.get(`/qa-section/all-questions?${params}`);
       return response.data;
     },
     getNextPageParam: (lastPage) => {
-      if (!lastPage?.pagination) return undefined;
-      return lastPage.pagination.hasNextPage ? lastPage.pagination.currentPage + 1 : undefined;
+      return lastPage.hasMore ? lastPage.currentPage + 1 : undefined;
     },
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    cacheTime: 5 * 60 * 1000, // Cache for 5 minutes
+    cacheTime: 5 * 60 * 1000,
   });
 
-  // Fetch next page when last element is in view
+  // Reset infinite query when filter changes
+  useEffect(() => {
+    refetch();
+  }, [currentFilter, refetch]);
+
+  // Load next page when scrolling to bottom
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const allQuestions = data?.pages.flatMap(page => page.questions) || [];
 
   useEffect(() => {
     if (actionData?.success) {
@@ -108,7 +155,6 @@ const Answer = () => {
     );
   }
 
-  const allQuestions = data?.pages.flatMap(page => page.questions) || [];
   console.log('All questions:', allQuestions); // Debug log
 
   const groups = [
@@ -170,9 +216,53 @@ const Answer = () => {
 
           {/* Main Content */}
           <div className="col-span-1 md:col-span-6">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6 border-b pb-3">
-              Questions
-            </h2>
+            <div className="flex flex-col gap-4 mb-6">
+              {/* Search bar */}
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Search questions..."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                {searchInput && (
+                  <button
+                    onClick={() => {
+                      setSearchInput('');
+                      setSearchParams(prev => {
+                        const newParams = new URLSearchParams(prev);
+                        newParams.delete('search');
+                        return newParams;
+                      });
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    <IoCloseOutline className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Filter buttons */}
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800">Questions</h2>
+                <div className="flex flex-wrap gap-2 mt-3 md:mt-0">
+                  {filterOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => handleFilterChange(option.value)}
+                      className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+                        currentFilter === option.value
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
             {allQuestions?.length === 0 ? (
               <div className="text-center p-4 md:p-8 bg-white rounded-lg shadow-md">
                 <p className="text-gray-600">

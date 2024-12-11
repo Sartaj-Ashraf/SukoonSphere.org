@@ -6,6 +6,7 @@ import customFetch from "@/utils/customFetch";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Answer from "./components/Answer";
+import AnswerFilter from "@/components/qa/AnswerFilter";
 import { toast } from "react-toastify";
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
@@ -14,6 +15,7 @@ const AllQuestionAnswers = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('newest');
   const { id } = useParams();
   const { ref, inView } = useInView();
 
@@ -26,9 +28,9 @@ const AllQuestionAnswers = () => {
     status,
     refetch
   } = useInfiniteQuery({
-    queryKey: ['answers', id],
+    queryKey: ['answers', id, activeFilter],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await customFetch.get(`/qa-section/question/${id}/answers?page=${pageParam}&limit=10`);
+      const response = await customFetch.get(`/qa-section/question/${id}/answers?page=${pageParam}&limit=10&sortBy=${activeFilter}`);
       return response.data;
     },
     getNextPageParam: (lastPage) => {
@@ -46,6 +48,11 @@ const AllQuestionAnswers = () => {
       fetchNextPage();
     }
   }, [inView, fetchNextPage, queryHasNextPage, isFetchingNextPage]);
+
+  const handleFilterChange = (filter) => {
+    setActiveFilter(filter);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleDeleteQuestion = async () => {
     try {
@@ -107,6 +114,12 @@ const AllQuestionAnswers = () => {
           ))}
         </div>
       </div>
+
+      {/* Answer Filter */}
+      <AnswerFilter 
+        activeFilter={activeFilter}
+        onFilterChange={handleFilterChange}
+      />
 
       {/* Answers List */}
       <div className="space-y-4">

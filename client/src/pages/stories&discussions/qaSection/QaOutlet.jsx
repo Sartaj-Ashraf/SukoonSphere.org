@@ -1,12 +1,14 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import QuestionCard from "./components/QuestionCard";
+import QaFilter from '@/components/qa/QaFilter';
 import { Spinner } from '@/components';
 import customFetch from '@/utils/customFetch';
 
 const QaOutlet = () => {
   const { ref, inView } = useInView();
+  const [activeFilter, setActiveFilter] = useState('newest');
 
   const {
     data,
@@ -15,9 +17,9 @@ const QaOutlet = () => {
     isFetchingNextPage,
     status,
   } = useInfiniteQuery({
-    queryKey: ['questions'],
+    queryKey: ['questions', activeFilter],
     queryFn: async ({ pageParam = 1 }) => {
-      const response = await customFetch.get(`/qa-section?page=${pageParam}&limit=10`);
+      const response = await customFetch.get(`/qa-section?page=${pageParam}&limit=10&sortBy=${activeFilter}`);
       return response.data;
     },
     getNextPageParam: (lastPage) => {
@@ -25,7 +27,7 @@ const QaOutlet = () => {
     },
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    cacheTime: 5 * 60 * 1000, // Cache for 5 minutes
+    cacheTime: 5 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -55,22 +57,34 @@ const QaOutlet = () => {
   }
 
   return (
-    <div className="space-y-4">
-      {allQuestions.map((question, index) => (
-        <QuestionCard
-          key={`${question._id}-${index}`}
-          question={question}
-        />
-      ))}
-      
-      {/* Loading indicator */}
-      <div ref={ref} className="py-4 text-center">
-        {isFetchingNextPage && (
-          <div className="text-gray-500"><Spinner /></div>
-        )}
-        {!isFetchingNextPage && hasNextPage && (
-          <div className="text-gray-400">Scroll for more</div>
-        )}
+    <div>
+      {/* Filter Component */}
+      <QaFilter 
+        activeFilter={activeFilter}
+        onFilterChange={(filter) => {
+          setActiveFilter(filter);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+
+      {/* Questions List */}
+      <div className="space-y-4">
+        {allQuestions.map((question, index) => (
+          <QuestionCard
+            key={`${question._id}-${index}`}
+            question={question}
+          />
+        ))}
+        
+        {/* Loading indicator */}
+        <div ref={ref} className="py-4 text-center">
+          {isFetchingNextPage && (
+            <div className="text-gray-500"><Spinner /></div>
+          )}
+          {!isFetchingNextPage && hasNextPage && (
+            <div className="text-gray-400">Scroll for more</div>
+          )}
+        </div>
       </div>
     </div>
   );
