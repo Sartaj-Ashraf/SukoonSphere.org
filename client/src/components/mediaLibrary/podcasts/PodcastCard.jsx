@@ -14,7 +14,6 @@ const PodcastCard = ({ podcast, isPlayList }) => {
         backgroundImage: `url(${podcast.imageUrl || "/default-podcast-image.jpg"})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-
       }}
       className="relative text-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl"
     >
