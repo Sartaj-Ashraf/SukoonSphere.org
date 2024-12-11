@@ -22,70 +22,96 @@ export const createPost = async (req, res) => {
 };
 
 export const getAllPosts = async (req, res) => {
-  // Get pagination parameters from query with defaults
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const skip = (page - 1) * limit;
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const sortBy = req.query.sortBy || 'newest';
 
-  // Get total count for pagination info
-  const totalCount = await Post.countDocuments({ deleted: { $ne: true } });
+    // Base pipeline stages
+    const pipeline = [
+      // Match non-deleted posts
+      {
+        $match: {
+          deleted: { $ne: true }
+        }
+      },
+      // Lookup user details
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      // Add computed fields
+      {
+        $addFields: {
+          username: { $arrayElemAt: ["$userDetails.name", 0] },
+          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
+          totalLikes: { $size: { $ifNull: ["$likes", []] } },
+          totalComments: { $size: { $ifNull: ["$comments", []] } },
+        }
+      },
+      // Project out unnecessary fields
+      {
+        $project: {
+          userDetails: 0,
+          deleted: 0,
+          __v: 0
+        }
+      }
+    ];
 
-  const posts = await Post.aggregate([
-    {
-      $match: {
-        deleted: { $ne: true }
-      }
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "userDetails"
-      }
-    },
-    {
-      $addFields: {
-        username: { $arrayElemAt: ["$userDetails.name", 0] },
-        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
-        totalLikes: { $size: { $ifNull: ["$likes", []] } },
-        totalComments: { $size: { $ifNull: ["$comments", []] } },
-      }
-    },
-    {
-      $project: {
-        userDetails: 0,
-        deleted: 0,
-        __v: 0
-      }
-    },
-    {
-      $sort: { createdAt: -1 }
-    },
-    {
-      $skip: skip
-    },
-    {
-      $limit: limit
+    // Add sort stage based on sortBy
+    switch (sortBy) {
+      case 'oldest':
+        pipeline.push({ $sort: { createdAt: 1 } });
+        break;
+      case 'mostLiked':
+        pipeline.push({ $sort: { totalLikes: -1, createdAt: -1 } });
+        break;
+      default: // 'newest'
+        pipeline.push({ $sort: { createdAt: -1 } });
     }
-  ]);
 
-  // Calculate pagination metadata
-  const totalPages = Math.ceil(totalCount / limit);
-  const hasNextPage = page < totalPages;
-  const hasPrevPage = page > 1;
+    // Get total count for pagination
+    const totalCount = await Post.aggregate([
+      pipeline[0], // Only use the match stage for count
+      { $count: 'total' }
+    ]);
 
-  res.status(StatusCodes.OK).json({
-    posts,
-    pagination: {
-      currentPage: page,
-      totalPages,
-      totalPosts: totalCount,
-      hasNextPage,
-      hasPrevPage,
-      limit
-    }
-  });
+    // Add pagination stages
+    pipeline.push(
+      { $skip: skip },
+      { $limit: limit }
+    );
+
+    // Execute the main query
+    const posts = await Post.aggregate(pipeline);
+
+    // Calculate pagination metadata
+    const total = totalCount[0]?.total || 0;
+    const totalPages = Math.ceil(total / limit);
+
+    res.status(StatusCodes.OK).json({
+      posts,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalPosts: total,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+        limit
+      }
+    });
+  } catch (error) {
+    console.error('Error in getAllPosts:', error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+      msg: 'Failed to fetch posts' 
+    });
+  }
 };
 
 export const getAllPostsByUserId = async (req, res) => {
