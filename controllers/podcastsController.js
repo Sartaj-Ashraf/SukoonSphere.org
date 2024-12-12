@@ -41,7 +41,11 @@ export const getSinglePodcast = async (req, res) => {
     if (!podcast) {
       throw new BadRequestError("Podcast not found");
     }
-    res.status(StatusCodes.OK).json({ podcast });
+    const user = await User.findById(podcast.userId).select('name  avatar _id');
+    if (!user) {
+      throw new BadRequestError("User not found");
+    }
+    res.status(StatusCodes.OK).json({ podcast,user });
 };
 
 export const getPlaylistPodcast = async (req, res) => {

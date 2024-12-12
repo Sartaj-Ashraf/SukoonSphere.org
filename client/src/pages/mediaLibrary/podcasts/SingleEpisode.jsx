@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import customFetch from "@/utils/customFetch";
 import { FaPlay, FaPause, FaVolumeUp, FaVolumeMute, FaUser } from "react-icons/fa";
 
@@ -16,12 +16,14 @@ const SingleEpisode = () => {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
-
+const [episodeUser, setEpisodeUser] = useState(null);
   useEffect(() => {
     const fetchEpisode = async () => {
       try {
         const response = await customFetch.get(`/podcasts/${episodeId}`);
         setEpisode(response.data.podcast);
+        setEpisodeUser(response.data.user);
+        console.log({ response });
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -99,11 +101,11 @@ const SingleEpisode = () => {
         <div className="mb-6 bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-md border border-gray-100">
           {/* Author Section */}
           <div className="flex items-center gap-4 mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
-            <div className="flex-shrink-0">
-              {episode.userId?.profileImage ? (
+            <Link to={`/about/user/${episodeUser._id}`} className="flex-shrink-0">
+              {episodeUser.avatar ? (
                 <img
-                  src={episode.userId.profileImage}
-                  alt={episode.userId.name}
+                  src={episodeUser.avatar}
+                  alt={episodeUser.name}
                   className="w-12 h-12 rounded-full object-cover ring-2 ring-white shadow-md"
                 />
               ) : (
@@ -111,14 +113,11 @@ const SingleEpisode = () => {
                   <FaUser className="w-5 h-5 text-white" />
                 </div>
               )}
-            </div>
+            </Link>
             <div className="flex-grow">
-              <h3 className="text-lg font-semibold text-gray-900">{episode.userId?.name || "Anonymous"}</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{episodeUser.name || "Anonymous"}</h3>
               <p className="text-sm text-gray-600">Content Creator</p>
             </div>
-            <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-full transition-colors duration-200 shadow-sm hover:shadow-md">
-              Follow
-            </button>
           </div>
 
           {/* Title and Episode Info */}
@@ -138,7 +137,7 @@ const SingleEpisode = () => {
               <svg className="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>{episode.duration || '00:00'}</span>
+              <span>{formatTime(duration)}</span>
             </div>
             {episode.episodeNo && (
               <div className="flex items-center gap-2 bg-purple-50 px-3 py-1.5 rounded-full">
@@ -175,9 +174,9 @@ const SingleEpisode = () => {
             <div className="flex flex-col justify-between space-y-4 md:space-y-0">
               {/* Episode Info */}
               <div className="text-center md:text-left">
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-2 line-clamp-2">{episode.title}</h1>
+                <h1 className="text-xl  md:text-2xl font-bold text-gray-800 mb-2 line-clamp-2">{episode.title}</h1>
                 <p className="text-base sm:text-lg text-blue-600 mb-2 sm:mb-4">{episode.author}</p>
-                <p className="text-sm sm:text-base text-gray-600 line-clamp-2 sm:line-clamp-3 mb-2">{episode.description}</p>
+                {/* <p className="text-sm sm:text-base text-gray-600 line-clamp-2 sm:line-clamp-3 mb-2">{episode.description}</p> */}
                 <div className="flex items-center justify-center md:justify-start space-x-4 mt-2 sm:mt-4 text-xs sm:text-sm text-gray-500">
                   <span className="flex items-center">
                     <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,7 +185,7 @@ const SingleEpisode = () => {
                     {formatTime(duration)}
                   </span>
                   <span>•</span>
-                  <span>{episode.publishedAt ? new Date(episode.publishedAt).toLocaleDateString('en-US', {
+                  <span>{episode.createdAt ? new Date(episode.createdAt).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric'
