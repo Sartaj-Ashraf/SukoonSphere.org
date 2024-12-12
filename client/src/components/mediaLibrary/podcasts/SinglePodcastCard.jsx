@@ -1,5 +1,6 @@
 import PostActions from "@/components/shared/PostActions";
 import DeleteModal from "@/components/shared/DeleteModal";
+import EditPodcastModel from "@/pages/contributors/models/EditPodcastModel";
 import React, { useState, useRef } from "react";
 import { FaPlay, FaPause, FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -11,6 +12,7 @@ const SinglePodcastCard = ({ podcast, fetchData }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const audioRef = useRef(null);
 
   const togglePlay = () => {
@@ -58,8 +60,7 @@ const SinglePodcastCard = ({ podcast, fetchData }) => {
   };
 
   const handleEdit = () => {
-    // Implement edit functionality
-    console.log("Edit podcast:", podcast._id);
+    setShowEditModal(true);
   };
 
   const handleDelete = () => {
@@ -122,23 +123,22 @@ const SinglePodcastCard = ({ podcast, fetchData }) => {
               </p>
             </div>
             <PostActions
-                handleEdit={handleEdit}
-                handleDelete={handleDelete}
-              />
-           
+              handleEdit={handleEdit}
+              handleDelete={handleDelete}
+            />
           </div>
 
           {/* Audio Progress Bar */}
           <button
-              onClick={togglePlay}
-              className="bg-[var(--primary)] text-white p-3 rounded-full shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
-            >
-              {isPlaying ? (
-                <FaPause className="w-5 h-5" />
-              ) : (
-                <FaPlay className="w-5 h-5" />
-              )}
-            </button>
+            onClick={togglePlay}
+            className="bg-[var(--primary)] text-white p-3 rounded-full shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
+          >
+            {isPlaying ? (
+              <FaPause className="w-5 h-5" />
+            ) : (
+              <FaPlay className="w-5 h-5" />
+            )}
+          </button>
           <div className="space-y-2 ">
             <div
               className="h-1.5 bg-gray-200 rounded-full cursor-pointer relative overflow-hidden"
@@ -188,6 +188,13 @@ const SinglePodcastCard = ({ podcast, fetchData }) => {
         title="Delete Podcast"
         message="Are you sure you want to delete this podcast? This action cannot be undone."
       />
+      {showEditModal && (
+        <EditPodcastModel
+          setShowModal={setShowEditModal}
+          podcast={podcast}
+          fetchData={fetchData}
+        />
+      )}
     </div>
   );
 };
