@@ -48,7 +48,7 @@ const AllPodcastPlaylists = () => {
   }
 
   return (
-    <div className="container mx-auto  py-2 min-h-screen">
+    <div className=" mx-auto  py-2 min-h-screen">
       <h1 className="text-3xl font-bold mb-4 text-center text-gray-800 flex items-center justify-center gap-3">
         <FaPodcast className="text-[var(--primary)]" size={36} />
         Podcast Playlists

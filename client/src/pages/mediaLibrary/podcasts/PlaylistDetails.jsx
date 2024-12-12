@@ -73,17 +73,17 @@ const PlaylistDetails = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Featured Episode */}
-            <div className="bg-[var(--primary)] rounded-2xl p-8 transform hover:scale-[1.02] transition-all duration-300 shadow-md">
+            <div className="bg-[var(--primary)] rounded-2xl p-4 md:p-8 transform hover:scale-[1.02] transition-all duration-300 shadow-md">
               <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
                 <img
-                  className="w-48 h-48 rounded-2xl object-cover shadow-2xl ring-4 ring-white/10"
+                  className="md:w-48 md:h-48 rounded-2xl object-cover shadow-2xl ring-4 ring-white/10"
                   src={
                     playlist.imageUrl ||
                     "https://randomuser.me/api/portraits/women/1.jpg"
                   }
                   alt="Featured Episode"
                 />
-                <div className="flex-1 space-y-4 text-center md:text-left">
+                <div className="flex-1 space-y-4 text-center md:text-left w-full">
                   <div className="flex items-center gap-4 justify-center md:justify-start">
                     <img
                       className="w-10 h-10 rounded-full border-2 border-white"
@@ -97,7 +97,7 @@ const PlaylistDetails = () => {
                       {playlist.userId?.name || "Unknown Creator"}
                     </span>
                   </div>
-                  <h1 className="text-xl md:text-2xl font-bold text-[var(--white-color)] mb-8 border-b pb-4">
+                  <h1 className="text-xl md:text-2xl font-bold text-[var(--white-color)] ">
                     {playlist.title}
                   </h1>
                   {/* Short Description */}

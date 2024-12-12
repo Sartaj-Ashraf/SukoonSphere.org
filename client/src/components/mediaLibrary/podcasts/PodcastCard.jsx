@@ -1,7 +1,6 @@
 import React from "react";
 import { FaDownload, FaPlay } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import "./audio.css";
 
 const PodcastCard = ({ podcast, isPlayList }) => {
   const navigate = useNavigate();
@@ -37,8 +36,8 @@ const PodcastCard = ({ podcast, isPlayList }) => {
         <p className="text-white mb-4 line-clamp-2 text-sm">
           {podcast.description || "No description available"}
         </p>
-        <div className="flex items-center justify-between">
-          <Link to={`/podcasts/episode/${podcast._id}`} className="flex items-center gap-2 backdrop-blur-md  bg-white/50 p-2 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300">
+        <div className="flex items-center  justify-between">
+          <Link to={`/podcasts/episode/${podcast._id}`} className="flex items-center gap-2 backdrop-blur-md  bg-white/50 px-4 py-2 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300">
           <span> Listen Now</span>
            <FaPlay className="text-white" />
           </Link>
