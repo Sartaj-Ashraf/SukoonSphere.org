@@ -24,7 +24,7 @@ const AllsinglePodcasts = () => {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-2 min-h-screen">
+    <div className=" mx-auto  py-2 min-h-screen">
       <h1 className="text-3xl font-bold mb-4 text-center text-gray-800">Single Podcasts</h1>
       <PodcastsGrid 
         podcasts={podcasts}
