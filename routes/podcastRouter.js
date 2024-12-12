@@ -10,7 +10,10 @@ import {
   getUserSinglePodcasts,
   getUserPlaylistPodcasts,
   deletePodcast,
-  getPlaylistPodcast
+  getPlaylistPodcast,
+  editPodcast,
+  editPodcastPlaylist,
+  deletePodcastPlaylist
 } from "../controllers/podcastsController.js";
 
 import { authenticateUser } from "../middleware/authMiddleware.js";
@@ -59,4 +62,13 @@ router.get("/playlists/:id", getPlaylistPodcast);
 // Delete a podcast by ID
 router.delete("/:id", authenticateUser, deletePodcast);
 
-export default router;
+// Delete a podcast playlist and its episodes
+router.delete('/playlist/:id', authenticateUser, deletePodcastPlaylist);
+
+// Edit a podcast by ID
+router.patch("/:id", authenticateUser, uploadPodcastFiles, editPodcast);
+
+// Edit a podcast playlist by ID
+router.patch('/playlist/:id', authenticateUser, uploadPodcastFiles, editPodcastPlaylist);
+
+export default router;  

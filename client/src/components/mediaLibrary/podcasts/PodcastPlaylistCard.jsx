@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { FaPlay, FaPlus, FaEllipsisV } from "react-icons/fa";
+import { FaPlay, FaPlus, FaEllipsisV, FaTrash } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import CreateNewPodcast from "../../../pages/contributors/models/CreateNewPodcast";
+import EditPodcastModel from "../../../pages/contributors/models/EditPodcastModel";
+import EditPodcastPlaylistModel from "../../../pages/contributors/models/EditPodcastPlaylistModel";
 import DeleteModal from "@/components/shared/DeleteModal";
 import PostActions from "@/components/shared/PostActions";
 import { toast } from "react-toastify";
@@ -9,8 +11,10 @@ import customFetch from "@/utils/customFetch";
 
 const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
   const [showAddEpisodeModal, setShowAddEpisodeModal] = useState(false);
+  const [showEditPlaylistModal, setShowEditPlaylistModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedEpisode, setSelectedEpisode] = useState(null);
 
   const handleDelete = (episode) => {
@@ -19,21 +23,32 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
   };
 
   const handleEdit = (episode) => {
-    // Implement edit functionality
-    console.log("Edit episode:", episode._id);
+    setSelectedEpisode(episode);
+    setShowEditModal(true);
   };
 
   const deleteEpisode = async () => {
     try {
       await customFetch.delete(`/podcasts/${selectedEpisode._id}`);
       toast.success("Episode deleted successfully");
+      setShowDeleteModal(false);
+      setSelectedEpisode(null);
       if (fetchData) await fetchData();
     } catch (error) {
       console.error("Error deleting episode:", error);
-      toast.error(error?.response?.data?.msg || "Failed to delete episode");
-    } finally {
+      toast.error(error?.response?.data?.msg || "Error deleting episode");
+    }
+  };
+
+  const deletePlaylist = async () => {
+    try {
+      await customFetch.delete(`/podcasts/playlist/${playlist._id}`);
+      toast.success("Playlist deleted successfully");
       setShowDeleteModal(false);
-      setSelectedEpisode(null);
+      if (fetchData) await fetchData();
+    } catch (error) {
+      console.error("Error deleting playlist:", error);
+      toast.error(error?.response?.data?.msg || "Error deleting playlist");
     }
   };
 
@@ -81,14 +96,28 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
                     {showMenu && (
                       <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-md z-10 py-1 animate-fade-in">
                         <button
-                          onClick={() => {
-                            setShowAddEpisodeModal(true);
-                            setShowMenu(false);
-                          }}
-                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2 transition-all duration-300"
+                          onClick={() => setShowAddEpisodeModal(true)}
+                          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white w-full"
                         >
                           <FaPlus className="w-4 h-4" />
                           Add Episode
+                        </button>
+                        <button
+                          onClick={() => setShowEditPlaylistModal(true)}
+                          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white w-full"
+                        >
+                          <FaEllipsisV className="w-4 h-4" />
+                          Edit Playlist
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowDeleteModal(true);
+                            setSelectedEpisode(null);
+                          }}
+                          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400 w-full"
+                        >
+                          <FaTrash className="w-4 h-4" />
+                          Delete Playlist
                         </button>
                       </div>
                     )}
@@ -98,6 +127,7 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
             </div>
           </div>
         </div>
+
         {/* Episode List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full p-4">
           {playlist?.episodes?.map((episode, index) => (
@@ -137,20 +167,44 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
           setShowModal={setShowAddEpisodeModal}
           type="playlist"
           playlistId={playlist._id}
+          fetchData={fetchData}
+        />
+      )}
+
+      {/* Edit Playlist Modal */}
+      {showEditPlaylistModal && (
+        <EditPodcastPlaylistModel
+          setShowModal={setShowEditPlaylistModal}
+          playlist={playlist}
+          fetchData={fetchData}
         />
       )}
 
       {/* Delete Modal */}
       <DeleteModal
         isOpen={showDeleteModal}
-        title="Delete Episode"
-        message={`Are you sure you want to delete "${selectedEpisode?.title}"? This action cannot be undone.`}
-        onDelete={deleteEpisode}
+        title={selectedEpisode ? "Delete Episode" : "Delete Playlist"}
+        message={
+          selectedEpisode
+            ? `Are you sure you want to delete "${selectedEpisode.title}"? This action cannot be undone.`
+            : `Are you sure you want to delete "${playlist.title}" and all its episodes? This action cannot be undone.`
+        }
+        onDelete={selectedEpisode ? deleteEpisode : deletePlaylist}
         onClose={() => {
           setShowDeleteModal(false);
           setSelectedEpisode(null);
         }}
       />
+
+      {/* Edit Episode Modal */}
+      {showEditModal && selectedEpisode && (
+        <EditPodcastModel
+          setShowModal={setShowEditModal}
+          podcast={selectedEpisode}
+          type="playlist"
+          fetchData={fetchData}
+        />
+      )}
     </div>
   );
 };
