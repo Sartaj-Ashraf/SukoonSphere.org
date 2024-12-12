@@ -1,20 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import customFetch from '@/utils/customFetch';
-import PodcastsGrid from '@/components/mediaLibrary/podcasts/PodcastsGrid';
-import { FaPlay, FaCalendarAlt, FaHeadphones, FaClock } from 'react-icons/fa';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { FaHeadphones, FaPlay, FaCalendarAlt, FaClock } from "react-icons/fa";
+import customFetch from "@/utils/customFetch";
+import MusicPlayer from "@/components/sharedComponents/MusicPlayer";
 
 const PlaylistDetails = () => {
   const { playlistId } = useParams();
   const [playlist, setPlaylist] = useState(null);
+  const [currentAudio, setCurrentAudio] = useState(null);
+  const [currentPodcast, setCurrentPodcast] = useState(null);
+  const [isHovered, setIsHovered] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isShortDesc, setIsShortDesc] = useState(true);
 
   useEffect(() => {
     const fetchPlaylist = async () => {
       try {
-        const response = await customFetch.get(`/podcasts/playlists/${playlistId}`);
-        console.log({response});
+        const response = await customFetch.get(
+          `/podcasts/playlists/${playlistId}`
+        );
         setPlaylist(response.data.playlist);
         setLoading(false);
       } catch (err) {
@@ -25,6 +30,17 @@ const PlaylistDetails = () => {
 
     fetchPlaylist();
   }, [playlistId]);
+
+  const handlePlayAudio = (podcast) => {
+    console.log("Playing podcast:", podcast); // Debug log
+    if (podcast && podcast.audioUrl) {
+      // Check for audioUrl
+      setCurrentAudio(podcast.audioUrl);
+      setCurrentPodcast(podcast);
+    } else {
+      console.error("No audio URL found for podcast:", podcast);
+    }
+  };
 
   if (loading) {
     return (
@@ -51,68 +67,124 @@ const PlaylistDetails = () => {
   }
 
   return (
-    <div className="min-h-screen ">
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <div className="bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-3xl">
-        {/* Hero Image Section */}
-        <div className="relative h-64 md:h-96 group">
-          <img
-            src={playlist.imageUrl || '/default-playlist-image.jpg'}
-            alt={playlist.title}
-            className="absolute inset-0 w-full h-full object-cover 
-              group-hover:scale-105 transition-transform duration-500 ease-in-out"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-            <div className="absolute bottom-8 left-8 right-8 text-white">
-              <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight 
-                text-shadow-lg line-clamp-2">{playlist.title}</h1>
-              <div className="flex flex-wrap items-center space-x-4 text-gray-200">
-                <div className="flex items-center space-x-2">
-                  <FaHeadphones className="text-indigo-300" />
-                  <span className="text-sm font-medium">
-                    {playlist.userId?.name || 'Unknown Creator'}
-                  </span>
-                </div>
-                <span className="text-gray-400">•</span>
-                <div className="flex items-center space-x-2">
-                  <FaPlay className="text-indigo-300" />
-                  <span className="text-sm font-medium">
-                    {playlist.episodes?.length || 0} Episodes
-                  </span>
+    <div className="min-h-screen px-4 py-8 ">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Featured Episode */}
+            <div className="bg-[var(--primary)] rounded-2xl p-8 transform hover:scale-[1.02] transition-all duration-300 shadow-md">
+              <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+                <img
+                  className="w-48 h-48 rounded-2xl object-cover shadow-2xl ring-4 ring-white/10"
+                  src={
+                    playlist.imageUrl ||
+                    "https://randomuser.me/api/portraits/women/1.jpg"
+                  }
+                  alt="Featured Episode"
+                />
+                <div className="flex-1 space-y-4 text-center md:text-left">
+                  <div className="flex items-center gap-4 justify-center md:justify-start">
+                    <img
+                      className="w-10 h-10 rounded-full border-2 border-white"
+                      src={
+                        playlist.userId?.avatar ||
+                        "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                      }
+                      alt="Host"
+                    />
+                    <span className="text-white/90 font-medium">
+                      {playlist.userId?.name || "Unknown Creator"}
+                    </span>
+                  </div>
+                  <h1 className="text-xl md:text-2xl font-bold text-[var(--white-color)] mb-8 border-b pb-4">
+                    {playlist.title}
+                  </h1>
+                  {/* Short Description */}
+                  <div className="space-y-1">
+                    <p className={`text-base text-[var(--grey--600)] leading-relaxed ${isShortDesc ? 'line-clamp-3' : ''}`}>
+                      {playlist.description}
+                    </p>
+                    <button
+                      onClick={() => setIsShortDesc(!isShortDesc)}
+                      className="text-sm text-indigo-300 hover:text-indigo-400 transition-colors duration-200"
+                    >
+                      {isShortDesc ? 'Show More' : 'Show Less'}
+                    </button>
+                  </div>
+                  <div className="flex items-center space-x-4 text-gray-200 justify-center md:justify-start">
+                    <div className="flex items-center space-x-2">
+                      <FaHeadphones className="text-indigo-300" />
+                      <span>{playlist.episodes?.length || 0} Episodes</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        
-        {/* Content Section */}
-        <div className="p-6 md:p-10">
-          {/* Description */}
-          <div className="prose max-w-none mb-8">
-            <p className="text-gray-600 leading-relaxed text-base md:text-lg">
-              {playlist.description || 'No description available'}
-            </p>
-          </div>
-          
-          {/* Episodes Section */}
-          <div className="border-t border-gray-100 pt-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800 flex items-center">
-              <span className="relative">
+
+            {/* Episodes List */}
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">
                 Episodes
-                <span className="absolute bottom-0 left-0 w-full h-1 bg-indigo-500 rounded"></span>
-              </span>
-            </h2>
-            <div className="space-y-6">
-              <PodcastsGrid 
-                podcasts={playlist.episodes} 
-                isPlayList={true} 
-              />
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {playlist.episodes && playlist.episodes.length > 0 ? (
+                  playlist.episodes.map((episode) => (
+                    <div
+                      key={episode.id}
+                      className="flex flex-row gap-4 p-4 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl bg-white"
+                      onMouseEnter={() => setIsHovered(episode.id)}
+                      onMouseLeave={() => setIsHovered(null)}
+                    >
+                      <div
+                        className="w-32 h-32 relative shadow-md rounded-lg overflow-hidden cursor-pointer"
+                        onClick={() => handlePlayAudio(episode)}
+                      >
+                        <img
+                          src={episode.imageUrl || playlist.imageUrl}
+                          alt={episode.title}
+                          className="w-full h-full object-cover "
+                        />
+                        <div
+                          className={`absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg transition-all duration-300 ${currentPodcast?.id === episode.id ? "opacity-100" : "opacity-0 hover:opacity-100"}`}
+                        >
+                          <FaPlay className="text-white text-4xl" />
+                        </div>
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <h4 className="font-semibold text-base text-gray-800 line-clamp-2">
+                          {episode.title}
+                        </h4>
+                        <p className="text-gray-600 line-clamp-2">
+                          {episode.description}
+                        </p>
+                        <div className="flex items-center gap-4 mt-3 text-gray-500 text-sm">
+                          <span className="flex items-center gap-1">
+                            <FaClock /> {episode.duration || "00:00"}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <FaCalendarAlt />{" "}
+                            {new Date(episode.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 col-span-2 text-center">
+                    No episodes available
+                  </p>
+                )}
+              </div>
             </div>
           </div>
+          <MusicPlayer
+            currentAudio={currentAudio}
+            currentPodcast={currentPodcast}
+          />
         </div>
       </div>
     </div>
-  </div>
   );
 };
 
