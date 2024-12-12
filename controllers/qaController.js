@@ -68,92 +68,200 @@ export const addQuestion = async (req, res) => {
 };
 
 export const getAllQuestions = async (req, res) => {
-  // Get pagination parameters from query with defaults
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const skip = (page - 1) * limit;
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const sortBy = req.query.sortBy || 'newest';
+    const search = req.query.search || '';
+    const skip = (page - 1) * limit;
 
-  // Get total count for pagination info
-  const totalCount = await Question.countDocuments();
+    // Base pipeline for questions
+    const pipeline = [
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      {
+        $lookup: {
+          from: "answers",
+          localField: "answers",
+          foreignField: "_id",
+          as: "answers"
+        }
+      },
+      {
+        $addFields: {
+          author: {
+            userId: "$createdBy",
+            username: { $arrayElemAt: ["$userDetails.name", 0] },
+            userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+          },
+          totalAnswers: { $size: "$answers" }
+        }
+      },
+      {
+        $project: {
+          userDetails: 0
+        }
+      }
+    ];
 
-  const questions = await Question.aggregate([
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "userDetails"
-      }
-    },
-    {
-      $addFields: {
-        author: {
-          userId: "$createdBy",
-          username: { $arrayElemAt: ["$userDetails.name", 0] },
-          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
-        },
-        totalAnswers: { $size: { $ifNull: ["$answers", []] } }
-      }
-    },
-    {
-      $project: {
-        userDetails: 0
-      }
-    },
-    {
-      $sort: { createdAt: -1 }
-    },
-    {
-      $skip: skip
-    },
-    {
-      $limit: limit
+    // Add search stage if search query exists
+    if (search) {
+      pipeline.unshift({
+        $match: {
+          $or: [
+            { questionText: { $regex: search, $options: 'i' } },
+            { context: { $regex: search, $options: 'i' } },
+            { tags: { $regex: search, $options: 'i' } }
+          ]
+        }
+      });
     }
-  ]);
 
-  const totalPages = Math.ceil(totalCount / limit);
+    // Add filter stages based on sortBy
+    switch (sortBy) {
+      case 'oldest':
+        pipeline.push({ $sort: { createdAt: 1 } });
+        break;
+      case 'mostAnswered':
+        pipeline.push({ $sort: { totalAnswers: -1, createdAt: -1 } });
+        break;
+      case 'unanswered':
+        pipeline.unshift({
+          $match: {
+            $or: [
+              { answers: { $size: 0 } },
+              { answers: { $exists: false } }
+            ]
+          }
+        });
+        pipeline.push({ $sort: { createdAt: -1 } });
+        break;
+      default: // 'newest'
+        pipeline.push({ $sort: { createdAt: -1 } });
+    }
 
-  res.status(StatusCodes.OK).json({ 
-    questions,
-    currentPage: page,
-    totalPages,
-    totalQuestions: totalCount,
-    hasMore: page < totalPages
-  });
+    // Get total count for pagination info
+    const totalCount = await Question.aggregate([
+      ...(search ? [{
+        $match: {
+          $or: [
+            { questionText: { $regex: search, $options: 'i' } },
+            { context: { $regex: search, $options: 'i' } },
+            { tags: { $regex: search, $options: 'i' } }
+          ]
+        }
+      }] : []),
+      ...(sortBy === 'unanswered' ? [{
+        $match: {
+          $or: [
+            { answers: { $size: 0 } },
+            { answers: { $exists: false } }
+          ]
+        }
+      }] : [])
+    ]).count('total');
+
+    // Add pagination stages
+    pipeline.push(
+      { $skip: skip },
+      { $limit: limit }
+    );
+
+    const questions = await Question.aggregate(pipeline);
+    const total = totalCount[0]?.total || 0;
+    const totalPages = Math.ceil(total / limit);
+
+    res.status(StatusCodes.OK).json({
+      questions,
+      currentPage: page,
+      totalPages,
+      totalQuestions: total,
+      hasMore: page < totalPages
+    });
+  } catch (error) {
+    console.error('Error in getAllQuestions:', error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+      msg: 'Failed to fetch questions' 
+    });
+  }
 };
 
 export const getUserQuestions = async (req, res) => {
   const { id: userId } = req.params;
-  const questions = await Question.aggregate([
-    {
-      $match: { createdBy: new mongoose.Types.ObjectId(userId) }
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "userDetails"
-      }
-    },
-    {
-      $addFields: {
-        username: { $arrayElemAt: ["$userDetails.name", 0] },
-        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
-        totalAnswers: { $size: { $ifNull: ["$answers", []] } }
-      }
-    },
-    {
-      $project: {
-        userDetails: 0
-      }
-    },
-    {
-      $sort: { createdAt: -1 }
-    }
-  ]);
+  const { page = 1, limit = 4 } = req.query;
+  const skip = (page - 1) * limit;
 
-  res.status(StatusCodes.OK).json({ questions });
+  try {
+    // Get total count for pagination
+    const totalQuestions = await Question.countDocuments({ createdBy: userId });
+    const totalPages = Math.ceil(totalQuestions / limit);
+
+    const questions = await Question.aggregate([
+      {
+        $match: { createdBy: new mongoose.Types.ObjectId(userId) }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      {
+        $lookup: {
+          from: "answers",
+          localField: "_id",
+          foreignField: "answeredTo",
+          as: "answers"
+        }
+      },
+      {
+        $addFields: {
+          username: { $arrayElemAt: ["$userDetails.name", 0] },
+          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
+          totalAnswers: { $size: "$answers" }
+        }
+      },
+      {
+        $project: {
+          userDetails: 0,
+          answers: 0
+        }
+      },
+      {
+        $sort: { createdAt: -1 }
+      },
+      {
+        $skip: parseInt(skip)
+      },
+      {
+        $limit: parseInt(limit)
+      }
+    ]);
+
+    res.status(StatusCodes.OK).json({
+      questions,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages,
+        totalQuestions,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
+  } catch (error) {
+    console.error('Error in getUserQuestions:', error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+      msg: 'Failed to fetch user questions' 
+    });
+  }
 };
 
 export const getAllQuestionsWithAnswer = async (req, res) => {
@@ -161,13 +269,15 @@ export const getAllQuestionsWithAnswer = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
+  const sortBy = req.query.sortBy || 'newest';
 
   // Get total count for pagination info
   const totalCount = await Question.countDocuments({
     answers: { $exists: true, $not: { $size: 0 } }
   });
 
-  const questions = await Question.aggregate([
+  // Base pipeline for questions with answers
+  const pipeline = [
     {
       $match: {
         answers: { $exists: true, $not: { $size: 0 } }
@@ -277,6 +387,15 @@ export const getAllQuestionsWithAnswer = async (req, res) => {
               ]
             }
           }
+        },
+        totalAnswerLikes: {
+          $sum: {
+            $map: {
+              input: "$answers",
+              as: "answer",
+              in: { $size: { $ifNull: ["$$answer.likes", []] } }
+            }
+          }
         }
       }
     },
@@ -285,18 +404,28 @@ export const getAllQuestionsWithAnswer = async (req, res) => {
         userDetails: 0,
         answerUserDetails: 0
       }
-    },
-    {
-      $sort: { createdAt: -1 }
-    },
-    {
-      $skip: skip
-    },
-    {
-      $limit: limit
     }
-  ]);
+  ];
 
+  // Add sort stage based on filter
+  switch (sortBy) {
+    case 'oldest':
+      pipeline.push({ $sort: { createdAt: 1 } });
+      break;
+    case 'mostAnswered':
+      pipeline.push({ $sort: { totalAnswers: -1, createdAt: -1 } });
+      break;
+    default: // 'newest'
+      pipeline.push({ $sort: { createdAt: -1 } });
+  }
+
+  // Add pagination stages
+  pipeline.push(
+    { $skip: skip },
+    { $limit: limit }
+  );
+
+  const questions = await Question.aggregate(pipeline);
   const totalPages = Math.ceil(totalCount / limit);
 
   res.status(StatusCodes.OK).json({
@@ -313,7 +442,6 @@ export const createAnswer = async (req, res) => {
   const { userId } = req.user;
   const { id: questionId } = req.params;
   const { context } = req.body;
-
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -463,99 +591,6 @@ export const getAnswerById = async (req, res) => {
           username: { $arrayElemAt: ["$userDetails.name", 0] },
           userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
         },
-        totalAnswers: { $size: "$answers" }
-      }
-    },
-    {
-      $project: {
-        userDetails: 0,
-        answers: 0
-      }
-    }
-  ]);
-
-  if (!question.length) {
-    throw new NotFoundError("Question not found");
-  }
-
-  res.status(StatusCodes.OK).json({
-    answer: answer[0],
-    question: question[0]
-  });
-};
-export const getAnswersByQuestionId = async (req, res) => {
-  const { id: questionId } = req.params;
-
-  // First get the question with user details
-  const question = await Question.aggregate([
-    {
-      $match: { _id: new mongoose.Types.ObjectId(questionId) }
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "userDetails"
-      }
-    },
-    {
-      $lookup: {
-        from: "answers",
-        localField: "answers",
-        foreignField: "_id",
-        as: "answers"
-      }
-    },
-    {
-      $addFields: {
-        author: {
-          userId: "$createdBy",
-          username: { $arrayElemAt: ["$userDetails.name", 0] },
-          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
-        },
-        totalAnswers: { $size: "$answers" }
-      }
-    },
-    {
-      $project: {
-        userDetails: 0
-      }
-    }
-  ]);
-
-  if (!question.length) {
-    throw new NotFoundError("Question not found");
-  }
-
-  // Then get all answers with user details
-  const answers = await Answer.aggregate([
-    {
-      $match: { answeredTo: new mongoose.Types.ObjectId(questionId) }
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "userDetails"
-      }
-    },
-    {
-      $lookup: {
-        from: "qacomments",
-        localField: "comments",
-        foreignField: "_id",
-        as: "comments"
-      }
-    },
-    {
-      $addFields: {
-        author: {
-          userId: "$createdBy",
-          username: { $arrayElemAt: ["$userDetails.name", 0] },
-          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
-        },
         totalLikes: { $size: { $ifNull: ["$likes", []] } },
         totalComments: { $size: { $ifNull: ["$comments", []] } }
       }
@@ -569,54 +604,220 @@ export const getAnswersByQuestionId = async (req, res) => {
       $sort: { createdAt: -1 }
     }
   ]);
+;
 
   res.status(StatusCodes.OK).json({
     question: question[0],
-    answers
+    answer: answer[0]
   });
+};
+export const getAnswersByQuestionId = async (req, res) => {
+  try {
+    const { id: questionId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const sortBy = req.query.sortBy || 'newest';
+    const skip = (page - 1) * limit;
+
+    // First get the question with user details
+    const question = await Question.aggregate([
+      {
+        $match: { _id: new mongoose.Types.ObjectId(questionId) }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      {
+        $lookup: {
+          from: "answers",
+          localField: "answers",
+          foreignField: "_id",
+          as: "answers"
+        }
+      },
+      {
+        $addFields: {
+          author: {
+            userId: "$createdBy",
+            username: { $arrayElemAt: ["$userDetails.name", 0] },
+            userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+          },
+          totalAnswers: { $size: "$answers" }
+        }
+      },
+      {
+        $project: {
+          userDetails: 0,
+          answers: 0
+        }
+      }
+    ]);
+
+    if (!question.length) {
+      throw new NotFoundError("Question not found");
+    }
+
+    // Get total count for pagination info
+    const totalAnswers = await Answer.countDocuments({ answeredTo: questionId });
+    const totalPages = Math.ceil(totalAnswers / limit);
+
+    // Then get paginated answers with user details
+    const pipeline = [
+      {
+        $match: { answeredTo: new mongoose.Types.ObjectId(questionId) }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      {
+        $lookup: {
+          from: "qacomments",
+          localField: "comments",
+          foreignField: "_id",
+          as: "comments"
+        }
+      },
+      {
+        $addFields: {
+          author: {
+            userId: "$createdBy",
+            username: { $arrayElemAt: ["$userDetails.name", 0] },
+            userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] }
+          },
+          totalLikes: { $size: { $ifNull: ["$likes", []] } },
+          totalComments: { $size: { $ifNull: ["$comments", []] } }
+        }
+      },
+      {
+        $project: {
+          userDetails: 0
+        }
+      }
+    ];
+
+    // Add sort stage based on filter
+    switch (sortBy) {
+      case 'oldest':
+        pipeline.push({ $sort: { createdAt: 1 } });
+        break;
+      case 'mostLiked':
+        pipeline.push({ $sort: { totalLikes: -1, createdAt: -1 } });
+        break;
+      default: // 'newest'
+        pipeline.push({ $sort: { createdAt: -1 } });
+    }
+
+    // Add pagination stages
+    pipeline.push(
+      { $skip: skip },
+      { $limit: limit }
+    );
+
+    const answers = await Answer.aggregate(pipeline);
+
+    res.status(StatusCodes.OK).json({
+      question: question[0],
+      answers,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalAnswers,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
+  } catch (error) {
+    if (error instanceof NotFoundError) {
+      res.status(StatusCodes.NOT_FOUND).json({ msg: error.message });
+    } else {
+      console.error('Error in getAnswersByQuestionId:', error);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+        msg: 'Failed to fetch answers' 
+      });
+    }
+  }
 };
 export const getUserAnswers = async (req, res) => {
   const { id: userId } = req.params;
-  const answers = await Answer.aggregate([
-    {
-      $match: { createdBy: new mongoose.Types.ObjectId(userId) }
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "createdBy",
-        foreignField: "_id",
-        as: "userDetails"
-      }
-    },
-    {
-      $lookup: {
-        from: "questions",
-        localField: "answeredTo",
-        foreignField: "_id",
-        as: "question"
-      }
-    },
-    {
-      $addFields: {
-        username: { $arrayElemAt: ["$userDetails.name", 0] },
-        userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
-        totalLikes: { $size: { $ifNull: ["$likes", []] } },
-        totalComments: { $size: { $ifNull: ["$comments", []] } },
-        question: { $arrayElemAt: ["$question", 0] }
-      }
-    },
-    {
-      $project: {
-        userDetails: 0
-      }
-    },
-    {
-      $sort: { createdAt: -1 }
-    }
-  ]);
+  const { page = 1, limit = 4 } = req.query;
+  const skip = (page - 1) * limit;
 
-  res.status(StatusCodes.OK).json({ answers });
+  try {
+    // Get total count for pagination
+    const totalAnswers = await Answer.countDocuments({ createdBy: userId });
+    const totalPages = Math.ceil(totalAnswers / limit);
+
+    const answers = await Answer.aggregate([
+      {
+        $match: { createdBy: new mongoose.Types.ObjectId(userId) }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+      {
+        $lookup: {
+          from: "questions",
+          localField: "answeredTo",
+          foreignField: "_id",
+          as: "question"
+        }
+      },
+      {
+        $addFields: {
+          username: { $arrayElemAt: ["$userDetails.name", 0] },
+          userAvatar: { $arrayElemAt: ["$userDetails.avatar", 0] },
+          totalLikes: { $size: { $ifNull: ["$likes", []] } },
+          totalComments: { $size: { $ifNull: ["$comments", []] } },
+          question: { $arrayElemAt: ["$question", 0] }
+        }
+      },
+      {
+        $project: {
+          userDetails: 0
+        }
+      },
+      {
+        $sort: { createdAt: -1 }
+      },
+      {
+        $skip: parseInt(skip)
+      },
+      {
+        $limit: parseInt(limit)
+      }
+    ]);
+
+    res.status(StatusCodes.OK).json({
+      answers,
+      pagination: {
+        currentPage: parseInt(page),
+        totalPages,
+        totalAnswers,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
+  } catch (error) {
+    console.error('Error in getUserAnswers:', error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+      msg: 'Failed to fetch user answers' 
+    });
+  }
 };
 // answer comment controllers
 export const createAnswerComment = async (req, res) => {
@@ -1125,7 +1326,7 @@ export const editAnswerReply = async (req, res) => {
   });
 };
 
-// delete controllers
+// delete controllers 
 export const deleteQuestion = async (req, res) => {
   const { id: postId } = req.params;
   const session = await mongoose.startSession();

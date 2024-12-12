@@ -125,8 +125,8 @@ export const validatePostInput = withValidationErrors([
   body("description")
     .notEmpty()
     .withMessage("Description is required")
-    .isLength({ max: 500 })
-    .withMessage("Description must not exceed 1000 characters"),
+    .isLength({ max: 1500 })
+    .withMessage("Description must not exceed 1500 characters"),
 
 ]);
 
@@ -135,8 +135,8 @@ export const validateQaSectionInput = withValidationErrors([
   body("questionText")
     .notEmpty()
     .withMessage("Question is required")
-    .isLength({ max: 100 })
-    .withMessage("Question must not exceed 100 characters"),
+    .isLength({ max: 200 })
+    .withMessage("Question must not exceed 200 characters"),
 
 ]);
 
@@ -144,8 +144,8 @@ export const validateAnswerInput = withValidationErrors([
   body("context")
     .notEmpty()
     .withMessage("answer is required")
-    .isLength({ max: 500 })
-    .withMessage("Answer must not exceed 500 characters"),
+    .isLength({ max: 2000 })
+    .withMessage("Answer must not exceed 2000 characters"),
 ]);
 
 export const validateQaCommentInput = withValidationErrors([

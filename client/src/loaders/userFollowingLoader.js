@@ -1,4 +1,5 @@
 import customFetch from "@/utils/customFetch";
+import { toast } from "react-toastify";
 export const userFollowingLoader = async ({ params }) => {
     try {
         const { data } = await customFetch.get(`/user/following/${params.id}`);

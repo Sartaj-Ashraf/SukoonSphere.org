@@ -47,19 +47,23 @@ function NavMenu() {
   };
   const settingsLinks = user 
   ? [
-      ...(loggedInUser?.role !== "contributor" || loggedInUser?.role === "admin" 
-        ? [{
-            name: "Become a contributor",
-            address: '/user/request-contributor',
-            icon: <CiMedal />,
-          },
-          
-        {
-          name:"Notifications",
-          address:'/admin',
-          icon: <MdOutlineNotificationsActive />
-        }
-        ] 
+      ...(loggedInUser?.role !== "contributor" 
+        ? [
+            ...(loggedInUser?.role === "admin" 
+              ? [
+                  {
+                    name: "Notifications",
+                    address: "/admin",
+                    icon: <MdOutlineNotificationsActive />,
+                  },
+                ]
+              : []),
+            {
+              name: "Become a contributor",
+              address: "/user/request-contributor",
+              icon: <CiMedal />,
+            },
+          ] 
         : []),
       {
         name: "Change Password",
@@ -70,7 +74,7 @@ function NavMenu() {
         name: "Logout",
         icon: <RxCross2 />,
         onClick: handleLogout,
-      }
+      },
     ] 
   : [
       {
@@ -82,19 +86,22 @@ function NavMenu() {
         name: "Login",
         address: "/auth/sign-in",
         icon: <BiLogIn />,
-      }
+      },
     ];
+
 
   return (
     <>
       {/* Desktop Nav */}
       <nav className="hidden lg:flex w-full bg-[var(--white-color)] sticky top-0 items-center justify-between shadow-[0px_1px_10px_rgba(0,0,0,0.1)] z-50 transition-all ease-in-out p-2 h-[65px]">
         <div className="flex w-full justify-between items-center px-4 lg:px-20">
+        <Link to="/">
           <img
             src={CompanyLogo}
             className="object-contain w-14"
             alt="Logo Loading..."
           />
+          </Link>
           <DesktopNav links={links} />
           {user ? (
             <UserSection
@@ -320,7 +327,7 @@ const UserSection = ({ user, miniMenu, toggleMiniMenu, handleLogout }) => {
 const AuthButtons = () => (
   <div className="flex gap-2">
     <Link to="/auth/sign-up">
-      <button className="hidden lg:flex bg-[var(--white-color)] items-center gap-1 rounded-[5px] shadow-[0_2px_0_0_rgba(0,0,0,0.04),_inset_0_0_0_2px_var(--grey--500)] transition-all ease-in-out duration-600 text-[var(--grey--900)] px-3 py-2 text-xs leading-[1.32] hover:bg-[var(--grey--200)]">
+      <button className="hidden lg:flex bg-[var(--white-color)] items-center gap-1 rounded-[5px] shadow-[0_2px_0_0_rgba(0,0,0,0.04),_inset_0_0_0_2px_var(--grey--400)] transition-all ease-in-out duration-600 text-[var(--grey--900)] px-3 py-2 text-xs leading-[1.32] hover:bg-[var(--grey--200)]">
         <span>Sign Up</span>
         <FaArrowRightLong />
       </button>
