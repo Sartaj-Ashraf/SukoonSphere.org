@@ -285,68 +285,205 @@ export const deletePodcast = async (req, res) => {
 };
 
 export const editPodcast = async (req, res) => {
+  const { id: podcastId } = req.params;
+  const { title, description, episodeNo } = req.body;
+
+  // Find the podcast and check ownership
+  const podcast = await Podcast.findOne({ _id: podcastId });
+  if (!podcast) {
+    throw new NotFoundError('Podcast not found');
+  }
+
+  // Check if user owns the podcast
+  if (podcast.userId.toString() !== req.user.userId) {
+    throw new UnauthorizedError('Not authorized to modify this podcast');
+  }
+
+  // Prepare update object with basic fields
+  const updateData = {
+    title: title || podcast.title,
+    description: description || podcast.description,
+    episodeNo: episodeNo || podcast.episodeNo
+  };
+
+  // Handle file updates
+  if (req.files) {
+    // Handle image update
+    if (req.files.image) {
+      // Delete old image file
+      const oldImagePath = podcast.imageUrl.replace(`${process.env.BACKEND_URL}/`, '');
+      try {
+        await unlinkAsync(oldImagePath);
+      } catch (error) {
+        console.error('Error deleting old image:', error);
+      }
+      // Set new image URL
+      const imageFile = req.files.image[0];
+      updateData.imageUrl = `${process.env.BACKEND_URL}/public/podcasts/images/${imageFile.filename}`;
+    }
+
+    // Handle audio update
+    if (req.files.audio) {
+      // Delete old audio file
+      const oldAudioPath = podcast.audioUrl.replace(`${process.env.BACKEND_URL}/`, '');
+      try {
+        await unlinkAsync(oldAudioPath);
+      } catch (error) {
+        console.error('Error deleting old audio:', error);
+      }
+      // Set new audio URL
+      const audioFile = req.files.audio[0];
+      updateData.audioUrl = `${process.env.BACKEND_URL}/public/podcasts/episodes/${audioFile.filename}`;
+    }
+  }
+
+  // Update the podcast
+  const updatedPodcast = await Podcast.findByIdAndUpdate(
+    podcastId,
+    updateData,
+    { new: true, runValidators: true }
+  );
+
+  res.status(StatusCodes.OK).json({
+    msg: 'Podcast updated successfully',
+    podcast: updatedPodcast
+  });
+};
+
+export const editPodcastPlaylist = async (req, res) => {
     try {
-        const { id: podcastId } = req.params;
+        const { id: playlistId } = req.params;
         const { title, description } = req.body;
-        
-        // Find the podcast
-        const podcast = await Podcast.findById(podcastId);
-        
-        if (!podcast) {
-            throw new NotFoundError('Podcast not found');
+
+        // Find the playlist
+        const playlist = await PodcastPlaylist.findById(playlistId);
+        if (!playlist) {
+            throw new NotFoundError('Playlist not found');
         }
 
-        // Check if the user is authorized to edit this podcast
-        if (podcast.userId.toString() !== req.user.userId) {
-            throw new UnauthorizedError('Not authorized to edit this podcast');
+        // Check authorization
+        if (playlist.userId.toString() !== req.user.userId) {
+            throw new UnauthorizedError('Not authorized to edit this playlist');
         }
 
-        // Update the podcast fields
-        const updatedFields = {
-            title: title || podcast.title,
-            description: description || podcast.description
+        // Prepare update data
+        const updateData = {
+            title: title?.trim(),
+            description: description?.trim()
         };
 
-        // Handle image update if new image is uploaded
-        if (req.files && req.files.image) {
+        // Handle image update if provided
+        if (req.files?.image) {
+            const imageFile = req.files.image[0];
             // Delete old image if it exists
-            if (podcast.imageUrl) {
-                const oldImagePath = path.join(process.cwd(), podcast.imageUrl);
+            if (playlist.imageUrl) {
+                const oldImagePath = playlist.imageUrl.replace(process.env.BACKEND_URL + '/public', 'public');
                 try {
                     await unlinkAsync(oldImagePath);
                 } catch (error) {
                     console.error('Error deleting old image:', error);
                 }
             }
-
-            const imageFile = req.files.image;
-            const imageFileName = `${Date.now()}-${imageFile.name}`;
-            const imagePath = path.join('uploads', 'podcasts', 'images', imageFileName);
-            
-            // Ensure directory exists
-            const imageDir = path.join(process.cwd(), 'uploads', 'podcasts', 'images');
-            if (!fs.existsSync(imageDir)) {
-                fs.mkdirSync(imageDir, { recursive: true });
-            }
-
-            // Move the new image
-            await imageFile.mv(path.join(process.cwd(), imagePath));
-            updatedFields.imageUrl = imagePath;
+            updateData.imageUrl = `${process.env.BACKEND_URL}/public/podcasts/images/${imageFile.filename}`;
         }
 
-        // Update the podcast
-        const updatedPodcast = await Podcast.findByIdAndUpdate(
-            podcastId,
-            updatedFields,
-            { new: true, runValidators: true }
-        );
+        // Update only provided fields
+        Object.keys(updateData).forEach(key => {
+            if (updateData[key] === undefined) {
+                delete updateData[key];
+            }
+        });
 
-        res.status(StatusCodes.OK).json({ 
-            message: 'Podcast updated successfully',
-            podcast: updatedPodcast 
+        // Update the playlist
+        const updatedPlaylist = await PodcastPlaylist.findByIdAndUpdate(
+            playlistId,
+            updateData,
+            { new: true, runValidators: true }
+        ).populate({
+            path: 'episodes',
+            select: 'title description imageUrl audioUrl episodeNo'
+        });
+
+        res.status(StatusCodes.OK).json({
+            msg: 'Playlist updated successfully',
+            playlist: updatedPlaylist
         });
     } catch (error) {
-        console.error('Error updating podcast:', error);
-        throw new BadRequestError(error.message || 'Error updating podcast');
+        // If there was an error and new files were uploaded, clean them up
+        if (req.files?.image) {
+            const imageFile = req.files.image[0];
+            const filePath = path.join('public', imageFile.path.split('public')[1]);
+            fs.unlink(filePath, err => {
+                if (err) console.error('Error cleaning up file:', err);
+            });
+        }
+        throw error;
+    }
+};
+
+export const deletePodcastPlaylist = async (req, res) => {
+    try {
+        const { id: playlistId } = req.params;
+
+        // Find the playlist and populate episodes
+        const playlist = await PodcastPlaylist.findById(playlistId)
+            .populate('episodes');
+
+        if (!playlist) {
+            throw new NotFoundError('Playlist not found');
+        }
+
+        // Check authorization
+        if (playlist.userId.toString() !== req.user.userId) {
+            throw new UnauthorizedError('Not authorized to delete this playlist');
+        }
+
+        // Delete all episode files and documents
+        for (const episode of playlist.episodes) {
+            // Delete episode image file
+            if (episode.imageUrl) {
+                const imageFilePath = episode.imageUrl.replace(process.env.BACKEND_URL + '/public', 'public');
+                try {
+                    await unlinkAsync(imageFilePath);
+                } catch (error) {
+                    console.error('Error deleting episode image:', error);
+                }
+            }
+
+            // Delete episode audio file
+            if (episode.audioUrl) {
+                const audioFilePath = episode.audioUrl.replace(process.env.BACKEND_URL + '/public', 'public');
+                try {
+                    await unlinkAsync(audioFilePath);
+                } catch (error) {
+                    console.error('Error deleting episode audio:', error);
+                }
+            }
+
+            // Delete episode document
+            await Podcast.findByIdAndDelete(episode._id);
+
+           
+        }
+
+        // Delete playlist image file
+        if (playlist.imageUrl) {
+            const playlistImagePath = playlist.imageUrl.replace(process.env.BACKEND_URL + '/public', 'public');
+            try {
+                await unlinkAsync(playlistImagePath);
+            } catch (error) {
+                console.error('Error deleting playlist image:', error);
+            }
+        }
+
+        // Delete the playlist document
+        await PodcastPlaylist.findByIdAndDelete(playlistId);
+
+        res.status(StatusCodes.OK).json({
+            msg: 'Playlist and all episodes deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting playlist:', error);
+        throw error;
     }
 };
