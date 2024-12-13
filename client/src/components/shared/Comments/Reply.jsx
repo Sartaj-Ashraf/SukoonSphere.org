@@ -1,7 +1,7 @@
 import UserAvatar from "../UserAvatar";
 import PostActions from "../PostActions";
 import DeleteModal from "../DeleteModal";
-import { Form, Link } from "react-router-dom";
+import { Form, Link, useNavigate } from "react-router-dom";
 import { FaRegHeart, FaReply } from "react-icons/fa";
 import { useState } from "react";
 import { useUser } from "@/context/UserContext";
@@ -17,6 +17,7 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
   const [isLiked, setIsLiked] = useState(reply.likes.includes(user?._id));
   const [likesCount, setLikesCount] = useState(reply.totalLikes || 0);
   const [showReplyForm, setShowReplyForm] = useState(false);
+  const navigate = useNavigate();
 
   const deleteReply = async () => {
     try {
@@ -30,6 +31,7 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
   const likeReply = async () => {
     if (!user) {
       toast.error("Please login to like this reply!");
+      navigate("/auth/sign-up");
       return;
     }
     try {

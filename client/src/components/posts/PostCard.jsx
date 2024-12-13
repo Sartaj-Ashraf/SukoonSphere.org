@@ -7,7 +7,7 @@ import {
 } from "react-icons/fa";
 import DeleteModal from "../shared/DeleteModal";
 import customFetch from "@/utils/customFetch";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import UserAvatar from "../shared/UserAvatar";
 import PostActions from "../shared/PostActions";
 import { toast } from "react-toastify";
@@ -28,7 +28,7 @@ const PostCard = ({
   const [likesCount, setLikesCount] = useState(post?.totalLikes || 0);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPost, setCurrentPost] = useState(post);
-
+  const navigate = useNavigate();
   const handleDelete = () => {
     setShowDeleteModal(true);
   };
@@ -57,6 +57,7 @@ const PostCard = ({
   const handleLike = async () => {
     if (!user) {
       toast.error("Please login to like this post!");
+      navigate("/auth/sign-up");
       return;
     }
     setIsLoading(true);
@@ -70,7 +71,6 @@ const PostCard = ({
       setIsLoading(false);
     }
   };
-
 
   return (
     <>
@@ -87,10 +87,7 @@ const PostCard = ({
           </div>
 
           {user?._id === currentPost.createdBy && (
-            <PostActions
-              handleEdit={handleEdit}
-              handleDelete={handleDelete}
-            />
+            <PostActions handleEdit={handleEdit} handleDelete={handleDelete} />
           )}
         </div>
 
@@ -123,7 +120,7 @@ const PostCard = ({
             disabled={isLoading}
             className={`flex items-center gap-1 ${
               isLiked ? "text-red-500" : ""
-            } hover:text-red-500 transition-colors`}
+            } lg:hover:text-red-500 transition-colors`}
           >
             <FaRegHeart className={isLiked ? "fill-current" : ""} />
             <span>{likesCount}</span>
@@ -146,10 +143,13 @@ const PostCard = ({
               <span>{totalComments}</span>
             </button>
           )}
-          
+
           {currentPost.editedAt && (
             <span className="text-xs text-gray-400 ml-auto">
-              edited {formatDistanceToNow(new Date(currentPost.editedAt), { addSuffix: true })}
+              edited{" "}
+              {formatDistanceToNow(new Date(currentPost.editedAt), {
+                addSuffix: true,
+              })}
             </span>
           )}
         </div>
