@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
+import PropTypes from 'prop-types';
 import HTMLFlipBook from "react-pageflip";
 import customFetch from "@/utils/customFetch";
 import { useParams } from "react-router-dom";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiCalendar, FiEye } from "react-icons/fi";
 import * as pdfjsLib from 'pdfjs-dist';
 import './Article.css';
 
 // Initialize PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+const pdfWorkerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
 
 const PageCover = React.forwardRef((props, ref) => {
   return (
@@ -24,22 +26,33 @@ const PageContent = React.forwardRef(({ pageNumber, pdfDoc }, ref) => {
   const canvasRef = React.useRef(null);
 
   useEffect(() => {
+    let isMounted = true;
     const renderPage = async () => {
-      if (!pdfDoc) return;
+      if (!pdfDoc || !isMounted) return;
       
       try {
         const page = await pdfDoc.getPage(pageNumber);
-        const viewport = page.getViewport({ scale: 1.5 });
+        const viewport = page.getViewport({ scale: window.devicePixelRatio || 1.5 });
         const canvas = canvasRef.current;
+        if (!canvas || !isMounted) return;
+
         const context = canvas.getContext('2d');
         
+        // Set the actual size of the canvas
         canvas.height = viewport.height;
         canvas.width = viewport.width;
         
-        await page.render({
+        // Set the display size of the canvas
+        canvas.style.height = `${viewport.height / (window.devicePixelRatio || 1)}px`;
+        canvas.style.width = `${viewport.width / (window.devicePixelRatio || 1)}px`;
+        
+        const renderContext = {
           canvasContext: context,
-          viewport: viewport
-        }).promise;
+          viewport: viewport,
+          enableWebGL: true
+        };
+
+        await page.render(renderContext).promise;
         
       } catch (error) {
         console.error('Error rendering page:', error);
@@ -47,6 +60,9 @@ const PageContent = React.forwardRef(({ pageNumber, pdfDoc }, ref) => {
     };
 
     renderPage();
+    return () => {
+      isMounted = false;
+    };
   }, [pageNumber, pdfDoc]);
 
   return (
@@ -58,6 +74,11 @@ const PageContent = React.forwardRef(({ pageNumber, pdfDoc }, ref) => {
   );
 });
 
+PageContent.propTypes = {
+  pageNumber: PropTypes.number.isRequired,
+  pdfDoc: PropTypes.object
+};
+
 const Article = () => {
   const { id } = useParams();
   const [pdfDoc, setPdfDoc] = useState(null);
@@ -65,34 +86,58 @@ const Article = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [articleInfo, setArticleInfo] = useState(null);
   const flipBookRef = React.useRef();
 
   useEffect(() => {
+    let isMounted = true;
+    let loadingTask = null;
+
     const loadPdf = async () => {
       try {
-        const response = await customFetch.get(`/api/v1/articles/${id}`);
-        const pdfUrl = response.data.pdfPath;
-        
-        // Load the PDF document with additional configuration
-        const loadingTask = pdfjsLib.getDocument({
+        const response = await customFetch.get(`/articles/get-article-cover-page/${id}`);
+        if (!isMounted) return;
+
+        const pdfUrl = response.data.coverPage.pdfPath;
+        const articleData = response.data.coverPage;
+        loadingTask = pdfjsLib.getDocument({
           url: pdfUrl,
           cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/cmaps/',
           cMapPacked: true,
           standardFontDataUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/standard_fonts/'
         });
+
+        loadingTask.onProgress = (progress) => {
+          // You can add a progress indicator here if needed
+          const percent = (progress.loaded / progress.total) * 100;
+        };
         
         const pdf = await loadingTask.promise;
+        if (!isMounted) return;
+
         setPdfDoc(pdf);
         setNumPages(pdf.numPages);
+        setArticleInfo(articleData);
         setLoading(false);
       } catch (err) {
-        setError('Failed to load article');
+        if (!isMounted) return;
+        setError(err.message || 'Failed to load article');
         console.error('Error loading PDF:', err);
         setLoading(false);
       }
     };
 
     loadPdf();
+
+    return () => {
+      isMounted = false;
+      if (loadingTask) {
+        loadingTask.destroy();
+      }
+      if (pdfDoc) {
+        pdfDoc.destroy();
+      }
+    };
   }, [id]);
 
   const nextPage = () => {
@@ -122,17 +167,26 @@ const Article = () => {
         size="stretch"
         minWidth={315}
         maxWidth={1000}
-        minHeight={400}
-        maxHeight={1533}
+        minHeight={window.innerWidth <= 768 ? 300 : 400}
+        maxHeight={window.innerWidth <= 768 ? 800 : 1533}
         maxShadowOpacity={0.5}
         showCover={true}
         mobileScrollSupport={true}
         ref={flipBookRef}
         onFlip={onPageChange}
         className="demo-book"
+        usePortrait={window.innerWidth <= 768}
       >
         <PageCover>
-          <h2>Article</h2>
+          <div className="cover-content">
+            <h2 className="title">{articleInfo?.title}</h2>
+            <div className="meta-info">
+              <div className="date-views">
+                <span><FiCalendar className="icon" /> {new Date(articleInfo?.createdAt).toLocaleDateString()}</span>
+                <span><FiEye className="icon" /> {articleInfo?.views?.length || 0} views</span>
+              </div>
+            </div>
+          </div>
         </PageCover>
 
         {Array.from(new Array(numPages), (el, index) => (
@@ -143,7 +197,12 @@ const Article = () => {
           />
         ))}
 
-        <PageCover>The End</PageCover>
+        <PageCover className="back-cover">
+          <div className="cover-content">
+            <h3 className="thank-you">Thank you for reading</h3>
+            <p className="footer-text">We hope you enjoyed this article</p>
+          </div>
+        </PageCover>
       </HTMLFlipBook>
 
       <div className="controls">
@@ -151,7 +210,7 @@ const Article = () => {
           <FiChevronLeft />
         </button>
         <span className="page-info">
-          Page {currentPage} of {numPages}
+          Page {currentPage} of {numPages + 2}
         </span>
         <button onClick={nextPage} className="nav-button">
           <FiChevronRight />
