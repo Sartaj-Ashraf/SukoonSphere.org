@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import HTMLFlipBook from "react-pageflip";
 import customFetch from "@/utils/customFetch";
 import { useParams } from "react-router-dom";
-import { FiChevronLeft, FiChevronRight, FiCalendar, FiEye } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiCalendar, FiEye, FiDownload } from "react-icons/fi";
 import * as pdfjsLib from 'pdfjs-dist';
 import './Article.css';
 
@@ -156,6 +156,23 @@ const Article = () => {
     setCurrentPage(e.data + 1);
   };
 
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(articleInfo.pdfPath);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${articleInfo.title || 'article'}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+    }
+  };
+
   if (error) return <div className="error-message">{error}</div>;
   if (loading) return <div className="loading">Loading PDF...</div>;
 
@@ -214,6 +231,9 @@ const Article = () => {
         </span>
         <button onClick={nextPage} className="nav-button">
           <FiChevronRight />
+        </button>
+        <button onClick={handleDownload} className="nav-button download-btn" title="Download PDF">
+          <FiDownload />
         </button>
       </div>
     </div>
