@@ -70,7 +70,7 @@ function Infography() {
             </span>
             <Link
               to={
-                "https://nhm.gov.in/images/pdf/National_Health_Mental_Policy.pdf"
+                "/about/mental-health"
               }
               target="_blank"
               className="hover:text-[var(--ternery)]"

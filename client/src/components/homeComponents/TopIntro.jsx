@@ -15,18 +15,18 @@ const TopIntro = () => {
         {/* Left Section - Text and CTAs */}
         <div>
           {/* Badge */}
-          <div className="bg-[var(--light-bg)] text-[--gray-700] text-[12px] sm:text-sm inline-flex items-center py-2 px-3 rounded-full mb-4 glossy-effect-bar ">
-            <span className="bg-[#01427a] text-white rounded-full w-4 h-4 flex items-center justify-center mr-2 p-3">
-              N
+          <div className="bg-[var(--primary)] text-[--gray-700] text-[12px] sm:text-sm inline-flex items-center py-2 px-2 rounded-full mb-4 glossy-effect-bar">
+            <span className="bg-[#01427a] text-white rounded-full w-4 h-4 flex items-center justify-center mr-2">
+              S
             </span>
             <Link
               to={
-                "https://nhm.gov.in/images/pdf/National_Health_Mental_Policy.pdf"
+                "/about/mental-health"
               }
               target="_blank"
-              className="hover:text-[var(--ternery)]"
+              className="text-white hover:text-[var(--ternery)]"
             >
-              NMHP: National Mental Health Programme
+              SukoonSphere: For Mental Health Challenges
             </Link>
           </div>
 

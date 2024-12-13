@@ -51,7 +51,7 @@ const links = [
         icon: <BiQuestionMark />,
       },
       {
-        name: "Stories",
+        name: "Posts",
         address: 'Posts',
         description: "User-submitted discussions",
         // icon: <FaCaretRight />,
