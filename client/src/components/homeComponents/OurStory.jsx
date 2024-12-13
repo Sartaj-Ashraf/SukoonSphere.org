@@ -19,18 +19,18 @@ const OurStory = () => {
             data-aos="fade-up"
           >
             <div className="bg-[var(--grey--900)] text-[--gray-700] text-sm hidden lg:inline-flex items-center py-2 px-3 rounded-full mb-4 glossy-effect-bar">
-              <span className="bg-[#01427a] text-white rounded-full w-4 h-4 flex items-center justify-center mr-2">
-                N
-              </span>
-              <Link
-                to={
-                  "https://www.nhm.gov.in/index1.php?lang=1&level=2&sublinkid=1043&lid=359"
-                }
-                target="_blank"
-                className="hover:text-[var(--ternery)]"
-              >
-                NMHP: National Mental Health Programme
-              </Link>
+            <span className="bg-[#01427a] text-white rounded-full w-4 h-4 flex items-center justify-center mr-2">
+              S
+            </span>
+            <Link
+              to={
+                "/about/mental-health"
+              }
+              target="_blank"
+              className="hover:text-[var(--ternery)]"
+            >
+              SukoonSphere: For Mental Health Challenges
+            </Link>
             </div>
             <h2
               className=" font-extrabold text-[1.6rem] md:text-[2.5rem] sm:leading-[3.5rem]"

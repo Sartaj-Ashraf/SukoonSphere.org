@@ -141,19 +141,20 @@ const TodaysQuote = () => {
     <>
       <SectionTitle title="Today's Quote" />
       <section className="max-w-6xl flex flex-col items-center justify-center  gap-6 mx-auto px-4 py-4">
-        <div className="bg-gray-200 inline-flex justify-center items-center px-4 py-2 rounded-full ">
-          <span className="bg-blue-900 text-white rounded-full w-6 h-6 flex items-center justify-center mr-2">
+        <div className="bg-[var(--grey--900)] text-[--gray-700] text-sm hidden lg:inline-flex items-center py-2 px-3 rounded-full mb-4 glossy-effect-bar">
+          <span className="bg-[#01427a] text-white rounded-full w-4 h-4 flex items-center justify-center mr-2">
             S
           </span>
           <Link
-            to="https://nhm.gov.in/images/pdf/National_Health_Mental_Policy.pdf"
+            to={
+              "/about/mental-health"
+            }
             target="_blank"
-            className="text-gray-700 hover:text-blue-600"
+            className=" text-white hover:text-[var(--ternery)]"
           >
-            SukoonSphere: Daily Inspiration
+            SukoonSphere: For Mental Health Challenges
           </Link>
         </div>
-
         <h2 className="text-2xl md:text-3xl font-bold  text-center  text-[1.6rem] md:text-[2.5rem] lg:text-[3.5rem] ">
           Open a Quote to get started!
         </h2>
