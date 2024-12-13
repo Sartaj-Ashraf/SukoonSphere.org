@@ -45,9 +45,9 @@ const QuestionCard = ({ question }) => {
           <span className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium">
             {totalAnswers} {totalAnswers === 1 ? "Answer" : "Answers"}
           </span>
-          {user && question?.author?.userId === user?._id && (
+          {/* {user && question?.author?.userId === user?._id && (
             <PostActions handleDelete={() => setShowDeleteModal(true)} />
-          )}
+          )} */}
         </div>
       </div>
 

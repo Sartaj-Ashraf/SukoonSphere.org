@@ -216,7 +216,8 @@ const Answer = () => {
 
           {/* Main Content */}
           <div className="col-span-1 md:col-span-6">
-            <div className="flex flex-col gap-4 mb-6">
+            <div className="flex flex-col gap-4 mb-6 bg-white rounded-lg shadow-md p-4 md:p-6">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800">Questions</h2>
               {/* Search bar */}
               <div className="relative">
                 <input
@@ -224,7 +225,7 @@ const Answer = () => {
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="Search questions..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full bg-[var(--white-color)] py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 {searchInput && (
                   <button
@@ -244,20 +245,20 @@ const Answer = () => {
               </div>
 
               {/* Filter buttons */}
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                <h2 className="text-xl md:text-2xl font-bold text-gray-800">Questions</h2>
-                <div className="flex flex-wrap gap-2 mt-3 md:mt-0">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mt-4 md:mt-0">
+                <div className="flex flex-wrap gap-2">
                   {filterOptions.map((option) => (
                     <button
                       key={option.value}
                       onClick={() => handleFilterChange(option.value)}
-                      className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+                      className={`px-3 py-1.5 text-sm rounded-full transition-colors flex items-center gap-1 ${
                         currentFilter === option.value
                           ? 'bg-blue-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
-                      {option.label}
+                      {option.icon}
+                      <span>{option.label}</span>
                     </button>
                   ))}
                 </div>
