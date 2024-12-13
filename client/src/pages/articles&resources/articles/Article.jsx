@@ -100,6 +100,8 @@ const Article = () => {
 
         const pdfUrl = response.data.coverPage.pdfPath;
         const articleData = response.data.coverPage;
+        setArticleInfo(articleData); // Set article info before loading PDF
+
         loadingTask = pdfjsLib.getDocument({
           url: pdfUrl,
           cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/cmaps/',
@@ -108,7 +110,6 @@ const Article = () => {
         });
 
         loadingTask.onProgress = (progress) => {
-          // You can add a progress indicator here if needed
           const percent = (progress.loaded / progress.total) * 100;
         };
         
@@ -117,7 +118,6 @@ const Article = () => {
 
         setPdfDoc(pdf);
         setNumPages(pdf.numPages);
-        setArticleInfo(articleData);
         setLoading(false);
       } catch (err) {
         if (!isMounted) return;
@@ -173,8 +173,31 @@ const Article = () => {
     }
   };
 
-  if (error) return <div className="error-message">{error}</div>;
-  if (loading) return <div className="loading">Loading PDF...</div>;
+  if (error) return (
+    <div className="flipbook-container">
+      <div className="error-message">{error}</div>
+      {articleInfo && (
+        <div className="controls">
+          <button onClick={handleDownload} className="nav-button download-btn" title="Download PDF">
+            <FiDownload />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+  
+  if (loading) return (
+    <div className="flipbook-container">
+      <div className="loading">Loading PDF...</div>
+      {articleInfo && (
+        <div className="controls">
+          <button onClick={handleDownload} className="nav-button download-btn" title="Download PDF">
+            <FiDownload />
+          </button>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="flipbook-container">
@@ -241,4 +264,3 @@ const Article = () => {
 };
 
 export default Article;
-// 
