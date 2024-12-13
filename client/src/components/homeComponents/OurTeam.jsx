@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 const OurTeam = () => {
   return (
     <>
-      <SectionTitle title="Our Team" />
+      <SectionTitle title="Our Contributors" />
       <div
         className="px-[1.5rem] max-w-7xl mx-auto flex flex-col items-center justify-center text-center pt-20"
         data-aos="fade-up"
