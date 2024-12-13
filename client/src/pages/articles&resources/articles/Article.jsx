@@ -83,11 +83,41 @@ const Article = () => {
   const { id } = useParams();
   const [pdfDoc, setPdfDoc] = useState(null);
   const [numPages, setNumPages] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [articleInfo, setArticleInfo] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState(null);
   const flipBookRef = React.useRef();
+
+  useEffect(() => {
+    const fetchArticle = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await customFetch.get(`/articles/get-article-cover-page/${id}`);
+        if (!response.ok) throw new Error('Failed to fetch article');
+        const data = await response.json();
+        setArticleInfo(data);
+        
+        // Set PDF URL separately
+        const pdfResponse = await customFetch.get(`${data.coverPage.pdfPath}`);
+        if (!pdfResponse.ok) throw new Error('Failed to load PDF');
+        const pdfBlob = await pdfResponse.blob();
+        setPdfUrl(URL.createObjectURL(pdfBlob));
+      } catch (err) {
+        console.error('Error:', err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchArticle();
+    return () => {
+      // Cleanup URL object on unmount
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+    };
+  }, [id]);
 
   useEffect(() => {
     let isMounted = true;
@@ -95,11 +125,7 @@ const Article = () => {
 
     const loadPdf = async () => {
       try {
-        const response = await customFetch.get(`/articles/get-article-cover-page/${id}`);
-        if (!isMounted) return;
-
-        const pdfUrl = response.data.coverPage.pdfPath;
-        const articleData = response.data.coverPage;
+        if (!pdfUrl) return;
         loadingTask = pdfjsLib.getDocument({
           url: pdfUrl,
           cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/cmaps/',
@@ -108,7 +134,6 @@ const Article = () => {
         });
 
         loadingTask.onProgress = (progress) => {
-          // You can add a progress indicator here if needed
           const percent = (progress.loaded / progress.total) * 100;
         };
         
@@ -117,13 +142,10 @@ const Article = () => {
 
         setPdfDoc(pdf);
         setNumPages(pdf.numPages);
-        setArticleInfo(articleData);
-        setLoading(false);
       } catch (err) {
         if (!isMounted) return;
         setError(err.message || 'Failed to load article');
         console.error('Error loading PDF:', err);
-        setLoading(false);
       }
     };
 
@@ -138,7 +160,7 @@ const Article = () => {
         pdfDoc.destroy();
       }
     };
-  }, [id]);
+  }, [pdfUrl]);
 
   const nextPage = () => {
     if (flipBookRef.current) {
@@ -157,8 +179,10 @@ const Article = () => {
   };
 
   const handleDownload = async () => {
+    if (!articleInfo) return;
+    
     try {
-      const response = await fetch(articleInfo.pdfPath);
+      const response = await customFetch.get(`${articleInfo.coverPage.pdfPath}`);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -166,15 +190,39 @@ const Article = () => {
       a.download = `${articleInfo.title || 'article'}.pdf`;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Download error:', err);
+      alert('Failed to download the PDF. Please try again later.');
     }
   };
 
-  if (error) return <div className="error-message">{error}</div>;
-  if (loading) return <div className="loading">Loading PDF...</div>;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  if (!articleInfo) return <div className="loading">Loading article information...</div>;
+
+  if (isLoading) return (
+    <div className="flipbook-container">
+      <div className="loading">Loading PDF viewer...</div>
+      <div className="controls">
+        <button onClick={handleDownload} className="nav-button download-btn" title="Download PDF">
+          <FiDownload />
+        </button>
+      </div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="flipbook-container">
+      <div className="error-message">{error}</div>
+      <div className="controls">
+        <button onClick={handleDownload} className="nav-button download-btn" title="Download PDF">
+          <FiDownload />
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="flipbook-container">
@@ -241,4 +289,3 @@ const Article = () => {
 };
 
 export default Article;
-// 
