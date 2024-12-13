@@ -18,7 +18,7 @@ function OurTeam() {
 
   return (
     <>
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-6">
         <div className="text-center max-w-4xl mx-auto space-y-6">
           <div className="relative inline-block">
             <h2
@@ -59,7 +59,7 @@ function OurTeam() {
             prioritizes your well-being.
           </p>
 
-          <div className="mt-8 flex justify-center">
+          <div className="my-8 flex justify-center ">
             <div
               className="inline-flex items-center space-x-3 
             px-6 py-2 
@@ -73,7 +73,7 @@ function OurTeam() {
               <span
                 className="text-sm text-[var(--grey--800)] 
               group-hover:text-[var(--primary)] 
-              transition-colors"
+              transition-"
               >
                 Expertise You Can Trust
               </span>
@@ -96,7 +96,7 @@ function OurTeam() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className=" mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {data?.posts?.map((member) => (
             <div
               key={member?._id}

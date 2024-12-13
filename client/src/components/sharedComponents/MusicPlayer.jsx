@@ -1,27 +1,47 @@
 import React, { useState, useEffect, useRef } from "react";
+import defaultImg from '@/assets/images/Podcast/defaultImage.jpg';
 
-const MusicPlayer = ({ currentAudio, currentPodcast }) => {
+const MusicPlayer = ({ currentAudio, currentPodcast, onNext, onPrevious }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isLooping, setIsLooping] = useState(false);
+  const [isRandom, setIsRandom] = useState(false);
   const audioRef = useRef(null);
 
   useEffect(() => {
     if (currentAudio) {
+      console.log('Setting audio source:', currentAudio);
       audioRef.current.src = currentAudio;
       audioRef.current.load();
-      setIsPlaying(true);
-      audioRef.current.play();
+      audioRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch(error => {
+        console.error("Error playing audio:", error);
+        setIsPlaying(false);
+      });
     }
   }, [currentAudio]);
 
   useEffect(() => {
-    if (isPlaying) {
-      audioRef.current.play();
+    if (audioRef.current) {
+      audioRef.current.loop = isLooping;
+    }
+  }, [isLooping]);
+
+  const togglePlay = () => {
+    if (audioRef.current.paused) {
+      audioRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch(error => {
+        console.error("Error playing audio:", error);
+        setIsPlaying(false);
+      });
     } else {
       audioRef.current.pause();
+      setIsPlaying(false);
     }
-  }, [isPlaying]);
+  };
 
   const handleTimeUpdate = () => {
     setCurrentTime(audioRef.current.currentTime);
@@ -32,6 +52,45 @@ const MusicPlayer = ({ currentAudio, currentPodcast }) => {
     const time = Number(e.target.value);
     setCurrentTime(time);
     audioRef.current.currentTime = time;
+  };
+
+  const handleForward = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.min(audioRef.current.currentTime + 10, audioRef.current.duration);
+    }
+  };
+
+  const handleBackward = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.max(audioRef.current.currentTime - 10, 0);
+    }
+  };
+
+  const toggleLoop = () => {
+    setIsLooping(!isLooping);
+  };
+
+  const toggleRandom = () => {
+    setIsRandom(!isRandom);
+  };
+
+  const handleDownload = async () => {
+    if (currentAudio) {
+      try {
+        const response = await fetch(currentAudio);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${currentPodcast?.title || 'audio'}.mp3`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } catch (error) {
+        console.error('Error downloading audio:', error);
+      }
+    }
   };
 
   const formatTime = (seconds) => {
@@ -91,79 +150,164 @@ const MusicPlayer = ({ currentAudio, currentPodcast }) => {
   };
 
   return (
-    <div className="sticky top-24 lg:w-96 p-6 bg-[#0b3948] mx-auto rounded-xl text-white font-sans">
-      <audio 
-        ref={audioRef}
-        onTimeUpdate={handleTimeUpdate}
-        onEnded={() => setIsPlaying(false)}
-      />
-      
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <span className="font-medium">Now Playing</span>
-        <button className="bg-transparent border-0 text-gray-400 cursor-pointer p-1">
-          <CustomIcon name="download" />
-        </button>
-      </div>
+    <div className="fixed bottom-0 left-0 right-0 lg:sticky lg:top-24 lg:h-[500px] w-full lg:w-96 mx-auto z-50">
+      <div 
+        className="relative h-20 lg:h-full p-2 lg:p-6 bg-white/10 backdrop-blur-lg lg:rounded-xl text-white font-sans overflow-hidden"
+        style={{
+          backgroundImage: `url(${currentPodcast?.imageUrl || currentPodcast?.image || defaultImg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* Overlay with backdrop blur */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-md lg:rounded-xl"></div>
 
-      {/* Album Art */}
-      <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden">
-        <img
-          src={currentPodcast?.image || "/api/placeholder/128/128"}
-          alt="Album art"
-          className="w-full h-full object-cover"
-        />
-      </div>
-
-      {/* Song Info */}
-      <div className="text-center mb-6">
-        <h2 className="text-lg font-semibold mb-1">{currentPodcast?.title || "Select a podcast"}</h2>
-        <p className="text-sm text-gray-400">{currentPodcast?.author || "Artist"}</p>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="mb-6">
-        <input
-          type="range"
-          value={currentTime}
-          max={duration || 0}
-          onChange={handleSeek}
-          className="w-full h-1 mb-2 appearance-none bg-gray-600 rounded cursor-pointer"
-        />
-        <div className="flex justify-between text-xs text-gray-400">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
+        {/* Mobile/Tablet View */}
+        <div className="lg:hidden relative z-10 h-full flex items-center gap-4">
+          <img
+            src={currentPodcast?.imageUrl || currentPodcast?.image || defaultImg}
+            alt={currentPodcast?.title || "Album art"}
+            className="h-16 w-16 rounded-lg object-cover"
+          />
+          <div className="flex-1 min-w-0">
+            <h2 className="font-semibold text-sm line-clamp-1">{currentPodcast?.title || "Select a podcast"}</h2>
+            <p className="text-xs text-gray-300 line-clamp-1">{currentPodcast?.author || "Artist"}</p>
+            <div className="mt-1 w-full bg-white/20 rounded-full h-1">
+              <div 
+                className="bg-white h-full rounded-full" 
+                style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button 
+              className="text-white/80 hover:text-white"
+              onClick={handleBackward}
+              disabled={!currentAudio}
+            >
+              <CustomIcon name="skip-back" />
+            </button>
+            <button
+              onClick={togglePlay}
+              className="w-10 h-10 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full text-white"
+              disabled={!currentAudio}
+            >
+              <CustomIcon name={isPlaying ? 'pause' : 'play'} />
+            </button>
+            <button 
+              className="text-white/80 hover:text-white"
+              onClick={handleForward}
+              disabled={!currentAudio}
+            >
+              <CustomIcon name="skip-forward" />
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Controls */}
-      <div className="flex justify-between items-center mb-6">
-        <button className="bg-transparent border-0 text-gray-400 cursor-pointer p-1">
-          <CustomIcon name="shuffle" />
-        </button>
-        <button className="bg-transparent border-0 text-gray-400 cursor-pointer p-1">
-          <CustomIcon name="skip-back" />
-        </button>
-        <button
-          onClick={() => setIsPlaying(!isPlaying)}
-          className="w-12 h-12 flex items-center justify-center bg-white border-0 rounded-full text-[#1a2433] cursor-pointer"
-          disabled={!currentAudio}
-        >
-          <CustomIcon name={isPlaying ? 'pause' : 'play'} />
-        </button>
-        <button className="bg-transparent border-0 text-gray-400 cursor-pointer p-1">
-          <CustomIcon name="skip-forward" />
-        </button>
-        <button className="bg-transparent border-0 text-gray-400 cursor-pointer p-1">
-          <CustomIcon name="repeat" />
-        </button>
-      </div>
+        {/* Audio Element */}
+        <audio 
+          ref={audioRef}
+          onTimeUpdate={handleTimeUpdate}
+          onEnded={() => {
+            setIsPlaying(false);
+            if (isLooping) {
+              audioRef.current.play();
+            } else if (onNext) {
+              onNext();
+            }
+          }}
+          onError={(e) => console.error("Error playing audio:", e)}
+        />
 
-      {/* Bottom Text */}
-      <div className="text-center">
-        <button className="bg-transparent border-0 text-gray-400 text-sm cursor-pointer p-1">
-          Playlist
-        </button>
+        {/* Desktop View */}
+        <div className="hidden lg:block relative z-10">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            <span className="font-medium">Now Playing</span>
+            <button 
+              className={`bg-transparent border-0 ${currentAudio ? 'text-white hover:text-gray-200' : 'text-gray-400'} cursor-pointer p-1`}
+              onClick={handleDownload}
+              disabled={!currentAudio}
+            >
+              <CustomIcon name="download" />
+            </button>
+          </div>
+
+          {/* Album Art */}
+          <div className="relative group w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden shadow-lg">
+            <img
+              src={currentPodcast?.imageUrl || currentPodcast?.image || defaultImg}
+              alt={currentPodcast?.title || "Album art"}
+              className="absolute z-20 top-0 left-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </div>
+
+          {/* Song Info */}
+          <div className="text-center mb-6">
+            <h2 className="text-lg font-semibold mb-1">{currentPodcast?.title || "Select a podcast"}</h2>
+            <p className="text-sm text-gray-300">{currentPodcast?.author || "Artist"}</p>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="mb-6">
+            <input
+              type="range"
+              value={currentTime}
+              max={duration || 0}
+              onChange={handleSeek}
+              className="w-full h-1 mb-2 appearance-none bg-gray-600 rounded cursor-pointer"
+            />
+            <div className="flex justify-between text-xs text-gray-300">
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(duration)}</span>
+            </div>
+          </div>
+
+          {/* Controls */}
+          <div className="flex justify-between items-center mb-6">
+            <button 
+              className={`bg-transparent border-0 ${isRandom ? 'text-white' : 'text-gray-400'} cursor-pointer p-1 hover:text-white transition-colors`}
+              onClick={toggleRandom}
+            >
+              <CustomIcon name="shuffle" />
+            </button>
+            <button 
+              className="bg-transparent border-0 text-gray-400 cursor-pointer p-1 hover:text-white transition-colors"
+              onClick={handleBackward}
+              disabled={!currentAudio}
+            >
+              <CustomIcon name="skip-back" />
+            </button>
+            <button
+              onClick={togglePlay}
+              className="w-12 h-12 flex items-center justify-center bg-white border-0 rounded-full text-[#1a2433] cursor-pointer hover:bg-gray-100 transition-colors"
+              disabled={!currentAudio}
+            >
+              <CustomIcon name={isPlaying ? 'pause' : 'play'} />
+            </button>
+            <button 
+              className="bg-transparent border-0 text-gray-400 cursor-pointer p-1 hover:text-white transition-colors"
+              onClick={handleForward}
+              disabled={!currentAudio}
+            >
+              <CustomIcon name="skip-forward" />
+            </button>
+            <button 
+              className={`bg-transparent border-0 ${isLooping ? 'text-white' : 'text-gray-400'} cursor-pointer p-1 hover:text-white transition-colors`}
+              onClick={toggleLoop}
+            >
+              <CustomIcon name="repeat" />
+            </button>
+          </div>
+
+          {/* Bottom Text */}
+          <div className="text-center">
+            <p className="text-sm text-gray-300">
+              {isLooping ? 'Loop: On' : isRandom ? 'Random: On' : 'Normal Play'}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

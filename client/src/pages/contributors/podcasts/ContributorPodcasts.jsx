@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useOutletContext, useParams } from 'react-router-dom'
 import { useUser } from "@/context/UserContext";
-import { FaMicrophone, FaList } from 'react-icons/fa';
+import { FaMicrophone, FaList, FaChevronDown } from 'react-icons/fa';
 import CreateNewPodcast from '../models/CreateNewPodcast';
 import CreateNewPodcastPlaylist from '../models/CreateNewPodcastPlaylist';
 import customFetch from '@/utils/customFetch';
@@ -16,6 +16,7 @@ const ContributorPodcasts = () => {
   const [playlists, setPlaylists] = useState([]);
   const [singlePodcasts, setSinglePodcasts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showDropdown, setShowDropdown] = useState(false);
   const { id: ParamId } = useParams()
   const user = useOutletContext();
   const { user: currentUser } = useUser();
@@ -53,27 +54,45 @@ const ContributorPodcasts = () => {
             <h2 className="text-2xl font-bold text-gray-900">Your Podcasts</h2>
             <p className="text-[var(--grey--800)]">
               Need help creating an podcast ? Check out 
-              <Link to={"/user-manual/create-podcast"} className="text-blue-500 hover:underline">
+              <Link to={"/user-manual/create-podcast"} className="text-blue-500 hover:underline px-2">
                 user manual
               </Link>{" "}
               for a step-by-step guide.
             </p>
           </div>
-          <button
-            onClick={() => setShowPodcastModal(true)}
-            className="btn-primary inline-flex items-center gap-2 px-3 py-1.5 text-sm"
-          >
-            Create New Podcast
-            <FaMicrophone className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setShowPlaylistModal(true)}
-            className="btn-primary inline-flex items-center gap-2 px-3 py-1.5 text-sm"
-          >
-            Create Podcast playlist
-            <FaList  className="w-4 h-4" />
-          </button>
-        </div>)}
+          <div className="relative transition-all duration-300">
+            <button
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="btn-primary inline-flex items-center gap-2 px-3 py-1.5 text-sm"
+            >
+              Create New Podcast
+              <FaChevronDown className="w-4 h-4" />
+            </button>
+            {showDropdown && (
+              <div className="absolute top-10 md:right-0 z-10 bg-white shadow-xl p-2 flex flex-col gap-1 rounded-lg w-52 ">
+                <button
+                  onClick={() => {
+                    setShowDropdown(false);
+                    setShowPodcastModal(true);
+                  }}
+                  className=" text-left px-2 py-1 rounded-lg hover:bg-gray-100 flex items-center w-fit border border-gray-200 "
+                >
+                  <span>Create New Podcast</span>  <FaMicrophone className="w-4 h-4 ml-2" />
+                </button>
+                <button
+                  onClick={() => {
+                    setShowDropdown(false);
+                    setShowPlaylistModal(true);
+                  }}
+                  className=" w-full text-left px-2 rounded-lg py-1 hover:bg-gray-100 flex items-center border border-gray-200"
+                >
+                <span>Create New Playlist</span> <FaList className="w-4 h-4 ml-2" />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       {isLoading ? (

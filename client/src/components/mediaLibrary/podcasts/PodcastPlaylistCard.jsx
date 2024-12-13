@@ -53,60 +53,68 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
   };
 
   return (
-    <div className=" bg-white rounded-lg shadow-md   transition-shadow w-full mb-4">
-      <div className="flex  flex-col ">
-        {/* Right side - Content */}
-        <div className="flex flex-col md:flex-row p-4 md:p-6 bg-white border-l-4 border-blue-500 space-y-4 md:space-y-0 md:space-x-6">
+    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 w-full mb-6 overflow-hidden">
+      <div className="flex flex-col">
+        <div className="flex flex-col md:flex-row p-4  md:p-6 space-y-2 md:space-y-0 md:space-x-8">
           {/* Left side - Image */}
-          <div className="flex-shrink-0 self-start md:self-center w-full md:w-fit">
-            <div className="relative group w-full md:w-64 h-48 md:h-[200px] overflow-hidden rounded-lg border border-gray-100 transition-all duration-300">
+          <div className="flex-shrink-0 self-start md:self-center">
+            <div className="relative group w-full md:w-72 h-52 md:h-[220px] overflow-hidden rounded-xl shadow-md">
               <img
                 src={playlist.imageUrl}
                 alt={playlist.title}
-                className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
+                className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute bottom-4 left-4 flex items-center space-x-3">
+                  <button className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg transform hover:scale-105 transition-all">
+                    <FaPlay className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
+          {/* Right side - Content */}
           <div className="flex-grow flex flex-col justify-between w-full">
             <div>
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-start mb-4">
                 <div className="flex-grow pr-4">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-lg md:text-2xl font-bold text-gray-800 mb-3 hover:text-blue-600 transition-colors">
                     {playlist.title}
                   </h3>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                  <p className="text-gray-600 text-base mb-4 line-clamp-2 leading-relaxed">
                     {playlist.description}
                   </p>
-                  <p className="text-sm text-gray-500 mb-3">
-                    {playlist.episodes.length}{" "}
-                    {playlist.episodes.length <= 1 ? "Total Episode" : "Total Episodes"}
-                  </p>
+                  <div className="flex items-center space-x-4">
+                    <span className="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
+                      {playlist.episodes.length} {playlist.episodes.length <= 1 ? "Episode" : "Episodes"}
+                    </span>
+                  </div>
                 </div>
 
                 {isContributor && (
                   <div className="relative">
                     <button
                       onClick={() => setShowMenu(!showMenu)}
-                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 focus:outline-none"
+                      className="p-2.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     >
-                      <FaEllipsisV />
+                      <FaEllipsisV className="w-5 h-5" />
                     </button>
 
                     {showMenu && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-md z-10 py-1 animate-fade-in">
+                      <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-lg shadow-lg z-10 py-1 animate-fade-in">
                         <button
                           onClick={() => setShowAddEpisodeModal(true)}
-                          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 w-full transition-colors"
                         >
-                          <FaPlus className="w-4 h-4" />
+                          <FaPlus className="w-5 h-5" />
                           Add Episode
                         </button>
                         <button
                           onClick={() => setShowEditPlaylistModal(true)}
-                          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 w-full transition-colors"
                         >
-                          <FaEllipsisV className="w-4 h-4" />
+                          <FaEllipsisV className="w-5 h-5" />
                           Edit Playlist
                         </button>
                         <button
@@ -114,9 +122,9 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
                             setShowDeleteModal(true);
                             setSelectedEpisode(null);
                           }}
-                          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400 w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 w-full transition-colors"
                         >
-                          <FaTrash className="w-4 h-4" />
+                          <FaTrash className="w-5 h-5" />
                           Delete Playlist
                         </button>
                       </div>
@@ -129,7 +137,7 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
         </div>
 
         {/* Episode List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full p-4 md:p-6">
           {playlist?.episodes?.map((episode, index) => (
             <div
               key={episode._id}
