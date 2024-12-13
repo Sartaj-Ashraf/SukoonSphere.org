@@ -7,6 +7,11 @@ import { FiChevronLeft, FiChevronRight, FiCalendar, FiEye, FiDownload } from "re
 import * as pdfjsLib from 'pdfjs-dist';
 import './Article.css';
 
+import { pdfjs } from 'react-pdf';
+
+// Set worker path
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js`;
+
 // Initialize PDF.js worker
 const pdfWorkerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
