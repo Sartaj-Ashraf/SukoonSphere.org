@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../../assets/styles/DisorderTags.css';
+import "../../assets/styles/DisorderTags.css"
 import SectionTitle from '../sharedComponents/SectionTitle';
 
 const DisorderTags = () => {
@@ -58,9 +58,9 @@ const DisorderTags = () => {
                 <h1 className=" h2 hidden md:block px-4 md:p-0 w-full text-wrap text-[var(--grey--900)] sm:mb-6 md:text-center text-[1.6rem] md:text-[2.5rem] lg:text-[3.5rem] sm:leading-[3.5rem]" data-aos="fade-up" >
                     Track. Detect. Prevent.
                 </h1>
-                <div className=" carousel-wrapper sm:mt-8">
+                <div className="carousel-wrapper sm:mt-8">
                     {/* Anxiety Disorders */}
-                    <div className=" flex gap-8 sm:gap-12 p-4 justify-center items-center content-right-left w-fit">
+                    <div className="content-left-right flex gap-8 sm:gap-12 p-4 justify-center items-center content-right-left w-fit">
                         {repeatedAnxietyDisorders.map((tag, index) =>
                             tag.type === 'text' ? (
                                 <span
@@ -84,7 +84,7 @@ const DisorderTags = () => {
                     </div>
 
                     {/* Mood Disorders */}
-                    <div className="flex gap-8 sm:gap-12 p-4 justify-center items-center content-left-right w-fit">
+                    <div className=" content-right-left flex gap-8 sm:gap-12 p-4 justify-center items-center content-left-right w-fit">
                         {repeatedMoodDisorders.map((tag, index) =>
                             tag.type === 'text' ? (
                                 <span
@@ -109,7 +109,7 @@ const DisorderTags = () => {
                     </div>
 
                     {/* Personality Disorders */}
-                    <div className="flex gap-8 sm:gap-12 p-4 justify-center items-center content-right-left w-fit">
+                    <div className=" content-left-right flex gap-8 sm:gap-12 p-4 justify-center items-center content-right-left w-fit">
                         {repeatedPersonalityDisorders.map((tag, index) =>
                             tag.type === 'text' ? (
                                 <span

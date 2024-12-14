@@ -52,13 +52,13 @@ const ContributorPodcasts = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 lg:mb-8">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Your Podcasts</h2>
-            <p className="text-[var(--grey--800)]">
+            {/* <p className="text-[var(--grey--800)]">
               Need help creating an podcast ? Check out 
               <Link to={"/user-manual/create-podcast"} className="text-blue-500 hover:underline px-2">
                 user manual
               </Link>{" "}
               for a step-by-step guide.
-            </p>
+            </p> */}
           </div>
           <div className="relative transition-all duration-300">
             <button
