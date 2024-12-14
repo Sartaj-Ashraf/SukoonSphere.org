@@ -276,7 +276,7 @@ const Articles = () => {
                 <h2 className="text-xl font-semibold text-[var(--grey--900)] mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200">
                   {article.title}
                 </h2>
-              
+                
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-[var(--grey--500)]">
                     {new Date(article.createdAt).toLocaleDateString(undefined, {
