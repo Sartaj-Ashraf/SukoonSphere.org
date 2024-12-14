@@ -1,115 +1,107 @@
+import { useEffect, useState } from 'react';
 import customFetch from '@/utils/customFetch';
-import React, { useEffect, useState } from 'react';
-import { FiFileText, FiEye, FiSearch } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import UserAvatar from '@/components/shared/UserAvatar';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { FaBookOpen, FaCalendarAlt, FaUser, FaSpinner } from 'react-icons/fa';
 
 const Articles = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchTimeout, setSearchTimeout] = useState(null);
-  const queryClient = useQueryClient();
-
-  const { data: articles = [], isLoading } = useQuery({
-    queryKey: ['articles', searchQuery],
-    queryFn: async () => {
-      const response = await customFetch(`articles/get-published-articles${searchQuery ? `?search=${searchQuery}` : ''}`);
-      return response.data.articles;
-    },
-    staleTime: 1000 * 60 * 5, // Data stays fresh for 5 minutes
-    cacheTime: 1000 * 60 * 30, // Cache persists for 30 minutes
-  });
-
-  const handleSearch = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-
-    if (searchTimeout) clearTimeout(searchTimeout);
-
-    const timeout = setTimeout(() => {
-      queryClient.invalidateQueries(['articles', query]);
-    }, 500);
-
-    setSearchTimeout(timeout);
-  };
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    return () => {
-      if (searchTimeout) clearTimeout(searchTimeout);
+    const fetchArticles = async () => {
+      try {
+        const response = await customFetch.get('articles');
+        setArticles(response.data);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to fetch articles');
+      } finally {
+        setLoading(false);
+      }
     };
+
+    fetchArticles();
   }, []);
 
-  if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center">
+        <FaSpinner className="w-8 h-8 text-blue-500 animate-spin mb-4" />
+        <p className="text-[var(--grey--600)] text-lg">Loading articles...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg max-w-md text-center">
+          <p className="text-lg font-medium mb-2">Error</p>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="p-6 rounded-xl shadow-sm max-w-7xl mx-auto">
-      {/* Search Bar */}
-      <div className="mb-8">
-        <div className="relative max-w-md mx-auto">
-          <input
-            type="text"
-            placeholder="Search articles..."
-            value={searchQuery}
-            onChange={handleSearch}
-            className="w-full px-5 py-3 pl-12 text-gray-700 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
-          />
-          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
-        </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header Section */}
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold text-[var(--grey--900)] mb-4">
+          Articles & Resources
+        </h1>
+        <p className="text-[var(--grey--600)] max-w-2xl mx-auto">
+          Explore our collection of articles written by mental health professionals and experts. 
+          Find valuable insights, tips, and information about mental health and well-being.
+        </p>
       </div>
 
-      {/* Articles Count */}
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-bold text-gray-800">
-          Articles <span className="text-blue-500 ml-2">{articles.length}</span>
-        </h2>
-      </div>
-
+      {/* Articles Grid */}
       {articles.length === 0 ? (
-        <div className="text-center py-12 px-4">
-          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FiFileText className="w-10 h-10 text-gray-400" />
-          </div>
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">
-            {searchQuery ? 'No matching articles found' : 'No articles yet'}
-          </h2>
-          <p className="text-gray-500 max-w-md mx-auto">
-            {searchQuery
-              ? 'Try searching with different keywords'
-              : 'Be the first to contribute!'}
+        <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
+          <FaBookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-[var(--grey--600)] text-lg mb-4">
+            No articles available at the moment
+          </p>
+          <p className="text-[var(--grey--500)]">
+            Please check back later for new content
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (
             <Link
               key={article._id}
               to={`/articles/article/${article._id}`}
-              className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group"
+              className="group bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-200 flex flex-col"
             >
-              <div className="p-6">
-                {/* Header with UserAvatar */}
-                <div className="flex items-center justify-between mb-4">
-                  <UserAvatar
-                    createdBy={article?.author?._id}
-                    username={article?.author?.name}
-                    userAvatar={article?.author?.avatar}
-                    createdAt={article?.createdAt}
-                    size="medium"
-                  />
+              {/* Article Preview Image */}
+              <div className="relative h-48 bg-gradient-to-r from-blue-50 to-indigo-50 overflow-hidden">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <FaBookOpen className="w-12 h-12 text-blue-200 group-hover:scale-110 transition-transform duration-200" />
                 </div>
+              </div>
 
-                {/* Title */}
-                <h2 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-blue-500 transition-colors line-clamp-2">
-                  {article?.title}
+              {/* Article Content */}
+              <div className="p-6 flex-1 flex flex-col">
+                <h2 className="text-xl font-semibold text-[var(--grey--900)] group-hover:text-blue-600 transition-colors duration-200 mb-3">
+                  {article.title}
                 </h2>
-
-                {/* Footer with Views */}
-                <div className="flex items-center justify-end text-sm text-gray-500">
-                  <div className="flex items-center gap-1">
-                    <FiEye className="w-4 h-4" />
-                    <span>{article?.views.length || 0} views</span>
+                
+               
+                {/* Article Metadata */}
+                <div className="flex items-center justify-between text-sm text-[var(--grey--500)] pt-4 border-t border-gray-100">
+                  <div className="flex items-center">
+                    <FaUser className="w-4 h-4 mr-2" />
+                    <span>{article.createdBy?.name || 'Anonymous'}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <FaCalendarAlt className="w-4 h-4 mr-2" />
+                    <span>{new Date(article.createdAt).toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}</span>
                   </div>
                 </div>
               </div>

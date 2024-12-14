@@ -1,332 +1,353 @@
-import React, { useEffect, useState } from "react";
-import CreateArticleModel from "./models/CreateArticleModel";
-import customFetch from "@/utils/customFetch";
-import { toast } from "react-toastify";
-import { FiPlus, FiCheck, FiAlertCircle, FiTrash2, FiClock, FiFile, FiEye } from "react-icons/fi";
-import DeleteModal from "@/components/shared/DeleteModal";
-import { Link, useOutletContext, useParams } from "react-router-dom";
-import { useUser } from "@/context/UserContext";
-
-// Simplified API service with only essential operations
-const articleService = {
-  getPendingArticles: async () => {
-    try {
-      const { data } = await customFetch.get("/articles/get-pending-articles");
-      return data.articles || [];
-    } catch (error) {
-      console.error('Error fetching pending articles:', error);
-      return [];
-    }
-  },
-
-  getPublishedArticles: async (id) => {
-    try {
-      const { data } = await customFetch.get(`articles/get-published-articles-by-user/${id}`);
-      return data.articles || [];
-    } catch (error) {
-      console.error('Error fetching published articles:', error);
-      return [];
-    }
-  },
-
-  publishArticle: async (articleId) => {
-    const { data } = await customFetch.patch(`/articles/publish-article/${articleId}`);
-    return data;
-  },
-
-  deleteArticle: async (articleId) => {
-    const { data } = await customFetch.delete(`/articles/delete-article/${articleId}`);
-    return data;
-  }
-};
+import { useState, useEffect } from 'react';
+import { Editor } from '@tinymce/tinymce-react';
+import customFetch from '@/utils/customFetch';
+import { useParams, useOutletContext } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
+import DeleteModal from '@/components/shared/DeleteModal';
 
 const Articles = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [pendingArticles, setPendingArticles] = useState([]);
-  const [publishedArticles, setPublishedArticles] = useState([]);
-  const [articleId, setArticleId] = useState(null);
-  const [showDeleteArticleModal, setShowDeleteArticleModal] = useState(false);
-  const { id: ParamId } = useParams()
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [editingArticle, setEditingArticle] = useState(null);
+  const [deletingArticleId, setDeletingArticleId] = useState(null);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const user = useOutletContext();
-  const { user: currentUser } = useUser();
-
-  const fetchArticles = async () => {
-    try {
-      // Always fetch published articles
-      const published = await articleService.getPublishedArticles(ParamId);
-      setPublishedArticles(published || []);
-
-      // Only fetch pending articles if user is contributor and viewing their own profile
-      if (user?.role === "contributor" && currentUser?._id === ParamId) {
-        const pending = await articleService.getPendingArticles();
-        setPendingArticles(pending || []);
-      } else {
-        setPendingArticles([]); // Clear pending articles if not authorized
-      }
-    } catch (error) {
-      console.error('Error fetching articles:', error);
-      toast.error("Failed to fetch articles");
-      setPendingArticles([]);
-      setPublishedArticles([]);
-    }
-  };
+  const { id: paramsId } = useParams();
 
   useEffect(() => {
-    fetchArticles();
-  }, [user?.role, currentUser?._id, ParamId]); // Re-fetch when these values change
+    if (paramsId) {
+      fetchUserArticles();
+    }
+  }, [paramsId]);
 
-  const handlePublishArticle = async (articleId) => {
+  const fetchUserArticles = async () => {
     try {
-      await articleService.publishArticle(articleId);
-      toast.success("Article published successfully");
-      fetchArticles();
-    } catch (error) {
-      console.log(error)
+      const response = await customFetch.get(`articles/user/${paramsId}`);
+      setArticles(response.data);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch articles');
+      toast.error('Failed to fetch articles');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDeleteArticle = async (articleId) => {
+  const handleDelete = async () => {
     try {
-      await articleService.deleteArticle(articleId);
-      toast.success("Article deleted successfully");
-      fetchArticles();
-      setShowDeleteArticleModal(false);
-    } catch (error) {
-      toast.error("Failed to delete article");
+      await customFetch.delete(`/articles/${deletingArticleId}`);
+      setArticles(articles.filter(article => article._id !== deletingArticleId));
+      toast.success('Article deleted successfully');
+      setIsDeleteModalOpen(false);
+      setDeletingArticleId(null);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete article');
     }
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  const handleEdit = (article) => {
+    setEditingArticle(article);
+    setTitle(article.title);
+    setContent(article.content);
+    setIsEditModalOpen(true);
   };
-  return (
-    <div className=" mx-auto lg:py-8">
-      {/* Create Article Button Section */}
-      {user?.role === "contributor" && currentUser?._id === ParamId && (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 lg:mb-8">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Your Articles</h2>
-            <p className="text-[var(--grey--800)]">
-              Need help creating an article? Check out our{" "}
-              <Link to={"/user-manual/create-article"} className="text-blue-500 hover:underline">
-                user manual
-              </Link>{" "}
-              for a step-by-step guide.
-            </p>
+
+  const handleCreate = () => {
+    setTitle('');
+    setContent('');
+    setIsCreateModalOpen(true);
+  };
+
+  const handleEditorChange = (content) => {
+    setContent(content);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    if (!title.trim() || !content.trim()) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    
+    setSubmitting(true);
+
+    try {
+      const response = await customFetch.put(`/articles/${editingArticle._id}`, {
+        title,
+        content
+      });
+      
+      setArticles(articles.map(article => 
+        article._id === editingArticle._id ? response.data : article
+      ));
+      
+      setIsEditModalOpen(false);
+      setEditingArticle(null);
+      resetForm();
+      toast.success('Article updated successfully');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update article');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
+    if (!title.trim() || !content.trim()) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    
+    setSubmitting(true);
+
+    try {
+      const response = await customFetch.post('/articles', {
+        title,
+        content
+      });
+      
+      setArticles([response.data, ...articles]);
+      setIsCreateModalOpen(false);
+      resetForm();
+      toast.success('Article created successfully');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to create article');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
+    setTitle('');
+    setContent('');
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  const isOwnProfile = user?._id === paramsId;
+
+  const ArticleModal = ({ isOpen, onClose, title: modalTitle, onSubmit, submitText }) => {
+    if (!isOpen) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100">
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-[var(--grey--900)]">{modalTitle}</h2>
+              <button
+                onClick={onClose}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <FaTimes className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={onSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="title" className="block text-sm font-medium text-[var(--grey--700)]">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="mt-1 block w-full rounded-lg border border-gray-200 bg-[var(--pure)] px-4 py-2 text-[var(--grey--900)] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[var(--grey--700)] mb-2">
+                  Content
+                </label>
+                <Editor
+                  apiKey="jnca4pglh1yq9yamj1klvg3i3f6bz039dte8l0yu6qaxotis"
+                  value={content}
+                  init={{
+                    height: 400,
+                    menubar: true,
+                    plugins: [
+                      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                    ],
+                    toolbar: 'undo redo | blocks | ' +
+                      'bold italic forecolor | alignleft aligncenter ' +
+                      'alignright alignjustify | bullist numlist outdent indent | ' +
+                      'removeformat | help',
+                    skin: 'oxide',
+                    content_css: 'default',
+                  }}
+                  onEditorChange={handleEditorChange}
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4 border-t">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 rounded-lg bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                >
+                  {submitting ? (
+                    <div className="flex items-center justify-center">
+                      <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
+                      Submitting...
+                    </div>
+                  ) : (
+                    submitText
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 rounded-lg border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-[var(--grey--900)]">
+          {isOwnProfile ? 'My Articles' : `${user?.name}'s Articles`}
+        </h1>
+        {isOwnProfile && (
           <button
-            onClick={() => setShowModal(true)}
-            className="btn-primary inline-flex items-center gap-2 px-3 py-1.5 text-sm"
+            onClick={handleCreate}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
-            <FiPlus className="w-4 h-4" />
             Create New Article
           </button>
+        )}
+      </div>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+          {error}
         </div>
       )}
 
-      {/* Pending Articles Section - Only show if user is contributor and viewing own profile */}
-      {user?.role === "contributor" && currentUser?._id === ParamId && pendingArticles && pendingArticles.length > 0 && (
-        <>
-          <div className="flex items-center gap-2 mb-6 pl-3">
-            <FiAlertCircle className="w-5 h-5 text-red-500" />
-            <h4 className="text-lg font-medium text-red-500">
-              {pendingArticles.length} pending articles found
-            </h4>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 mb-8">
-            {pendingArticles.map((article) => (
-              <div key={article._id} className="bg-white p-4 sm:p-6 shadow-md hover:shadow-xl transition-all duration-300 rounded-lg border-l-4 border-red-500">
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <FiFile className="w-5 h-5 text-red-500 shrink-0" />
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-800 break-words">
-                        {article.title || "Untitled"}
-                      </h3>
-                    </div>
-                    <div className="flex items-center gap-2 mt-2 text-gray-600">
-                      <FiClock className="w-4 h-4 shrink-0" />
-                      <span className="text-sm">
-                        Created: {formatDate(article.createdAt)}
-                      </span>
-                    </div>
-                    {article.pdfPath && (
-                      <div className="mt-2 text-sm text-gray-600 flex items-center gap-2">
-                        <FiFile className="w-4 h-4 shrink-0" />
-                        <span className="truncate">
-                          PDF File: {article.pdfPath.split('/').pop()}
-                        </span>
-                      </div>
-                    )}
+      {articles.length === 0 ? (
+        <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-100">
+          <p className="text-[var(--grey--600)] text-lg mb-4">
+            {isOwnProfile 
+              ? "You haven't created any articles yet."
+              : `${user?.name} hasn't created any articles yet.`}
+          </p>
+          {isOwnProfile && (
+            <button
+              onClick={handleCreate}
+              className="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
+            >
+              Create your first article
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {articles.map((article) => (
+            <div
+              key={article._id}
+              className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-200 group"
+            >
+              <div className="p-6">
+                <h2 className="text-xl font-semibold text-[var(--grey--900)] mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200">
+                  {article.title}
+                </h2>
+                
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-[var(--grey--500)]">
+                    {new Date(article.createdAt).toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
                   </div>
-                </div>
-
-                <div className="flex flex-wrap items-center justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
-                  <Link
-                    className="bg-blue-500 text-white inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-[6px] hover:bg-blue-600 hover:scale-105 transition-all duration-300"
-                    to={`/articles/article/${article._id}`}
-                  >
-                    <FiEye className="w-4 h-4" />
-                    Preview
-                  </Link>
-                  <button
-                    onClick={() => handlePublishArticle(article._id)}
-                    className="bg-[var(--secondary)] inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-[6px] hover:scale-105 transition-all duration-300 hover:bg-[var(--secondary-hover)]"
-                  >
-                    <FiCheck className="w-4 h-4" />
-                    Publish
-                  </button>
-                  <button
-                    onClick={() => {
-                      setArticleId(article._id);
-                      setShowDeleteArticleModal(true);
-                    }}
-                    className="btn-red inline-flex items-center gap-1.5 px-3 py-1.5 text-sm"
-                  >
-                    <FiTrash2 className="w-4 h-4" />
-                    Delete
-                  </button>
-                </div>
-
-                {article.pages && article.pages.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <div className="flex flex-wrap gap-2">
-                      {article.pages.map((page) => (
-                        <div
-                          key={page._id}
-                          className="px-2 py-1 bg-gray-50 rounded-full text-sm text-gray-600 flex items-center gap-1.5"
-                        >
-                          <span className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium">
-                            {page.pageNumber}
-                          </span>
-                          <span className="text-xs">Page {page.pageNumber}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* Published Articles Section - Show for everyone */}
-      {publishedArticles && publishedArticles.length > 0 && (
-        <>
-          <div className="flex items-center gap-2 mb-6 pl-3">
-            <FiCheck className="w-5 h-5 text-green-500" />
-            <h4 className="text-lg font-medium text-green-500">
-              {publishedArticles.length} published articles
-            </h4>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6">
-            {publishedArticles.map((article) => (
-              <div key={article._id} className="bg-white p-4 sm:p-6 shadow-md hover:shadow-xl transition-all duration-300 rounded-lg border-l-4 border-green-500">
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <FiFile className="w-5 h-5 text-green-500 shrink-0" />
-                      <Link
-                        to={`/articles/article/${article._id}`}
-                        className="text-lg sm:text-xl font-bold text-gray-800 break-words"
+                  {isOwnProfile && (
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => handleEdit(article)}
+                        className="text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                        title="Edit article"
                       >
-                        {article.title || "Untitled"}
-                      </Link>
-                    </div>
-                    <div className="flex items-center gap-2 mt-2 text-gray-600">
-                      <FiClock className="w-4 h-4 shrink-0" />
-                      <span className="text-sm">
-                        Published: {formatDate(article.publishedAt || article.createdAt)}
-                      </span>
-                    </div>
-                    {article.pdfPath && (
-                      <div className="mt-2 text-sm text-gray-600 flex items-center gap-2">
-                        <FiFile className="w-4 h-4 shrink-0" />
-                        <span className="truncate">
-                          PDF File: {article.pdfPath.split('/').pop()}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {
-                  user?.role === "contributor" && currentUser?._id === ParamId && (
-                    <div className="flex flex-wrap items-center justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
-                      <Link
-                        className="bg-blue-500 text-white inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-[6px] hover:bg-blue-600 hover:scale-105 transition-all duration-300"
-                        to={`/articles/article/${article._id}`}
-                      >
-                        <FiEye className="w-4 h-4" />
-                        Preview
-                      </Link>
+                        <FaEdit className="w-4 h-4" />
+                      </button>
                       <button
                         onClick={() => {
-                          setArticleId(article._id);
-                          setShowDeleteArticleModal(true);
+                          setDeletingArticleId(article._id);
+                          setIsDeleteModalOpen(true);
                         }}
-                        className="btn-red inline-flex items-center gap-1.5 px-3 py-1.5 text-sm"
+                        className="text-red-600 hover:text-red-800 transition-colors duration-200"
+                        title="Delete article"
                       >
-                        <FiTrash2 className="w-4 h-4" />
-                        Delete
+                        <FaTrash className="w-4 h-4" />
                       </button>
                     </div>
-                  )
-                }
-
-                {article.pages && article.pages.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <div className="flex flex-wrap gap-2">
-                      {article.pages.map((page) => (
-                        <div
-                          key={page._id}
-                          className="px-2 py-1 bg-gray-50 rounded-full text-sm text-gray-600 flex items-center gap-1.5"
-                        >
-                          <span className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium">
-                            {page.pageNumber}
-                          </span>
-                          <span className="text-xs">Page {page.pageNumber}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            ))}
-          </div>
-        </>
+            </div>
+          ))}
+        </div>
       )}
 
-      {/* No Articles Message */}
-      {(!pendingArticles || pendingArticles.length === 0) &&
-        (!publishedArticles || publishedArticles.length === 0) && (
-          <div className="text-center py-8">
-            <h3 className="text-lg text-gray-600">No articles found</h3>
-          </div>
-        )}
+      {/* Create Article Modal */}
+      <ArticleModal
+        isOpen={isCreateModalOpen}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          resetForm();
+        }}
+        title="Create New Article"
+        onSubmit={handleCreateSubmit}
+        submitText="Create Article"
+      />
 
-      {/* Modals */}
-      {showModal && (
-        <CreateArticleModel
-          setShowModal={setShowModal}
-          onArticleCreated={fetchArticles}
-        />
-      )}
+      {/* Edit Article Modal */}
+      <ArticleModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          resetForm();
+        }}
+        title="Edit Article"
+        onSubmit={handleUpdate}
+        submitText="Update Article"
+      />
 
+      {/* Delete Confirmation Modal */}
       <DeleteModal
-        isOpen={showDeleteArticleModal}
-        setIsOpen={setShowDeleteArticleModal}
-        onDelete={() => handleDeleteArticle(articleId)}
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeletingArticleId(null);
+        }}
+        onDelete={handleDelete}
+        title="Delete Article"
+        message="Are you sure you want to delete this article? This action cannot be undone."
+        itemType="article"
       />
     </div>
   );
