@@ -90,8 +90,16 @@ const Article = () => {
           <h1>{article.title}</h1>
           <div className="article-meta">
             <div className="meta-item">
-              <FaUser className="meta-icon" />
-              <span>{article.createdBy?.name || 'Anonymous'}</span>
+              {article.authorAvatar ? (
+                <img 
+                  src={article.authorAvatar} 
+                  alt={article.authorName} 
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <FaUser className="meta-icon" />
+              )}
+              <span>{article.authorName || 'Anonymous'}</span>
             </div>
             <div className="meta-separator" />
             <div className="meta-item">
