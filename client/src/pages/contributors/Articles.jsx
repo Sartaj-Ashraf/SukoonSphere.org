@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import customFetch from '@/utils/customFetch';
-import { useParams, useOutletContext } from 'react-router-dom';
+import { useParams, useOutletContext, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FaTimes, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaTimes, FaEdit, FaTrash, FaSpinner, FaSearch } from 'react-icons/fa';
+import { IoCloseOutline } from "react-icons/io5";
 import DeleteModal from '@/components/shared/DeleteModal';
 
 const Articles = () => {
@@ -18,19 +19,60 @@ const Articles = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [pagination, setPagination] = useState(null);
   const user = useOutletContext();
   const { id: paramsId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentFilter = searchParams.get('filter') || 'newest';
+  const searchQuery = searchParams.get('search') || '';
+  const currentPage = parseInt(searchParams.get('page') || '1');
+  const [searchInput, setSearchInput] = useState(searchQuery);
+
+  // Filter options
+  const filterOptions = [
+    { value: 'newest', label: 'Newest First' },
+    { value: 'oldest', label: 'Oldest First' },
+    { value: 'title', label: 'By Title' },
+  ];
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchInput !== searchQuery) {
+        setSearchParams(prev => {
+          const newParams = new URLSearchParams(prev);
+          if (searchInput) {
+            newParams.set('search', searchInput);
+          } else {
+            newParams.delete('search');
+          }
+          newParams.set('page', '1'); // Reset to first page on search
+          return newParams;
+        });
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput, searchQuery, setSearchParams]);
 
   useEffect(() => {
     if (paramsId) {
       fetchUserArticles();
     }
-  }, [paramsId]);
+  }, [paramsId, currentPage, currentFilter, searchQuery]);
 
   const fetchUserArticles = async () => {
     try {
-      const response = await customFetch.get(`articles/user/${paramsId}`);
-      setArticles(response.data);
+      setLoading(true);
+      const params = new URLSearchParams({
+        page: currentPage,
+        limit: 6,
+        sortBy: currentFilter,
+        ...(searchQuery && { search: searchQuery })
+      });
+      const response = await customFetch.get(`articles/user/${paramsId}?${params}`);
+      setArticles(response.data.articles);
+      setPagination(response.data.pagination);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch articles');
       toast.error('Failed to fetch articles');
@@ -39,10 +81,30 @@ const Articles = () => {
     }
   };
 
+  const handleFilterChange = (value) => {
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set('filter', value);
+      newParams.set('page', '1'); // Reset to first page on filter change
+      return newParams;
+    });
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && (!pagination || newPage <= pagination.totalPages)) {
+      setSearchParams(prev => {
+        const newParams = new URLSearchParams(prev);
+        newParams.set('page', newPage.toString());
+        return newParams;
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const handleDelete = async () => {
     try {
       await customFetch.delete(`/articles/${deletingArticleId}`);
-      setArticles(articles.filter(article => article._id !== deletingArticleId));
+      await fetchUserArticles(); // Refresh the list after delete
       toast.success('Article deleted successfully');
       setIsDeleteModalOpen(false);
       setDeletingArticleId(null);
@@ -83,10 +145,7 @@ const Articles = () => {
         content
       });
       
-      setArticles(articles.map(article => 
-        article._id === editingArticle._id ? response.data : article
-      ));
-      
+      await fetchUserArticles(); // Refresh the list after update
       setIsEditModalOpen(false);
       setEditingArticle(null);
       resetForm();
@@ -108,12 +167,12 @@ const Articles = () => {
     setSubmitting(true);
 
     try {
-      const response = await customFetch.post('/articles', {
+      await customFetch.post('/articles', {
         title,
         content
       });
       
-      setArticles([response.data, ...articles]);
+      await fetchUserArticles(); // Refresh the list after create
       setIsCreateModalOpen(false);
       resetForm();
       toast.success('Article created successfully');
@@ -132,7 +191,7 @@ const Articles = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <FaSpinner className="w-8 h-8 text-blue-500 animate-spin" />
       </div>
     );
   }
@@ -199,25 +258,18 @@ const Articles = () => {
 
               <div className="flex gap-4 pt-4 border-t">
                 <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex-1 rounded-lg bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                >
-                  {submitting ? (
-                    <div className="flex items-center justify-center">
-                      <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2"></div>
-                      Submitting...
-                    </div>
-                  ) : (
-                    submitText
-                  )}
-                </button>
-                <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 rounded-lg border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? 'Saving...' : submitText}
                 </button>
               </div>
             </form>
@@ -228,69 +280,95 @@ const Articles = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-[var(--grey--900)]">
-          {isOwnProfile ? 'My Articles' : `${user?.name}'s Articles`}
-        </h1>
-        {isOwnProfile && (
-          <button
-            onClick={handleCreate}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Create New Article
-          </button>
-        )}
-      </div>
-
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
-          {error}
-        </div>
-      )}
-
-      {articles.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-100">
-          <p className="text-[var(--grey--600)] text-lg mb-4">
-            {isOwnProfile 
-              ? "You haven't created any articles yet."
-              : `${user?.name} hasn't created any articles yet.`}
-          </p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header with Search and Filters */}
+      <div className="flex flex-col gap-4 mb-6 bg-white rounded-lg shadow-md p-4 md:p-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-800">My Articles</h2>
           {isOwnProfile && (
             <button
               onClick={handleCreate}
-              className="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Create your first article
+              Create New Article
             </button>
           )}
         </div>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article) => (
-            <div
-              key={article._id}
-              className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-200 group"
+
+        {/* Search bar */}
+        <div className="relative">
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Search articles..."
+            className="w-full bg-[var(--white-color)] py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          {searchInput && (
+            <button
+              onClick={() => {
+                setSearchInput('');
+                setSearchParams(prev => {
+                  const newParams = new URLSearchParams(prev);
+                  newParams.delete('search');
+                  return newParams;
+                });
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
             >
-              <div className="p-6">
-                <h2 className="text-xl font-semibold text-[var(--grey--900)] mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200">
-                  {article.title}
-                </h2>
-                
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-[var(--grey--500)]">
-                    {new Date(article.createdAt).toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+              <IoCloseOutline className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+
+        {/* Filter buttons */}
+        <div className="flex flex-wrap gap-2">
+          {filterOptions.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => handleFilterChange(option.value)}
+              className={`px-3 py-1.5 text-sm rounded-full transition-colors flex items-center gap-1 ${
+                currentFilter === option.value
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              <span>{option.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Articles Grid */}
+      {error ? (
+        <div className="text-center p-4 bg-red-100 rounded-lg text-red-700">
+          {error}
+        </div>
+      ) : articles.length === 0 ? (
+        <div className="text-center p-8 bg-white rounded-lg shadow-md">
+          <p className="text-gray-600 text-lg">No articles found</p>
+          <p className="text-gray-500">Try adjusting your search or filters</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {articles.map((article) => (
+              <div
+                key={article._id}
+                className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-200"
+              >
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-[var(--grey--900)] mb-2">
+                    {article.title}
+                  </h3>
+                  <div className="text-sm text-gray-500 mb-4">
+                    {new Date(article.createdAt).toLocaleDateString()}
                   </div>
                   {isOwnProfile && (
-                    <div className="flex gap-4">
+                    <div className="flex gap-2 mt-4">
                       <button
                         onClick={() => handleEdit(article)}
-                        className="text-blue-600 hover:text-blue-800 transition-colors duration-200"
-                        title="Edit article"
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       >
                         <FaEdit className="w-4 h-4" />
                       </button>
@@ -299,8 +377,7 @@ const Articles = () => {
                           setDeletingArticleId(article._id);
                           setIsDeleteModalOpen(true);
                         }}
-                        className="text-red-600 hover:text-red-800 transition-colors duration-200"
-                        title="Delete article"
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
                         <FaTrash className="w-4 h-4" />
                       </button>
@@ -308,12 +385,55 @@ const Articles = () => {
                   )}
                 </div>
               </div>
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {pagination && pagination.totalPages > 1 && (
+            <div className="flex justify-center gap-2 mt-8">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 rounded-lg ${
+                  currentPage === 1
+                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
+              >
+                Previous
+              </button>
+              <span className="px-4 py-2 text-[var(--grey--600)]">
+                Page {currentPage} of {pagination.totalPages}
+              </span>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === pagination.totalPages}
+                className={`px-4 py-2 rounded-lg ${
+                  currentPage === pagination.totalPages
+                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
+              >
+                Next
+              </button>
             </div>
-          ))}
+          )}
         </div>
       )}
 
-      {/* Create Article Modal */}
+      {/* Modals */}
+      <ArticleModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingArticle(null);
+          resetForm();
+        }}
+        title="Edit Article"
+        onSubmit={handleUpdate}
+        submitText="Update Article"
+      />
+
       <ArticleModal
         isOpen={isCreateModalOpen}
         onClose={() => {
@@ -325,19 +445,6 @@ const Articles = () => {
         submitText="Create Article"
       />
 
-      {/* Edit Article Modal */}
-      <ArticleModal
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          resetForm();
-        }}
-        title="Edit Article"
-        onSubmit={handleUpdate}
-        submitText="Update Article"
-      />
-
-      {/* Delete Confirmation Modal */}
       <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => {
@@ -347,7 +454,6 @@ const Articles = () => {
         onDelete={handleDelete}
         title="Delete Article"
         message="Are you sure you want to delete this article? This action cannot be undone."
-        itemType="article"
       />
     </div>
   );

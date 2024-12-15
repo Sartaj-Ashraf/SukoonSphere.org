@@ -1,35 +1,65 @@
-import { useState } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
-import axios from 'axios';
+import { useState, useMemo, useCallback } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import '@/styles/editor.css';
+import customFetch from '@/utils/customFetch';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const CreateArticle = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleEditorChange = (content) => {
-    setContent(content);
-  };
+  // Memoize the modules configuration
+  const modules = useMemo(() => ({
+    toolbar: [
+      [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
+      [{size: []}],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{'list': 'ordered'}, {'list': 'bullet'}, 
+       {'indent': '-1'}, {'indent': '+1'}],
+      ['link', 'image'],
+      ['clean']
+    ],
+    clipboard: {
+      matchVisual: false,
+    }
+  }), []);
+
+  // Memoize the formats configuration
+  const formats = useMemo(() => [
+    'header', 'font', 'size',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet', 'indent',
+    'link', 'image'
+  ], []);
+
+  // Memoize the onChange handler
+  const handleEditorChange = useCallback((newContent) => {
+    setContent(newContent);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!title.trim() || !content.trim()) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    
     setLoading(true);
-    setError('');
 
     try {
-      const response = await axios.post('/api/articles', {
+      await customFetch.post('/articles', {
         title,
         content
       });
       
-      if (response.data) {
-        navigate('/articles'); // Redirect to articles list
-      }
+      toast.success('Article created successfully');
+      navigate('/articles');
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong');
+      toast.error(err.response?.data?.message || 'Failed to create article');
     } finally {
       setLoading(false);
     }
@@ -39,12 +69,6 @@ const CreateArticle = () => {
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Create New Article</h1>
       
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="title" className="block text-sm font-medium text-gray-700">
@@ -60,30 +84,24 @@ const CreateArticle = () => {
           />
         </div>
 
-        <div>
+        <div className="editor-container">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Content
           </label>
-          <Editor
-            apiKey="your-tinymce-api-key"
-            init={{
-              height: 500,
-              menubar: true,
-              plugins: [
-                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-              ],
-              toolbar: 'undo redo | blocks | ' +
-                'bold italic forecolor | alignleft aligncenter ' +
-                'alignright alignjustify | bullist numlist outdent indent | ' +
-                'removeformat | help',
-            }}
-            onEditorChange={handleEditorChange}
-          />
+          <div className="h-96">
+            <ReactQuill
+              theme="snow"
+              value={content}
+              onChange={handleEditorChange}
+              modules={modules}
+              formats={formats}
+              className="h-full"
+              preserveWhitespace
+            />
+          </div>
         </div>
 
-        <div>
+        <div className="mt-16">
           <button
             type="submit"
             disabled={loading}
