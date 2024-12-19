@@ -175,7 +175,7 @@ const Articles = () => {
                 <label className="block text-sm font-medium text-[var(--grey--700)] mb-2">
                   Content
                 </label>
-                <Editor
+                <Editor 
                   apiKey="jnca4pglh1yq9yamj1klvg3i3f6bz039dte8l0yu6qaxotis"
                   value={content}
                   init={{

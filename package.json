@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.62.2",
+    "@tinymce/tinymce-react": "^5.1.1",
     "aos": "^2.3.4",
     "axios": "^1.7.4",
     "bcryptjs": "^2.4.3",
