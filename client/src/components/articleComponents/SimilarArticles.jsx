@@ -1,4 +1,4 @@
-import { articles } from "@/utils/Articles"
+
 import { SidebarArticles } from "..";
 
 const SimilarArticles = ({ title }) => {

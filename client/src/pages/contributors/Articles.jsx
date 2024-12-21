@@ -1,5 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
+import ReactQuill from 'react-quill';
+import JoditEditor from 'jodit-react';
+import 'react-quill/dist/quill.snow.css';
 import customFetch from '@/utils/customFetch';
 import { useParams, useOutletContext, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -8,6 +11,15 @@ import { IoCloseOutline } from "react-icons/io5";
 import DeleteModal from '@/components/shared/DeleteModal';
 
 const Articles = () => {
+  const editor = useRef(null);
+  // const config = useMemo(
+	// 	{
+	// 		readonly: false, // all options from https://xdsoft.net/jodit/docs/,
+	// 		placeholder: placeholder || 'Start typings...'
+	// 	},
+	// 	[placeholder]
+	// );
+
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -21,6 +33,9 @@ const Articles = () => {
   const [submitting, setSubmitting] = useState(false);
   const [pagination, setPagination] = useState(null);
   const user = useOutletContext();
+
+
+
   const { id: paramsId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const currentFilter = searchParams.get('filter') || 'newest';
@@ -28,14 +43,12 @@ const Articles = () => {
   const currentPage = parseInt(searchParams.get('page') || '1');
   const [searchInput, setSearchInput] = useState(searchQuery);
 
-  // Filter options
   const filterOptions = [
     { value: 'newest', label: 'Newest First' },
     { value: 'oldest', label: 'Oldest First' },
     { value: 'title', label: 'By Title' },
   ];
 
-  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchInput !== searchQuery) {
@@ -51,7 +64,6 @@ const Articles = () => {
         });
       }
     }, 500);
-
     return () => clearTimeout(timer);
   }, [searchInput, searchQuery, setSearchParams]);
 
@@ -136,15 +148,12 @@ const Articles = () => {
       toast.error('Please fill in all fields');
       return;
     }
-    
     setSubmitting(true);
-
     try {
       const response = await customFetch.put(`/articles/${editingArticle._id}`, {
         title,
         content
       });
-      
       await fetchUserArticles(); // Refresh the list after update
       setIsEditModalOpen(false);
       setEditingArticle(null);
@@ -157,21 +166,19 @@ const Articles = () => {
     }
   };
 
+
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) {
       toast.error('Please fill in all fields');
       return;
     }
-    
     setSubmitting(true);
-
     try {
       await customFetch.post('/articles', {
         title,
         content
       });
-      
       await fetchUserArticles(); // Refresh the list after create
       setIsCreateModalOpen(false);
       resetForm();
@@ -200,7 +207,6 @@ const Articles = () => {
 
   const ArticleModal = ({ isOpen, onClose, title: modalTitle, onSubmit, submitText }) => {
     if (!isOpen) return null;
-
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100">
@@ -214,48 +220,38 @@ const Articles = () => {
                 <FaTimes className="w-5 h-5" />
               </button>
             </div>
-
             <form onSubmit={onSubmit} className="space-y-6">
               <div>
                 <label htmlFor="title" className="block text-sm font-medium text-[var(--grey--700)]">
                   Title
                 </label>
-                <input
+                <textarea
                   type="text"
                   id="title"
+                  name="title"
+                  rows={1}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="mt-1 block w-full rounded-lg border border-gray-200 bg-[var(--pure)] px-4 py-2 text-[var(--grey--900)] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                   required
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-[var(--grey--700)] mb-2">
                   Content
                 </label>
-                <Editor
-                  apiKey="jnca4pglh1yq9yamj1klvg3i3f6bz039dte8l0yu6qaxotis"
+                <JoditEditor
+                  ref={editor}
                   value={content}
-                  init={{
-                    height: 400,
-                    menubar: true,
-                    plugins: [
-                      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-                    ],
-                    toolbar: 'undo redo | blocks | ' +
-                      'bold italic forecolor | alignleft aligncenter ' +
-                      'alignright alignjustify | bullist numlist outdent indent | ' +
-                      'removeformat | help',
-                    skin: 'oxide',
-                    content_css: 'default',
+                  config={{
+                    readonly: false,
+                    placeholder: 'Start typing...'  
                   }}
-                  onEditorChange={handleEditorChange}
+                  tabIndex={1} // tabIndex of textarea
+                  onBlur={newContent => setContent(newContent)} 
+                  // onChange={newContent => { }}
                 />
               </div>
-
               <div className="flex gap-4 pt-4 border-t">
                 <button
                   type="button"
@@ -281,29 +277,26 @@ const Articles = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header with Search and Filters */}
       <div className="flex flex-col gap-4 mb-6 bg-white rounded-lg shadow-md p-4 md:p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <h2 className="text-xl md:text-2xl font-bold text-gray-800">My Articles</h2>
           {isOwnProfile && (
             <button
               onClick={handleCreate}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="btn-2"
             >
               Create New Article
             </button>
           )}
         </div>
-
-        {/* Search bar */}
         <div className="relative">
-          <input
+          {/* <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search articles..."
             className="w-full bg-[var(--white-color)] py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
+          /> */}
           {searchInput && (
             <button
               onClick={() => {
@@ -320,26 +313,21 @@ const Articles = () => {
             </button>
           )}
         </div>
-
-        {/* Filter buttons */}
         <div className="flex flex-wrap gap-2">
           {filterOptions.map((option) => (
             <button
               key={option.value}
               onClick={() => handleFilterChange(option.value)}
-              className={`px-3 py-1.5 text-sm rounded-full transition-colors flex items-center gap-1 ${
-                currentFilter === option.value
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              className={`px-3 py-1.5 text-sm rounded-full transition-colors flex items-center gap-1 ${currentFilter === option.value
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
             >
               <span>{option.label}</span>
             </button>
           ))}
         </div>
       </div>
-
-      {/* Articles Grid */}
       {error ? (
         <div className="text-center p-4 bg-red-100 rounded-lg text-red-700">
           {error}
@@ -387,18 +375,15 @@ const Articles = () => {
               </div>
             ))}
           </div>
-
-          {/* Pagination */}
           {pagination && pagination.totalPages > 1 && (
             <div className="flex justify-center gap-2 mt-8">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`px-4 py-2 rounded-lg ${
-                  currentPage === 1
-                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
-                }`}
+                className={`px-4 py-2 rounded-lg ${currentPage === 1
+                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                  : 'bg-blue-500 text-white hover:bg-blue-600'
+                  }`}
               >
                 Previous
               </button>
@@ -408,11 +393,10 @@ const Articles = () => {
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === pagination.totalPages}
-                className={`px-4 py-2 rounded-lg ${
-                  currentPage === pagination.totalPages
-                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
-                }`}
+                className={`px-4 py-2 rounded-lg ${currentPage === pagination.totalPages
+                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                  : 'bg-blue-500 text-white hover:bg-blue-600'
+                  }`}
               >
                 Next
               </button>
@@ -420,8 +404,6 @@ const Articles = () => {
           )}
         </div>
       )}
-
-      {/* Modals */}
       <ArticleModal
         isOpen={isEditModalOpen}
         onClose={() => {
@@ -433,7 +415,6 @@ const Articles = () => {
         onSubmit={handleUpdate}
         submitText="Update Article"
       />
-
       <ArticleModal
         isOpen={isCreateModalOpen}
         onClose={() => {
@@ -444,7 +425,6 @@ const Articles = () => {
         onSubmit={handleCreateSubmit}
         submitText="Create Article"
       />
-
       <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => {
