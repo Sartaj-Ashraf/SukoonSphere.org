@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import ReactQuill from 'react-quill';
 import JoditEditor from 'jodit-react';
@@ -28,8 +28,6 @@ const Articles = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
   const [deletingArticleId, setDeletingArticleId] = useState(null);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [pagination, setPagination] = useState(null);
   const user = useOutletContext();
@@ -127,23 +125,14 @@ const Articles = () => {
 
   const handleEdit = (article) => {
     setEditingArticle(article);
-    setTitle(article.title);
-    setContent(article.content);
     setIsEditModalOpen(true);
   };
 
   const handleCreate = () => {
-    setTitle('');
-    setContent('');
     setIsCreateModalOpen(true);
   };
 
-  const handleEditorChange = (content) => {
-    setContent(content);
-  };
-
-  const handleUpdate = async (e) => {
-    e.preventDefault();
+  const handleUpdate = async ({ title, content }) => {
     if (!title.trim() || !content.trim()) {
       toast.error('Please fill in all fields');
       return;
@@ -157,7 +146,6 @@ const Articles = () => {
       await fetchUserArticles(); // Refresh the list after update
       setIsEditModalOpen(false);
       setEditingArticle(null);
-      resetForm();
       toast.success('Article updated successfully');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to update article');
@@ -166,9 +154,7 @@ const Articles = () => {
     }
   };
 
-
-  const handleCreateSubmit = async (e) => {
-    e.preventDefault();
+  const handleCreateSubmit = async ({ title, content }) => {
     if (!title.trim() || !content.trim()) {
       toast.error('Please fill in all fields');
       return;
@@ -181,18 +167,12 @@ const Articles = () => {
       });
       await fetchUserArticles(); // Refresh the list after create
       setIsCreateModalOpen(false);
-      resetForm();
       toast.success('Article created successfully');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to create article');
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const resetForm = () => {
-    setTitle('');
-    setContent('');
   };
 
   if (loading) {
@@ -205,14 +185,26 @@ const Articles = () => {
 
   const isOwnProfile = user?._id === paramsId;
 
-  const ArticleModal = ({ isOpen, onClose, title: modalTitle, onSubmit, submitText }) => {
+  const ArticleModal = memo(({ isOpen, onClose, title: headerTitle, onSubmit, submitText, initialTitle = '', initialContent = '' }) => {
+    const [modalTitle, setModalTitle] = useState(initialTitle);
+    const [modalContent, setModalContent] = useState(initialContent);
+    const editorRef = useRef(null);
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      onSubmit({
+        title: modalTitle,
+        content: modalContent
+      });
+    };
+
     if (!isOpen) return null;
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-[var(--grey--900)]">{modalTitle}</h2>
+              <h2 className="text-2xl font-bold text-[var(--grey--900)]">{headerTitle}</h2>
               <button
                 onClick={onClose}
                 className="text-gray-500 hover:text-gray-700 transition-colors"
@@ -220,18 +212,17 @@ const Articles = () => {
                 <FaTimes className="w-5 h-5" />
               </button>
             </div>
-            <form onSubmit={onSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="title" className="block text-sm font-medium text-[var(--grey--700)]">
                   Title
                 </label>
-                <textarea
+                <input
                   type="text"
                   id="title"
                   name="title"
-                  rows={1}
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  value={modalTitle}
+                  onChange={(e) => setModalTitle(e.target.value)}
                   className="mt-1 block w-full rounded-lg border border-gray-200 bg-[var(--pure)] px-4 py-2 text-[var(--grey--900)] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                   required
                 />
@@ -241,15 +232,14 @@ const Articles = () => {
                   Content
                 </label>
                 <JoditEditor
-                  ref={editor}
-                  value={content}
+                  ref={editorRef}
+                  value={modalContent}
                   config={{
                     readonly: false,
                     placeholder: 'Start typing...'  
                   }}
-                  tabIndex={1} // tabIndex of textarea
-                  onBlur={newContent => setContent(newContent)} 
-                  // onChange={newContent => { }}
+                  tabIndex={1}
+                  onBlur={newContent => setModalContent(newContent)}
                 />
               </div>
               <div className="flex gap-4 pt-4 border-t">
@@ -273,7 +263,7 @@ const Articles = () => {
         </div>
       </div>
     );
-  };
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -409,21 +399,23 @@ const Articles = () => {
         onClose={() => {
           setIsEditModalOpen(false);
           setEditingArticle(null);
-          resetForm();
         }}
         title="Edit Article"
         onSubmit={handleUpdate}
         submitText="Update Article"
+        initialTitle={editingArticle?.title || ''}
+        initialContent={editingArticle?.content || ''}
       />
       <ArticleModal
         isOpen={isCreateModalOpen}
         onClose={() => {
           setIsCreateModalOpen(false);
-          resetForm();
         }}
         title="Create New Article"
         onSubmit={handleCreateSubmit}
         submitText="Create Article"
+        initialTitle=""
+        initialContent=""
       />
       <DeleteModal
         isOpen={isDeleteModalOpen}
