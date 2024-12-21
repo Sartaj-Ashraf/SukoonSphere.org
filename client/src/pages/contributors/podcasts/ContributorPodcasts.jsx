@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useOutletContext, useParams } from 'react-router-dom'
 import { useUser } from "@/context/UserContext";
-import { FaMicrophone, FaList, FaChevronDown } from 'react-icons/fa';
+import { FaMicrophone, FaList, FaChevronDown, FaPlus } from 'react-icons/fa';
 import CreateNewPodcast from '../models/CreateNewPodcast';
 import CreateNewPodcastPlaylist from '../models/CreateNewPodcastPlaylist';
 import customFetch from '@/utils/customFetch';
@@ -63,30 +63,32 @@ const ContributorPodcasts = () => {
           <div className="relative transition-all duration-300">
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="btn-primary inline-flex items-center gap-2 px-3 py-1.5 text-sm"
+              className="btn-primary flex items-center gap-2 px-4 py-2 text-sm rounded-lg shadow-md"
             >
               Create New Podcast
-              <FaChevronDown className="w-4 h-4" />
+              <FaPlus className="w-4 h-4" />
             </button>
             {showDropdown && (
-              <div className="absolute top-10 md:right-0 z-10 bg-white shadow-xl p-2 flex flex-col gap-1 rounded-lg w-52 ">
+              <div className="absolute top-10 md:right-0 z-10 bg-white shadow-xl p-2 rounded-lg w-52 ">
                 <button
                   onClick={() => {
                     setShowDropdown(false);
                     setShowPodcastModal(true);
                   }}
-                  className=" text-left px-2 py-1 rounded-lg hover:bg-gray-100 flex items-center w-fit border border-gray-200 "
+                  className="block w-full text-[.9rem] text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                 >
-                  <span>Create New Podcast</span>  <FaMicrophone className="w-4 h-4 ml-2" />
+                  <span>Create Podcast</span>
+                  <FaMicrophone className="w-4 h-4 ml-2 inline-block" />
                 </button>
                 <button
                   onClick={() => {
                     setShowDropdown(false);
                     setShowPlaylistModal(true);
                   }}
-                  className=" w-full text-left px-2 rounded-lg py-1 hover:bg-gray-100 flex items-center border border-gray-200"
+                  className="block w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                 >
-                <span>Create New Playlist</span> <FaList className="w-4 h-4 ml-2" />
+                  <span>Create Playlist</span>
+                  <FaList className="w-4 h-4 ml-2 inline-block" />
                 </button>
               </div>
             )}

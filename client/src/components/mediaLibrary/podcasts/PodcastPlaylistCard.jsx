@@ -33,7 +33,7 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
       toast.success("Episode deleted successfully");
       setShowDeleteModal(false);
       setSelectedEpisode(null);
-      if (fetchData) await fetchData();
+      window.location.reload();
     } catch (error) {
       console.error("Error deleting episode:", error);
       toast.error(error?.response?.data?.msg || "Error deleting episode");
@@ -53,7 +53,7 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 w-full mb-6 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 w-full mb-6 ">
       <div className="flex flex-col">
         <div className="flex flex-col md:flex-row p-4  md:p-6 space-y-2 md:space-y-0 md:space-x-8">
           {/* Left side - Image */}
@@ -93,7 +93,7 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
                 </div>
 
                 {isContributor && (
-                  <div className="relative">
+                  <div className="relative group">
                     <button
                       onClick={() => setShowMenu(!showMenu)}
                       className="p-2.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
@@ -102,19 +102,19 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
                     </button>
 
                     {showMenu && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-lg shadow-lg z-10 py-1 animate-fade-in">
+                      <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-lg shadow-lg z-10 py-2 animate-fade-in">
                         <button
                           onClick={() => setShowAddEpisodeModal(true)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 w-full transition-colors"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 w-full transition-colors"
                         >
-                          <FaPlus className="w-5 h-5" />
+                          <FaPlus className="w-5 h-5 text-blue-600" />
                           Add Episode
                         </button>
                         <button
                           onClick={() => setShowEditPlaylistModal(true)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 w-full transition-colors"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 w-full transition-colors"
                         >
-                          <FaEllipsisV className="w-5 h-5" />
+                          <FaPencilAlt className="w-5 h-5 text-blue-600" />
                           Edit Playlist
                         </button>
                         <button
@@ -122,9 +122,9 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
                             setShowDeleteModal(true);
                             setSelectedEpisode(null);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 w-full transition-colors"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 w-full transition-colors"
                         >
-                          <FaTrash className="w-5 h-5" />
+                          <FaTrash className="w-5 h-5 text-red-600" />
                           Delete Playlist
                         </button>
                       </div>
@@ -156,7 +156,7 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
                   </p>
                 </div>
                 {isContributor && (
-                  <div className="flex-shrink-0 ">
+                  <div className="flex-shrink-0 z-50">
                     <PostActions
                       handleEdit={() => handleEdit(episode)}
                       handleDelete={() => handleDelete(episode)}

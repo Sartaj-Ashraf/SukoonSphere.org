@@ -58,8 +58,8 @@ const CreateVideoModel = ({ setShowModal }) => {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-12 bg-black bg-opacity-50 backdrop-blur-sm">
-            <div className="p-4 bg-white w-full max-w-lg rounded-xl shadow-2xl transform transition-all relative z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-12 bg-black bg-opacity-50 backdrop-blur-sm overflow-hidden">
+            <div className="p-4 bg-white w-full max-w-lg rounded-xl shadow-2xl transform transition-all relative z-50 overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-[var(--primary)] flex items-center gap-2">
                         <FaVideo className="text-primary" />
@@ -73,7 +73,7 @@ const CreateVideoModel = ({ setShowModal }) => {
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)]">
                     <div>
                         <input
                             type="text"
