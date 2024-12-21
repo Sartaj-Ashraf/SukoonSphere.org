@@ -48,7 +48,7 @@ const EditPodcastModel = ({ setShowModal, podcast, fetchData, type }) => {
             if (response.status === 200) {
                 toast.success('Podcast updated successfully!');
                 setShowModal(false);
-                if (fetchData) await fetchData();
+                window.location.reload();   
             }
         } catch (error) {
             console.log('Error updating podcast:', error);

@@ -43,13 +43,18 @@ const EditPodcastPlaylistModel = ({ setShowModal, playlist, fetchData }) => {
 
             const response = await customFetch.patch(`/podcasts/playlist/${playlist._id}`, formData);
             toast.success('Playlist updated successfully');
-            if (fetchData) await fetchData();
+    
+                window.location.reload();
+         
             setShowModal(false);
         } catch (error) {
             console.error('Error updating playlist:', error);
             toast.error(error?.response?.data?.msg || 'Something went wrong');
         } finally {
             setIsSubmitting(false);
+            if (fetchData){
+                fetchData();
+            }
         }
     };
 
