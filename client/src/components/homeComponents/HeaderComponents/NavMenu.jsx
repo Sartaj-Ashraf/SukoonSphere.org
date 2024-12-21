@@ -9,7 +9,7 @@ import links from "@/utils/SharedComp/PageLinks";
 import DesktopNav from "./DesktopNav";
 import UserMenu from "./UserMenu";
 import { MdOutlineNotificationsActive, MdOutlinePassword } from "react-icons/md";
-import { BiLogIn } from "react-icons/bi";
+import { BiLogIn, BiUserPlus } from "react-icons/bi";
 import { FiUserPlus } from "react-icons/fi";
 import { BiMessageSquareAdd } from "react-icons/bi";
 import { CiMedal } from "react-icons/ci";
@@ -148,7 +148,10 @@ function NavMenu() {
               </Link>
             ) : (
               <Link to="/auth/sign-in">
-                <BiUser className="text-2xl text-gray-600" />
+                <button className="bg-[var(--secondary)] px-2 py-1 text-sm rounded-[6px] hover:scale-105 transition-all duration-300 hover:bg-[var(--secondary-hover)] flex items-center">
+                  <BiUserPlus className="text-xl text-gray-600 inline-block" />
+                  <span className="ml-2">Sign In</span>
+                </button>
               </Link>
             )}
           </div>

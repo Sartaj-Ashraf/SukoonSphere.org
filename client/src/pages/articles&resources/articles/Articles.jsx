@@ -117,6 +117,7 @@ const Articles = () => {
   }
 
   const allArticles = data?.pages.flatMap(page => page.articles) || [];
+  console.log("All articles:", allArticles);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -137,13 +138,13 @@ const Articles = () => {
         
         {/* Search bar */}
         <div className="relative">
-          <input
+          {/* <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search articles..."
             className="w-full bg-[var(--white-color)] py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
+          /> */}
           {searchInput && (
             <button
               onClick={() => {
@@ -217,7 +218,11 @@ const Articles = () => {
                   {/* Article Metadata */}
                   <div className="flex items-center justify-between text-sm text-[var(--grey--500)] pt-4 border-t border-gray-100">
                     <div className="flex items-center">
-                      <FaUser className="w-4 h-4 mr-2" />
+                      {article.authorAvatar ? (
+                        <img src={`${article.authorAvatar}`} alt="" className="w-6 h-6 mr-2 object-cover rounded-full" />
+                      ) : (
+                        <FaUser className="w-4 h-4 mr-2" />
+                      )}
                       <span>{article.authorName || 'Anonymous'}</span>
                     </div>
                     <div className="flex items-center">

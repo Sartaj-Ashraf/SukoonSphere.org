@@ -27,9 +27,6 @@ const Videos = () => {
             setLoading(false);
         }
     };
-
-
-
     useEffect(() => {
         getUploadedVideos();
     }, []);
