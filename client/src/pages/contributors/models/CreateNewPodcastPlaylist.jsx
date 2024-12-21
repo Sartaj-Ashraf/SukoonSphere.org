@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { FaList, FaTimes } from "react-icons/fa";
+import { FaList, FaTimes, FaTimesCircle } from "react-icons/fa";
 import customFetch from "@/utils/customFetch";
 
 const CreateNewPodcastPlaylist = ({ setShowModal }) => {
@@ -124,17 +124,18 @@ const CreateNewPodcastPlaylist = ({ setShowModal }) => {
                     </div>
 
                     <div className="flex justify-end space-x-4">
-                        <button
+                    <button
                             type="button"
                             onClick={() => setShowModal(false)}
-                            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                            className="btn-red flex items-center justify-center gap-2"
                         >
+                            <FaTimesCircle />
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="px-6 py-2 bg-[var(--primary)] text-white rounded-lg transition-colors disabled:opacity-50"
+                            className="btn-2"
                         >
                             {isSubmitting ? "Creating..." : "Create Playlist"}
                         </button>

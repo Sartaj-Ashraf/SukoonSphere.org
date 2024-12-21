@@ -84,7 +84,7 @@ const UserPosts = () => {
     return (
         <div className="lg:p-6 bg-white rounded-xl">
             {/* Search Bar */}
-            <div className="mb-4 lg:mb-8">
+            {/* <div className="mb-4 lg:mb-8">
                 <div className="relative max-w-md mx-auto">
                     <input
                         type="text"
@@ -95,7 +95,7 @@ const UserPosts = () => {
                     />
                     <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
                 </div>
-            </div>
+            </div> */}
 
             {/* Posts Count */}
             <div className="flex items-center justify-between mb-4 lg:mb-8">

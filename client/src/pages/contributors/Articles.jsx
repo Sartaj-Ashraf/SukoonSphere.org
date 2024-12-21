@@ -4,11 +4,12 @@ import ReactQuill from 'react-quill';
 import JoditEditor from 'jodit-react';
 import 'react-quill/dist/quill.snow.css';
 import customFetch from '@/utils/customFetch';
-import { useParams, useOutletContext, useSearchParams } from 'react-router-dom';
+import { useParams, useOutletContext, useSearchParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FaTimes, FaEdit, FaTrash, FaSpinner, FaSearch } from 'react-icons/fa';
+import { FaTimes, FaEdit, FaTrash, FaSpinner, FaSearch, FaPlus, FaTimesCircle } from 'react-icons/fa';
 import { IoCloseOutline } from "react-icons/io5";
 import DeleteModal from '@/components/shared/DeleteModal';
+import PostActions from '@/components/shared/PostActions';
 
 const Articles = () => {
   const editor = useRef(null);
@@ -243,17 +244,18 @@ const Articles = () => {
                 />
               </div>
               <div className="flex gap-4 pt-4 border-t">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Cancel
-                </button>
+              <button
+              type="button"
+              onClick={onClose}
+              className="btn-red flex items-center justify-center gap-2"
+            >
+              <FaTimesCircle />
+              Cancel
+            </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? 'Saving...' : submitText}
                 </button>
@@ -266,16 +268,26 @@ const Articles = () => {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col gap-4 mb-6 bg-white rounded-lg shadow-md p-4 md:p-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-800">My Articles</h2>
+    <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-4 py-8">
+      <div className="flex flex-col gap-4 mb-6 rounded-lg ">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+          <div className="flex flex-col gap-2">
+          <h2 className="text-xl md:text-2xl font-bold text-[var(--grey--900)]">My Articles</h2>
+          <p className="text-[var(--grey--800)]">
+            Dont know how to upload a article? Check out our{" "}
+            <Link to={"/user-manual/create-article"} className="text-blue-500 hover:underline">
+              user manual
+            </Link>{" "}
+            for a step-by-step guide.
+          </p>
+          </div>
           {isOwnProfile && (
             <button
               onClick={handleCreate}
-              className="btn-2"
+              className="btn-2 flex items-center gap-2"
             >
-              Create New Article
+              Create Article
+              <FaPlus className="w-5 h-5" />
             </button>
           )}
         </div>
@@ -303,17 +315,18 @@ const Articles = () => {
             </button>
           )}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 shadow-md p-1 bg-white rounded-lg">
           {filterOptions.map((option) => (
             <button
               key={option.value}
               onClick={() => handleFilterChange(option.value)}
-              className={`px-3 py-1.5 text-sm rounded-full transition-colors flex items-center gap-1 ${currentFilter === option.value
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              className={`p-1 sm:px-1 sm:py-1 md:px-2 lg:px-3 lg:py-2 text-xs md:text-sm rounded-full transition-colors flex items-center gap-1 ${currentFilter === option.value
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-[var(--grey--800)] hover:bg-gray-100 hover:shadow-sm'
                 }`}
             >
-              <span>{option.label}</span>
+              <span className="sm:hidden md:block">{option.label}</span>
+              <span className="hidden sm:block md:hidden">{option.shortLabel}</span>
             </button>
           ))}
         </div>
@@ -336,14 +349,19 @@ const Articles = () => {
                 className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-200"
               >
                 <div className="p-6">
-                  <h3 className="text-lg font-semibold text-[var(--grey--900)] mb-2">
+                  <Link
+                    to={`/articles/article/${article._id}`}
+                    className="text-lg font-semibold text-[var(--grey--900)] hover:text-[var(--ternery)] cursor-pointer mb-2"
+                  >
                     {article.title}
-                  </h3>
+                  </Link>
                   <div className="text-sm text-gray-500 mb-4">
                     {new Date(article.createdAt).toLocaleDateString()}
                   </div>
                   {isOwnProfile && (
-                    <div className="flex gap-2 mt-4">
+                    <PostActions  />
+                  )}
+                    {/* <div className="flex gap-2 mt-4">
                       <button
                         onClick={() => handleEdit(article)}
                         className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -359,8 +377,8 @@ const Articles = () => {
                       >
                         <FaTrash className="w-4 h-4" />
                       </button>
-                    </div>
-                  )}
+                    </div> */}
+                  {/* )} */}
                 </div>
               </div>
             ))}

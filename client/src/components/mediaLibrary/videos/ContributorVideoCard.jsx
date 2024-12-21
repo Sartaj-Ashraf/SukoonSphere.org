@@ -3,6 +3,7 @@ import EditVideoModel from "@/pages/contributors/models/EditVideoModel";
 import customFetch from "@/utils/customFetch";
 import React, { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const ContributorVideoCard = ({ video, refetchVideos }) => {
@@ -53,7 +54,11 @@ const ContributorVideoCard = ({ video, refetchVideos }) => {
                     </div>
                 </div>
                 <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{video.title}</h3>
+                    <Link
+                    to={`/all-videos/video/${video._id}`}
+                    >
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2 hover:text-[var(--ternery)]">{video.title}</h3>
+                    </Link>
                     <p className="text-sm text-gray-600 mb-2">
                         Created: {formatDate(video.createdAt)}
                     </p>

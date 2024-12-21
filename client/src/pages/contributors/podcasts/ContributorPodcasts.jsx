@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useOutletContext, useParams } from 'react-router-dom'
+import React, { useState, useEffect } from "react";
+import { Link, useOutletContext, useParams } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
-import { FaMicrophone, FaList, FaChevronDown, FaPlus } from 'react-icons/fa';
-import CreateNewPodcast from '../models/CreateNewPodcast';
-import CreateNewPodcastPlaylist from '../models/CreateNewPodcastPlaylist';
-import customFetch from '@/utils/customFetch';
-import { toast } from 'react-toastify';
-import PodcastPlaylistCard from '@/components/mediaLibrary/podcasts/PodcastPlaylistCard';
-import SinglePodcastCard from '@/components/mediaLibrary/podcasts/SinglePodcastCard';
+import { FaMicrophone, FaList, FaChevronDown, FaPlus } from "react-icons/fa";
+import CreateNewPodcast from "../models/CreateNewPodcast";
+import CreateNewPodcastPlaylist from "../models/CreateNewPodcastPlaylist";
+import customFetch from "@/utils/customFetch";
+import { toast } from "react-toastify";
+import PodcastPlaylistCard from "@/components/mediaLibrary/podcasts/PodcastPlaylistCard";
+import SinglePodcastCard from "@/components/mediaLibrary/podcasts/SinglePodcastCard";
 
 const ContributorPodcasts = () => {
   const [showPodcastModal, setShowPodcastModal] = useState(false);
@@ -17,7 +17,7 @@ const ContributorPodcasts = () => {
   const [singlePodcasts, setSinglePodcasts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showDropdown, setShowDropdown] = useState(false);
-  const { id: ParamId } = useParams()
+  const { id: ParamId } = useParams();
   const user = useOutletContext();
   const { user: currentUser } = useUser();
 
@@ -26,15 +26,15 @@ const ContributorPodcasts = () => {
       setIsLoading(true);
       const [playlistsRes, singlesRes] = await Promise.all([
         customFetch.get(`/podcasts/user/${currentUser._id}/playlists`),
-        customFetch.get(`/podcasts/user/${currentUser._id}/singles`)
+        customFetch.get(`/podcasts/user/${currentUser._id}/singles`),
       ]);
       console.log(playlistsRes, singlesRes);
-      
+
       setPlaylists(playlistsRes.data.playlists);
       setSinglePodcasts(singlesRes.data.podcasts);
     } catch (error) {
-      console.error('Error fetching podcasts:', error);
-      toast.error('Failed to load podcasts');
+      console.error("Error fetching podcasts:", error);
+      toast.error("Failed to load podcasts");
     } finally {
       setIsLoading(false);
     }
@@ -44,29 +44,35 @@ const ContributorPodcasts = () => {
     fetchData();
   }, []);
 
-  const isContributor = user?.role === "contributor" && currentUser?._id === ParamId;
+  const isContributor =
+    user?.role === "contributor" && currentUser?._id === ParamId;
 
   return (
-    <div className='mx-auto lg:py-8'>
+    <div className="mx-auto px-4 sm:px-6 lg:px-4 py-8">
       {isContributor && (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 lg:mb-8">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Your Podcasts</h2>
-            {/* <p className="text-[var(--grey--800)]">
-              Need help creating an podcast ? Check out 
-              <Link to={"/user-manual/create-podcast"} className="text-blue-500 hover:underline px-2">
-                user manual
-              </Link>{" "}
-              for a step-by-step guide.
-            </p> */}
+            <div>
+              <p className="text-[var(--grey--800)]">
+                Dont know how to upload a podcast? Check out our{" "}
+                <Link
+                  to={"/user-manual/create-podcast"}
+                  className="text-blue-500 hover:underline"
+                >
+                  user manual
+                </Link>{" "}
+                for a step-by-step guide.
+              </p>
+            </div>
           </div>
           <div className="relative transition-all duration-300">
-            <button
+          <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="btn-primary flex items-center gap-2 px-4 py-2 text-sm rounded-lg shadow-md"
+              className="btn-2 flex items-center gap-2"
             >
-              Create New Podcast
-              <FaPlus className="w-4 h-4" />
+              Create podcasts
+              <FaPlus className="w-5 h-5" />
             </button>
             {showDropdown && (
               <div className="absolute top-10 md:right-0 z-10 bg-white shadow-xl p-2 rounded-lg w-52 ">
@@ -108,8 +114,8 @@ const ContributorPodcasts = () => {
             <div>
               <h3 className="text-xl font-semibold mb-4">Your Playlists</h3>
               <div className="space-y-4">
-                {playlists.map(playlist => (
-                  <PodcastPlaylistCard 
+                {playlists.map((playlist) => (
+                  <PodcastPlaylistCard
                     key={playlist._id}
                     playlist={playlist}
                     isContributor={isContributor}
@@ -124,8 +130,8 @@ const ContributorPodcasts = () => {
             <div>
               <h3 className="text-xl font-semibold mb-4">Your podcasts</h3>
               <div className="grid grid-cols-1 gap-4">
-                {singlePodcasts.map(podcast => (
-                  <SinglePodcastCard 
+                {singlePodcasts.map((podcast) => (
+                  <SinglePodcastCard
                     key={podcast._id}
                     podcast={podcast}
                     fetchData={fetchData}
@@ -138,27 +144,29 @@ const ContributorPodcasts = () => {
           {/* Empty State */}
           {playlists?.length === 0 && singlePodcasts.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500">No podcasts found. Create your first podcast or playlist!</p>
+              <p className="text-gray-500">
+                No podcasts found. Create your first podcast or playlist!
+              </p>
             </div>
           )}
         </div>
       )}
 
       {showPodcastModal && (
-        <CreateNewPodcast 
-          setShowModal={setShowPodcastModal} 
+        <CreateNewPodcast
+          setShowModal={setShowPodcastModal}
           type="single"
-          fetchData={fetchData} 
+          fetchData={fetchData}
         />
       )}
       {showPlaylistModal && (
-        <CreateNewPodcastPlaylist 
+        <CreateNewPodcastPlaylist
           setShowModal={setShowPlaylistModal}
           fetchData={fetchData}
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ContributorPodcasts
+export default ContributorPodcasts;

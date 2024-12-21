@@ -49,7 +49,7 @@ export const PostModal = createOptimizedComponent(() => import("./posts/PostMode
 
 export const QuizIntro = createOptimizedComponent(() => import("./quizPageComponents/allQuizzesComponents/QuizIntro"));
 export const QuizList = createOptimizedComponent(() => import("./quizPageComponents/allQuizzesComponents/QuizList"));
-export const FilterQuizByCatagory = createOptimizedComponent(() => import("./quizPageComponents/allQuizzesComponents/filterQuizzesByCatagory"));
+export const FilterQuizByCatagory = createOptimizedComponent(() => import("./quizPageComponents/allQuizzesComponents/FilterQuizzesByCatagory"));
 
 // QA Section Components
 export const QuestionModal = createOptimizedComponent(() => import("./qaSectionsComponents/QuestionModal"));

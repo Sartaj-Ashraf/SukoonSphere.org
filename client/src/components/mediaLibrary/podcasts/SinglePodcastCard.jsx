@@ -139,7 +139,7 @@ const SinglePodcastCard = ({ podcast, fetchData }) => {
         <div className="flex-1 p-4 md:p-5 flex flex-col">
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1 pr-4">
-              <Link to={`/podcast/${podcast._id}`} className="block group">
+              <Link to={`/podcasts/episode/${podcast._id}`} className="block group">
                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
                   {podcast.title}
                 </h3>

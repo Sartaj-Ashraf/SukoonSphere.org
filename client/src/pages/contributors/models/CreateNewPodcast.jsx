@@ -173,14 +173,15 @@ const CreateNewPodcast = ({ setShowModal, type = 'single', playlistId = null, fe
                         <button
                             type="button"
                             onClick={() => setShowModal(false)}
-                            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                            className="btn-red flex items-center justify-center gap-2"
                         >
+                            <FaTimesCircle />
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="px-6 py-2 bg-[var(--primary)] text-white rounded-lg transition-colors disabled:opacity-50"
+                            className="btn-2"
                         >
                             {isSubmitting ? "Creating..." : type === 'playlist' ? "Add to Playlist" : "Create Podcast"}
                         </button>

@@ -5,6 +5,7 @@ import { FiPlus } from 'react-icons/fi';
 import CreateVideoModel from '../models/CreateVideoModel';
 import ContributorVideoCard from '@/components/mediaLibrary/videos/ContributorVideoCard';
 import customFetch from '@/utils/customFetch';
+import { FaPlus } from 'react-icons/fa';
 
 const Videos = () => {
     const [showModal, setShowModal] = useState(false);
@@ -32,7 +33,7 @@ const Videos = () => {
     }, []);
 
     return (
-        <div className="mx-auto lg:py-8">
+        <div className="mx-auto px-4 sm:px-6 lg:px-4 py-8">
             {user?.role === "contributor" && currentUser?._id === ParamId && (
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 lg:mb-8">
                     <div>
@@ -46,12 +47,12 @@ const Videos = () => {
                         </p>
                     </div>
                     <button
-                        onClick={() => setShowModal(true)}
-                        className="btn-primary inline-flex items-center gap-2 px-3 py-1.5 text-sm"
-                    >
-                        <FiPlus className="w-4 h-4" />
-                        Create video
-                    </button>
+              onClick={() => setShowModal(true)}
+              className="btn-2 flex items-center gap-2"
+            >
+              Create Video
+              <FaPlus className="w-5 h-5" />
+            </button>
 
                 </div>
             )}
