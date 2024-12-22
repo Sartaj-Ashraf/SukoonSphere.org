@@ -10,6 +10,7 @@ import { FaTimes, FaEdit, FaTrash, FaSpinner, FaSearch, FaPlus, FaTimesCircle } 
 import { IoCloseOutline } from "react-icons/io5";
 import DeleteModal from '@/components/shared/DeleteModal';
 import PostActions from '@/components/shared/PostActions';
+import ArticleGallery from '@/components/ArticleGallery';
 
 const Articles = () => {
   const editor = useRef(null);
@@ -32,8 +33,6 @@ const Articles = () => {
   const [submitting, setSubmitting] = useState(false);
   const [pagination, setPagination] = useState(null);
   const user = useOutletContext();
-
-
 
   const { id: paramsId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -200,67 +199,92 @@ const Articles = () => {
     };
 
     if (!isOpen) return null;
+
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100">
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-[var(--grey--900)]">{headerTitle}</h2>
-              <button
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                <FaTimes className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="title" className="block text-sm font-medium text-[var(--grey--700)]">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={modalTitle}
-                  onChange={(e) => setModalTitle(e.target.value)}
-                  className="mt-1 block w-full rounded-lg border border-gray-200 bg-[var(--pure)] px-4 py-2 text-[var(--grey--900)] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--grey--700)] mb-2">
-                  Content
-                </label>
-                <JoditEditor
-                  ref={editorRef}
-                  value={modalContent}
-                  config={{
-                    readonly: false,
-                    placeholder: 'Start typing...'  
-                  }}
-                  tabIndex={1}
-                  onBlur={newContent => setModalContent(newContent)}
-                />
-              </div>
-              <div className="flex gap-4 pt-4 border-t">
-              <button
-              type="button"
-              onClick={onClose}
-              className="btn-red flex items-center justify-center gap-2"
-            >
-              <FaTimesCircle />
-              Cancel
-            </button>
+      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="bg-white w-full h-full flex">
+          {/* Left Sidebar - Gallery */}
+          <div className="w-1/4 border-r border-gray-200 flex flex-col h-full">
+            <ArticleGallery onImageUrlCopy={(url) => {
+              if (editorRef.current) {
+                const editor = editorRef.current;
+                editor.selection.insertHTML(`<img src="${url}" alt="" style="max-width: 100%; height: auto;" />`);
+              }
+            }} />
+          </div>
+
+          {/* Right Side - Editor */}
+          <div className="flex-1 flex flex-col h-full">
+            <div className="p-6 border-b">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-[var(--grey--900)]">{headerTitle}</h2>
                 <button
-                  type="submit"
-                  disabled={submitting}
-                  className="btn-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={onClose}
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
                 >
-                  {submitting ? 'Saving...' : submitText}
+                  <FaTimes className="w-5 h-5" />
                 </button>
               </div>
-            </form>
+            </div>
+
+            <div className="flex-1 p-6 overflow-y-auto">
+              <form onSubmit={handleSubmit} className="h-full flex flex-col">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="col-span-2">
+                    <label htmlFor="title" className="block text-sm font-medium text-[var(--grey--700)]">
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      id="title"
+                      name="title"
+                      value={modalTitle}
+                      onChange={(e) => setModalTitle(e.target.value)}
+                      className="mt-1 block w-full rounded-lg border border-gray-200 bg-[var(--pure)] px-4 py-2 text-[var(--grey--900)] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                      required
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-[var(--grey--700)] mb-2">
+                      Content
+                    </label>
+                    <div className="h-auto">
+                      <JoditEditor
+                        ref={editorRef}
+                        value={modalContent}  
+                        config={{
+                          readonly: false,
+                          placeholder: 'Start typing...',
+                          height: 'auto',
+                          minHeight: '300px',
+                          maxHeight: 'auto',
+                        
+                        }}
+                        tabIndex={1}
+                        onBlur={newContent => setModalContent(newContent)}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-4 pt-4 mt-4 border-t">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="btn-red flex items-center justify-center gap-2"
+                  >
+                    <FaTimesCircle />
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="btn-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {submitting ? 'Saving...' : submitText}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
@@ -278,6 +302,7 @@ const Articles = () => {
             <Link to={"/user-manual/create-article"} className="text-blue-500 hover:underline">
               user manual
             </Link>{" "}
+
             for a step-by-step guide.
           </p>
           </div>
