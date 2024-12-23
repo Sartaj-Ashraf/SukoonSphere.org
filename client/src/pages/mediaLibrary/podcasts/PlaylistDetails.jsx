@@ -13,7 +13,6 @@ const PlaylistDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isShortDesc, setIsShortDesc] = useState(true);
-
   useEffect(() => {
     const fetchPlaylist = async () => {
       try {
@@ -74,50 +73,53 @@ const PlaylistDetails = () => {
           <div className="lg:col-span-2 space-y-8">
             {/* Featured Episode */}
             <div className="bg-[var(--primary)] rounded-2xl p-4 md:p-8 transform hover:scale-[1.02] transition-all duration-300 shadow-md">
-              <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
-                <img
-                  className="md:w-48 md:h-48 rounded-2xl object-cover shadow-2xl ring-4 ring-white/10"
-                  src={
-                    playlist.imageUrl ||
-                    "https://randomuser.me/api/portraits/women/1.jpg"
-                  }
-                  alt="Featured Episode"
-                />
-                <div className="flex-1 space-y-4 text-center md:text-left w-full">
-                  <div className="flex items-center gap-4 justify-center md:justify-start">
-                    <img
-                      className="w-10 h-10 rounded-full border-2 border-white"
-                      src={
-                        playlist.userId?.avatar ||
-                        "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                      }
-                      alt="Host"
-                    />
-                    <span className="text-white/90 font-medium">
-                      {playlist.userId?.name || "Unknown Creator"}
-                    </span>
-                  </div>
-                  <h1 className="text-xl md:text-2xl font-bold text-[var(--white-color)] ">
-                    {playlist.title}
-                  </h1>
-                  {/* Short Description */}
-                  <div className="space-y-1">
-                    <p className={`text-base text-[var(--grey--600)] leading-relaxed ${isShortDesc ? 'line-clamp-3' : ''}`}>
-                      {playlist.description}
-                    </p>
-                    <button
-                      onClick={() => setIsShortDesc(!isShortDesc)}
-                      className="text-sm text-indigo-300 hover:text-indigo-400 transition-colors duration-200"
-                    >
-                      {isShortDesc ? 'Show More' : 'Show Less'}
-                    </button>
-                  </div>
-                  <div className="flex items-center space-x-4 text-gray-200 justify-center md:justify-start">
-                    <div className="flex items-center space-x-2">
-                      <FaHeadphones className="text-indigo-300" />
-                      <span>{playlist.episodes?.length || 0} Episodes</span>
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-row gap-6">
+                  <img
+                    className="md:w-48 md:h-48 w-32 h-32 rounded-2xl object-cover shadow-2xl ring-4 ring-white/10"
+                    src={
+                      playlist.imageUrl ||
+                      "https://randomuser.me/api/portraits/women/1.jpg"
+                    }
+                    alt="Featured Episode"
+                  />
+                  <div className="flex flex-col gap-4">
+                      <div className="flex items-center gap-4">
+                        <img
+                          className="w-10 h-10 rounded-full border-2 border-white"
+                          src={
+                            playlist.userId?.avatar ||
+                            "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                          }
+                          alt="Host"
+                        />
+                        <span className="text-white/90 font-medium">
+                          {playlist.userId?.name  || "Unknown Creator"}
+                        </span>
+                      </div>
+                    <h1 className="text-xl md:text-2xl font-bold text-[var(--white-color)]">
+                      {playlist.title}
+                    </h1>
+                    <div className="flex items-center space-x-4 text-gray-200">
+                      <div className="flex items-center space-x-2">
+                        <FaHeadphones className="text-indigo-300" />
+                        <span>{playlist.episodes?.length || 0} Episodes</span>
+                      </div>
                     </div>
                   </div>
+                </div>
+                <div className="space-y-1">
+                  <p
+                    className={`text-base text-[var(--grey--600)] leading-relaxed ${isShortDesc ? "line-clamp-3" : ""}`}
+                  >
+                    {playlist.description}
+                  </p>
+                  <button
+                    onClick={() => setIsShortDesc(!isShortDesc)}
+                    className="text-sm text-indigo-300 hover:text-indigo-400 transition-colors duration-200"
+                  >
+                    {isShortDesc ? "Show More" : "Show Less"}
+                  </button>
                 </div>
               </div>
             </div>
@@ -155,12 +157,9 @@ const PlaylistDetails = () => {
                         <h4 className="font-semibold text-base text-gray-800 line-clamp-2">
                           {episode.title}
                         </h4>
-                        <p className="text-gray-600 line-clamp-2">
-                          {episode.description}
-                        </p>
-                        <div className="flex items-center gap-4 mt-3 text-gray-500 text-sm">
+                        <div className="flex flex-col items-start  gap-4 mt-3 text-gray-500 text-sm">
                           <span className="flex items-center gap-1">
-                            <FaClock /> {episode.duration || "00:00"}
+                            <FaHeadphones /> Episode No: {episode.episodeNo}
                           </span>
                           <span className="flex items-center gap-1">
                             <FaCalendarAlt />{" "}
