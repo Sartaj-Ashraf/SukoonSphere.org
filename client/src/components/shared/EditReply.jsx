@@ -25,7 +25,6 @@ const EditReply = ({ reply, onClose, onUpdate }) => {
       const response = await customFetch.patch(endpoint, {
         content: editedContent,
       });
-      console.log(response);
 
       // Preserve all original reply properties while updating with new data
       const updatedReply = {
