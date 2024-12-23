@@ -4,7 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { useSearchParams } from 'react-router-dom';
 import customFetch from '@/utils/customFetch';
 import { Link } from 'react-router-dom';
-import { FaBookOpen, FaCalendarAlt, FaUser, FaSpinner } from 'react-icons/fa';
+import { FaBookOpen, FaCalendarAlt, FaUser, FaSpinner, FaSearch } from 'react-icons/fa';
 import { IoCloseOutline } from "react-icons/io5";
 
 const Articles = () => {
@@ -138,13 +138,14 @@ const Articles = () => {
         
         {/* Search bar */}
         <div className="relative">
-          {/* <input
+          <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search articles..."
-            className="w-full bg-[var(--white-color)] py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          /> */}
+            className="w-full bg-[var(--white-color)] py-2 px-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           {searchInput && (
             <button
               onClick={() => {
@@ -205,7 +206,15 @@ const Articles = () => {
                 {/* Article Preview Image */}
                 <div className="relative h-48 bg-gradient-to-r from-blue-50 to-indigo-50 overflow-hidden">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <FaBookOpen className="w-12 h-12 text-blue-200 group-hover:scale-110 transition-transform duration-200" />
+                    {article.imageUrl ? (
+                      <img
+                        src={article.imageUrl}
+                        alt={article.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <FaBookOpen className="w-12 h-12 text-blue-200 group-hover:scale-110 transition-transform duration-200" />
+                    )}
                   </div>
                 </div>
 

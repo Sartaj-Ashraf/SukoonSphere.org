@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaPlay, FaPlus, FaEllipsisV, FaTrash } from "react-icons/fa";
+import { FaPlay, FaPlus, FaEllipsisV, FaTrash, FaPencilAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import CreateNewPodcast from "../../../pages/contributors/models/CreateNewPodcast";
 import EditPodcastModel from "../../../pages/contributors/models/EditPodcastModel";

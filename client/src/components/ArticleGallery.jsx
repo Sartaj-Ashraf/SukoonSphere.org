@@ -186,7 +186,7 @@ const ArticleGallery = ({ onImageUrlCopy }) => {
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {images.map((image) => (
-              <div key={image._id} className="relative group aspect-video">
+              <div key={image._id} className="relative group w-[140px] h-[140px]">
                 <img
                   src={image.imageUrl}
                   alt=""
