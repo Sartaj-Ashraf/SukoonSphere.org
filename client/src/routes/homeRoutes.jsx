@@ -67,7 +67,7 @@ export const homeRoutes = [
             element: <QaCommentOutlet />,
           },
           {
-            path: "comments/:commentId/reply",
+            path: ":commentId/reply",
             element: <QaRepliesOutlet />,
           },
         ],

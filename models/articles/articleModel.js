@@ -24,6 +24,12 @@ const ArticleSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    imageUrl: {
+      type: String,
+    },
+    imagePublicId: {
+      type: String,
+    },
     // status: {
     //   type: String,
     //   default: "pending",

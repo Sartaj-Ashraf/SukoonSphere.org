@@ -11,16 +11,18 @@ import { IoCloseOutline } from "react-icons/io5";
 import DeleteModal from '@/components/shared/DeleteModal';
 import PostActions from '@/components/shared/PostActions';
 import ArticleGallery from '@/components/ArticleGallery';
+import ArticleCard from '../../components/ArticleCard';
+import Pagination from '../../components/Pagination';
 
 const Articles = () => {
   const editor = useRef(null);
   // const config = useMemo(
-	// 	{
-	// 		readonly: false, // all options from https://xdsoft.net/jodit/docs/,
-	// 		placeholder: placeholder || 'Start typings...'
-	// 	},
-	// 	[placeholder]
-	// );
+  //   {
+  //     readonly: false, // all options from https://xdsoft.net/jodit/docs/,
+  //     placeholder: placeholder || 'Start typings...'
+  //   },
+  //   [placeholder]
+  // );
 
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -132,16 +134,55 @@ const Articles = () => {
     setIsCreateModalOpen(true);
   };
 
-  const handleUpdate = async ({ title, content }) => {
+  const handleCreateSubmit = async ({ title, content, image }) => {
     if (!title.trim() || !content.trim()) {
       toast.error('Please fill in all fields');
       return;
     }
     setSubmitting(true);
+
     try {
-      const response = await customFetch.put(`/articles/${editingArticle._id}`, {
-        title,
-        content
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('content', content);
+      if (image) {
+        formData.append('image', image);
+      }
+
+      await customFetch.post('/articles', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      await fetchUserArticles(); // Refresh the list after create
+      setIsCreateModalOpen(false);
+      toast.success('Article created successfully');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to create article');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleUpdate = async ({ title, content, image }) => {
+    if (!title.trim() || !content.trim()) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    setSubmitting(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('content', content);
+      if (image) {
+        formData.append('image', image);
+      }
+
+      await customFetch.put(`/articles/${editingArticle._id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
       await fetchUserArticles(); // Refresh the list after update
       setIsEditModalOpen(false);
@@ -149,27 +190,6 @@ const Articles = () => {
       toast.success('Article updated successfully');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to update article');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleCreateSubmit = async ({ title, content }) => {
-    if (!title.trim() || !content.trim()) {
-      toast.error('Please fill in all fields');
-      return;
-    }
-    setSubmitting(true);
-    try {
-      await customFetch.post('/articles', {
-        title,
-        content
-      });
-      await fetchUserArticles(); // Refresh the list after create
-      setIsCreateModalOpen(false);
-      toast.success('Article created successfully');
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to create article');
     } finally {
       setSubmitting(false);
     }
@@ -188,13 +208,28 @@ const Articles = () => {
   const ArticleModal = memo(({ isOpen, onClose, title: headerTitle, onSubmit, submitText, initialTitle = '', initialContent = '' }) => {
     const [modalTitle, setModalTitle] = useState(initialTitle);
     const [modalContent, setModalContent] = useState(initialContent);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
     const editorRef = useRef(null);
+
+    const handleImageChange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        setSelectedImage(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
 
     const handleSubmit = (e) => {
       e.preventDefault();
       onSubmit({
         title: modalTitle,
-        content: modalContent
+        content: modalContent,
+        image: selectedImage
       });
     };
 
@@ -244,6 +279,41 @@ const Articles = () => {
                       required
                     />
                   </div>
+
+                  {/* Image Upload */}
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-[var(--grey--700)] mb-2">
+                      Featured Image
+                    </label>
+                    <div className="mt-1 flex items-center gap-4">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      />
+                      {imagePreview && (
+                        <div className="relative w-24 h-24 rounded-lg overflow-hidden">
+                          <img 
+                            src={imagePreview} 
+                            alt="Preview" 
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedImage(null);
+                              setImagePreview(null);
+                            }}
+                            className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                          >
+                            <FaTimes className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="col-span-2">
                     <label className="block text-sm font-medium text-[var(--grey--700)] mb-2">
                       Content
@@ -258,7 +328,6 @@ const Articles = () => {
                           height: 'auto',
                           minHeight: '300px',
                           maxHeight: 'auto',
-                        
                         }}
                         tabIndex={1}
                         onBlur={newContent => setModalContent(newContent)}
@@ -293,67 +362,49 @@ const Articles = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-4 py-8">
-      <div className="flex flex-col gap-4 mb-6 rounded-lg ">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
-          <div className="flex flex-col gap-2">
-          <h2 className="text-xl md:text-2xl font-bold text-[var(--grey--900)]">My Articles</h2>
-          <p className="text-[var(--grey--800)]">
-            Dont know how to upload a article? Check out our{" "}
-            <Link to={"/user-manual/create-article"} className="text-blue-500 hover:underline">
-              user manual
-            </Link>{" "}
-
-            for a step-by-step guide.
-          </p>
+      <div className="flex flex-col gap-4 mb-6">
+        {/* Header Section */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-[var(--grey--900)]">My Articles</h1>
+              <p className="mt-2 text-[var(--grey--600)]">
+                Don't know how to upload an article? Check out our{" "}
+                <Link to="/user-manual/create-article" className="text-blue-500 hover:underline">
+                  user manual
+                </Link>{" "}
+                for a step-by-step guide.
+              </p>
+            </div>
+            {isOwnProfile && (
+              <button
+                onClick={handleCreate}
+                className="btn-2"
+              >
+                <FaPlus className="w-4 h-4" />
+                Create Article
+              </button>
+            )}
           </div>
-          {isOwnProfile && (
-            <button
-              onClick={handleCreate}
-              className="btn-2 flex items-center gap-2"
-            >
-              Create Article
-              <FaPlus className="w-5 h-5" />
-            </button>
-          )}
         </div>
-        <div className="relative">
-          {/* <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Search articles..."
-            className="w-full bg-[var(--white-color)] py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          /> */}
-          {searchInput && (
-            <button
-              onClick={() => {
-                setSearchInput('');
-                setSearchParams(prev => {
-                  const newParams = new URLSearchParams(prev);
-                  newParams.delete('search');
-                  return newParams;
-                });
-              }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-            >
-              <IoCloseOutline className="w-5 h-5" />
-            </button>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-2 shadow-md p-1 bg-white rounded-lg">
-          {filterOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => handleFilterChange(option.value)}
-              className={`p-1 sm:px-1 sm:py-1 md:px-2 lg:px-3 lg:py-2 text-xs md:text-sm rounded-full transition-colors flex items-center gap-1 ${currentFilter === option.value
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-[var(--grey--800)] hover:bg-gray-100 hover:shadow-sm'
+
+        {/* Filters Section */}
+        <div className="bg-white rounded-xl shadow-sm p-4">
+          <div className="flex flex-wrap gap-3">
+            {filterOptions.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => handleFilterChange(option.value)}
+                className={`px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
+                  currentFilter === option.value
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'bg-gray-50 text-[var(--grey--700)] hover:bg-gray-100'
                 }`}
-            >
-              <span className="sm:hidden md:block">{option.label}</span>
-              <span className="hidden sm:block md:hidden">{option.shortLabel}</span>
-            </button>
-          ))}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
       {error ? (
@@ -369,71 +420,24 @@ const Articles = () => {
         <div className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {articles.map((article) => (
-              <div
+              <ArticleCard
                 key={article._id}
-                className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-200"
-              >
-                <div className="p-6">
-                  <Link
-                    to={`/articles/article/${article._id}`}
-                    className="text-lg font-semibold text-[var(--grey--900)] hover:text-[var(--ternery)] cursor-pointer mb-2"
-                  >
-                    {article.title}
-                  </Link>
-                  <div className="text-sm text-gray-500 mb-4">
-                    {new Date(article.createdAt).toLocaleDateString()}
-                  </div>
-                  {isOwnProfile && (
-                    <PostActions  />
-                  )}
-                    {/* <div className="flex gap-2 mt-4">
-                      <button
-                        onClick={() => handleEdit(article)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      >
-                        <FaEdit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setDeletingArticleId(article._id);
-                          setIsDeleteModalOpen(true);
-                        }}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <FaTrash className="w-4 h-4" />
-                      </button>
-                    </div> */}
-                  {/* )} */}
-                </div>
-              </div>
+                article={article}
+                isOwnProfile={isOwnProfile}
+                onEdit={() => handleEdit(article)}
+                onDelete={() => {
+                  setDeletingArticleId(article._id);
+                  setIsDeleteModalOpen(true);
+                }}
+              />
             ))}
           </div>
           {pagination && pagination.totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-8">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={`px-4 py-2 rounded-lg ${currentPage === 1
-                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-500 text-white hover:bg-blue-600'
-                  }`}
-              >
-                Previous
-              </button>
-              <span className="px-4 py-2 text-[var(--grey--600)]">
-                Page {currentPage} of {pagination.totalPages}
-              </span>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === pagination.totalPages}
-                className={`px-4 py-2 rounded-lg ${currentPage === pagination.totalPages
-                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-500 text-white hover:bg-blue-600'
-                  }`}
-              >
-                Next
-              </button>
-            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={pagination.totalPages}
+              onPageChange={handlePageChange}
+            />
           )}
         </div>
       )}

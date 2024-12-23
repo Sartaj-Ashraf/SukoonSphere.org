@@ -2,6 +2,7 @@ import Article from "../models/articles/articleModel.js";
 import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import User from "../models/userModel.js";
+import { UnauthenticatedError } from "../errors/customErors.js";
 
 // Get all articles with pagination, search, and filters
 export const getAllArticles = async (req, res) => {
@@ -18,10 +19,12 @@ export const getAllArticles = async (req, res) => {
       {
         $match: {
           deleted: { $ne: true },
-          $or: [
-            { title: { $regex: search, $options: 'i' } },
-            { content: { $regex: search, $options: 'i' } }
-          ]
+          ...(search && {
+            $or: [
+              { title: { $regex: search, $options: 'i' } },
+              { content: { $regex: search, $options: 'i' } }
+            ]
+          })
         }
       },
       // Lookup user details
@@ -145,83 +148,88 @@ export const getSingleArticle = async (req, res) => {
 
 // Create article
 export const createArticle = async (req, res) => {
-  try {
-    const { title, content } = req.body;
+  const { title, content } = req.body;
 
-    const article = new Article({
-      title,
-      content,
-      author: req.user.userId,
-    });
-    const savedArticle = await article.save();
-    
-    // Add article to user's articles array
-    await User.findByIdAndUpdate(
-      req.user.userId,
-      { $push: { articles: savedArticle._id } }
-    );
+  let imageUrl = null;
+  let imagePublicId = null;
 
-    res.status(StatusCodes.CREATED).json(savedArticle);
-  } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
+  // Handle image upload if present
+  if (req.file) {
+    imageUrl = `${process.env.BACKEND_URL}/articles/${req.file.filename}`;
+    imagePublicId = req.file.filename;
   }
+
+  const article = await Article.create({
+    title,
+    content,
+    author: req.user.userId,
+    imageUrl,
+    imagePublicId
+  });
+
+  res.status(StatusCodes.CREATED).json({ article });
 };
 
 // Update article
 export const updateArticle = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { title, content } = req.body;
-    
-    const article = await Article.findById(id);
-    if (!article) {
-      return res.status(StatusCodes.NOT_FOUND).json({ message: "Article not found" });
-    }
+  const { id: articleId } = req.params;
+  const { title, content } = req.body;
+  const { userId } = req.user;
 
-    // Check if user is the author
-    if (article.author.toString() !== req.user.userId.toString()) {
-      return res.status(StatusCodes.FORBIDDEN).json({ message: "Not authorized to update this article" });
-    }
-
-    const updatedArticle = await Article.findByIdAndUpdate(
-      id,
-      { title, content },
-      { new: true }
-    ).populate('author', 'name avatar _id');
-
-    res.status(StatusCodes.OK).json(updatedArticle);
-  } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
+  const article = await Article.findById(articleId);
+  if (!article) {
+    throw new Error('Article not found');
   }
+
+  if (article.author.toString() !== userId) {
+    throw new Error('Not authorized to update this article');
+  }
+
+  // Handle image update if present
+  let imageUpdate = {};
+  if (req.file) {
+    // Delete old image if exists
+    if (article.imagePublicId) {
+      // await deleteFile(`public/articles/${article.imagePublicId}`);
+    }
+    imageUpdate = {
+      imageUrl: `${process.env.BACKEND_URL}/articles/${req.file.filename}`,
+      imagePublicId: req.file.filename
+    };
+  }
+
+  const updatedArticle = await Article.findByIdAndUpdate(
+    articleId,
+    { title, content, ...imageUpdate },
+    { new: true, runValidators: true }
+  );
+
+  res.status(StatusCodes.OK).json({ article: updatedArticle });
 };
 
 // Delete article (soft delete)
 export const deleteArticle = async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    const article = await Article.findById(id);
-    if (!article) {
-      return res.status(StatusCodes.NOT_FOUND).json({ message: "Article not found" });
-    }
+  const { id: articleId } = req.params;
+  const { userId } = req.user;
 
-    // Check if user is the author
-    if (article.author.toString() !== req.user.userId.toString()) {
-      return res.status(StatusCodes.FORBIDDEN).json({ message: "Not authorized to delete this article" });
-    }
-
-    await Article.findByIdAndUpdate(id, { deleted: true });
-    
-    // Remove article from user's articles array
-    await User.findByIdAndUpdate(
-      req.user.userId,
-      { $pull: { articles: id } }
-    );
-
-    res.status(StatusCodes.OK).json({ message: "Article deleted successfully" });
-  } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
+  const article = await Article.findById(articleId);
+  if (!article) {
+    throw new Error('Article not found');
   }
+
+  if (article.author.toString() !== userId) {
+    throw new Error('Not authorized to delete this article');
+  }
+
+  // Delete image if exists
+  if (article.imagePublicId) {
+    // await deleteFile(`public/articles/${article.imagePublicId}`);
+  }
+
+  article.deleted = true;
+  await article.save();
+
+  res.status(StatusCodes.OK).json({ msg: 'Article deleted successfully' });
 };
 
 // Get articles by user ID with pagination
