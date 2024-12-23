@@ -28,7 +28,7 @@ const PodcastCard = ({ podcast, isPlayList }) => {
         <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </div>
       <div className="p-4 relative ">
-        <h2 className="text-xl font-bold mb-2 text-white line-clamp-2">
+        <h2 className="text-xl font-bold mb-2 text-white line-clamp-2 h-14">
           {podcast.title}
         </h2>
 
@@ -38,7 +38,7 @@ const PodcastCard = ({ podcast, isPlayList }) => {
         </p> */}
         <div className=" ">
           <div className="flex items-center gap-2 ">
-            <FaCalendar size={16} className="text-[var(--grey--400)]" />
+            <FaCalendar size={16} className= "text-[var(--grey--400)]" />
             <p className="text-[var(--grey--400)] text-sm mt-2">
               {podcast.createdAt.split("T")[0]}
             </p>
