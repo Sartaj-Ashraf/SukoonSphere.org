@@ -7,8 +7,8 @@ import { toast } from "react-toastify";
 import UserAvatar from "@/components/shared/UserAvatar";
 import { FiEdit } from "react-icons/fi";
 import { IoCloseOutline } from "react-icons/io5";
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { useInView } from 'react-intersection-observer';
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
 
 export const answerAction = async ({ request }) => {
   const formData = await request.formData();
@@ -38,20 +38,20 @@ const Answer = () => {
   const actionData = useActionData();
   const { ref, inView } = useInView();
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentFilter = searchParams.get('filter') || 'newest';
-  const searchQuery = searchParams.get('search') || '';
+  const currentFilter = searchParams.get("filter") || "newest";
+  const searchQuery = searchParams.get("search") || "";
   const [searchInput, setSearchInput] = useState(searchQuery);
 
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchInput !== searchQuery) {
-        setSearchParams(prev => {
+        setSearchParams((prev) => {
           const newParams = new URLSearchParams(prev);
           if (searchInput) {
-            newParams.set('search', searchInput);
+            newParams.set("search", searchInput);
           } else {
-            newParams.delete('search');
+            newParams.delete("search");
           }
           return newParams;
         });
@@ -63,10 +63,10 @@ const Answer = () => {
 
   // Filter options
   const filterOptions = [
-    { value: 'newest', label: 'Newest First' },
-    { value: 'oldest', label: 'Oldest First' },
-    { value: 'mostAnswered', label: 'Most Answered' },
-    { value: 'unanswered', label: 'Unanswered' },
+    { value: "newest", label: "Newest First" },
+    { value: "oldest", label: "Oldest First" },
+    { value: "mostAnswered", label: "Most Answered" },
+    { value: "unanswered", label: "Unanswered" },
   ];
 
   const handleFilterChange = (value) => {
@@ -81,17 +81,19 @@ const Answer = () => {
     isFetchingNextPage,
     status,
     error: loadError,
-    refetch
+    refetch,
   } = useInfiniteQuery({
-    queryKey: ['questions', currentFilter, searchQuery],
+    queryKey: ["questions", currentFilter, searchQuery],
     queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams({
         page: pageParam,
         limit: 10,
         sortBy: currentFilter,
-        ...(searchQuery && { search: searchQuery })
+        ...(searchQuery && { search: searchQuery }),
       });
-      const response = await customFetch.get(`/qa-section/all-questions?${params}`);
+      const response = await customFetch.get(
+        `/qa-section/all-questions?${params}`
+      );
       return response.data;
     },
     getNextPageParam: (lastPage) => {
@@ -114,7 +116,7 @@ const Answer = () => {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const allQuestions = data?.pages.flatMap(page => page.questions) || [];
+  const allQuestions = data?.pages.flatMap((page) => page.questions) || [];
 
   useEffect(() => {
     if (actionData?.success) {
@@ -133,7 +135,7 @@ const Answer = () => {
     setNewAnswer("");
   };
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
         <Spinner />
@@ -155,7 +157,7 @@ const Answer = () => {
     );
   }
 
-  console.log('All questions:', allQuestions); // Debug log
+  console.log("All questions:", allQuestions); // Debug log
 
   const groups = [
     {
@@ -217,7 +219,9 @@ const Answer = () => {
           {/* Main Content */}
           <div className="col-span-1 md:col-span-6">
             <div className="flex flex-col gap-4 mb-6 bg-white rounded-lg shadow-md p-4 md:p-6">
-              <h2 className="text-xl md:text-2xl font-bold text-gray-800">Questions</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800">
+                Questions
+              </h2>
               {/* Search bar */}
               <div className="relative">
                 <input
@@ -230,10 +234,10 @@ const Answer = () => {
                 {searchInput && (
                   <button
                     onClick={() => {
-                      setSearchInput('');
-                      setSearchParams(prev => {
+                      setSearchInput("");
+                      setSearchParams((prev) => {
                         const newParams = new URLSearchParams(prev);
-                        newParams.delete('search');
+                        newParams.delete("search");
                         return newParams;
                       });
                     }}
@@ -251,10 +255,10 @@ const Answer = () => {
                     <button
                       key={option.value}
                       onClick={() => handleFilterChange(option.value)}
-                      className={`px-3 py-1.5 text-sm rounded-full transition-colors flex items-center gap-1 ${
+                      className={`flex items-center  gap-2 px-3 py-2 rounded-full transition-all duration-200 ease-in-out whitespace-nowrap ${
                         currentFilter === option.value
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          ? "bg-[var(--primary)] text-white"
+                          : "text-[var(--grey--800)] hover:bg-gray-100 hover:shadow-sm"
                       }`}
                     >
                       {option.icon}
@@ -325,7 +329,7 @@ const Answer = () => {
                         className={`flex-1 md:flex-none inline-flex items-center justify-center gap-2 py-2 md:py-2.5 px-3 md:px-4 rounded-xl font-medium text-sm transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] ${
                           selectedQuestionId === question._id
                             ? "bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
-                            : "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-md hover:shadow-lg"
+                            : "btn-2 shadow-md hover:shadow-lg"
                         }`}
                       >
                         {selectedQuestionId === question._id ? (
@@ -374,7 +378,7 @@ const Answer = () => {
                         <div className="flex justify-end">
                           <button
                             type="submit"
-                            className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="btn-2 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             Submit Answer
                           </button>
@@ -387,10 +391,14 @@ const Answer = () => {
                 {/* Loading indicator */}
                 <div ref={ref} className="py-4 text-center">
                   {isFetchingNextPage && (
-                    <div className="text-gray-500">Loading more questions...</div>
+                    <div className="text-gray-500">
+                      Loading more questions...
+                    </div>
                   )}
                   {!isFetchingNextPage && hasNextPage && (
-                    <div className="text-gray-400">Scroll for more questions</div>
+                    <div className="text-gray-400">
+                      Scroll for more questions
+                    </div>
                   )}
                   {!hasNextPage && allQuestions.length === 0 && (
                     <div className="text-gray-400">No questions available</div>

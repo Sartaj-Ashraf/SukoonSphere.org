@@ -9,7 +9,12 @@ import { toast } from "react-toastify";
 import EditReply from "../EditReply";
 import { formatDistanceToNow } from "date-fns";
 
-const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handleSubmit }) => {
+const Reply = ({
+  reply: initialReply,
+  handleDeleteReply,
+  handleLikeReply,
+  handleSubmit,
+}) => {
   const { user } = useUser();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -37,7 +42,7 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
     try {
       await handleLikeReply(reply._id);
       setIsLiked(!isLiked);
-      setLikesCount(prevCount => isLiked ? prevCount - 1 : prevCount + 1);
+      setLikesCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1));
     } catch (error) {
       console.log(error);
     }
@@ -91,16 +96,22 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
               onUpdate={handleUpdateReply}
             />
           ) : (
-            <div >
-              <p className="text-gray-600 text-xs md:text-sm mb-0">
-                <Link to={`/profile/${reply.commentUserId}`} className="text-[var(--primary)]">
+            <div>
+              <p className="text-gray-600 text-xs md:text-sm mb-0 ">
+                <Link
+                  to={`/about/user/${reply.commentUserId}`}
+                  className=" hover:underline text-[var(--ternery)]"
+                >
                   @{reply.commentUsername}
-                </Link>{' '}
+                </Link>{" "}
                 {reply.content}
               </p>
               {reply.editedAt && (
                 <span className=" text-[10px] text-gray-400 italic flex flex-row-reverse">
-                  Edited {formatDistanceToNow(new Date(reply.editedAt), { addSuffix: true })}
+                  Edited{" "}
+                  {formatDistanceToNow(new Date(reply.editedAt), {
+                    addSuffix: true,
+                  })}
                 </span>
               )}
             </div>
@@ -110,12 +121,16 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
           <div className="flex items-center gap-3 my-1">
             <button
               className={`flex items-center gap-2 px-2 py-1 rounded-full transition-all duration-200 ${
-                isLiked ? "text-red-500 bg-red-50 hover:bg-red-100" : "text-gray-500 hover:bg-gray-100"
+                isLiked
+                  ? "text-red-500 bg-red-50 hover:bg-red-100"
+                  : "text-gray-500 hover:bg-gray-100"
               }`}
               onClick={likeReply}
             >
               <FaRegHeart className="w-3 h-3 md:w-4 md:h-4" />
-              <span className="text-xs md:text-sm font-medium">{likesCount}</span>
+              <span className="text-xs md:text-sm font-medium">
+                {likesCount}
+              </span>
             </button>
             <button
               onClick={handleReplyClick}
@@ -141,14 +156,11 @@ const Reply = ({ reply: initialReply, handleDeleteReply, handleLikeReply, handle
               <button
                 type="button"
                 onClick={() => setShowReplyForm(false)}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                className="btn-red"
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-              >
+              <button type="submit" className="btn-2">
                 Reply
               </button>
             </div>

@@ -2,7 +2,13 @@ import PostActions from "@/components/shared/PostActions";
 import DeleteModal from "@/components/shared/DeleteModal";
 import EditPodcastModel from "@/pages/contributors/models/EditPodcastModel";
 import React, { useState, useRef, useEffect } from "react";
-import { FaPlay, FaPause, FaUser, FaVolumeUp, FaVolumeMute } from "react-icons/fa";
+import {
+  FaPlay,
+  FaPause,
+  FaUser,
+  FaVolumeUp,
+  FaVolumeMute,
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import customFetch from "@/utils/customFetch";
@@ -119,52 +125,20 @@ const SinglePodcastCard = ({ podcast, fetchData }) => {
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </div>
-          <div className="absolute inset-0 z-20">
-            <div className="absolute bottom-4 left-4">
-              <button
-                onClick={togglePlay}
-                className="p-3.5 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/50"
-              >
-                {isPlaying ? (
-                  <FaPause className="w-5 h-5" />
-                ) : (
-                  <FaPlay className="w-5 h-5 ml-0.5" />
-                )}
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Right side - Content */}
         <div className="flex-1 p-4 md:p-5 flex flex-col">
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1 pr-4">
-              <Link to={`/podcasts/episode/${podcast._id}`} className="block group">
+              <Link
+                to={`/podcasts/episode/${podcast._id}`}
+                className="block group"
+              >
                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
                   {podcast.title}
                 </h3>
               </Link>
-
-              {/* Creator Info */}
-              <div className="flex items-center space-x-3 mb-2">
-                {podcast.userId?.profileImage ? (
-                  <img
-                    src={podcast.userId.profileImage}
-                    alt={podcast.userId.name}
-                    className="w-8 h-8 rounded-full object-cover ring-2 ring-gray-100"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center ring-2 ring-gray-100">
-                    <FaUser className="w-4 h-4 text-blue-500" />
-                  </div>
-                )}
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-900">
-                    {podcast.userId?.name || "Anonymous"}
-                  </span>
-                  <span className="text-xs text-gray-500">Creator</span>
-                </div>
-              </div>
 
               <p className="text-gray-600 text-sm mb-3 line-clamp-2 leading-relaxed">
                 {podcast.description}
@@ -274,7 +248,7 @@ const SinglePodcastCard = ({ podcast, fetchData }) => {
         title="Delete Podcast"
         message="Are you sure you want to delete this podcast? This action cannot be undone."
       />
-      
+
       {showEditModal && (
         <EditPodcastModel
           setShowModal={setShowEditModal}

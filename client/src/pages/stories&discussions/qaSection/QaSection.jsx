@@ -17,7 +17,11 @@ export const questionsAction = async ({ request }) => {
     window.location.href = "/qa-section";
     return { success: response.data.msg };
   } catch (error) {
-    return { error: error?.response?.data?.msg || "An error occurred during posting question." };
+    return {
+      error:
+        error?.response?.data?.msg ||
+        "An error occurred during posting question.",
+    };
   }
 };
 
@@ -63,12 +67,17 @@ const QaSection = () => {
               <h3 className="text-lg font-semibold mb-4">Coming Soon</h3>
               <div className="space-y-4">
                 {groups.map((group) => (
-                  <div key={group.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
+                  <div
+                    key={group.id}
+                    className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                  >
                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                       {group.name.charAt(0)}
                     </div>
                     <div>
-                      <p className="font-medium text-sm text-gray-900">{group.name}</p>
+                      <p className="font-medium text-sm text-gray-900">
+                        {group.name}
+                      </p>
                       <p className="text-xs text-gray-500">Starting soon</p>
                     </div>
                   </div>
@@ -80,8 +89,9 @@ const QaSection = () => {
           {/* Middle section */}
           <div className="col-span-1 lg:col-span-6">
             {/* Header */}
-            <div className="mb-3 text-center bg-white p-4 rounded-lg">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">
+            <div className="mb-3 text-center bg-blue-50 p-4 rounded-lg">
+              <h2 className=" text-gray-800 mb-4"></h2>
+              <h2 className="text-md sm:text-xl font-bold mb-4 text-[var(--grey--900)]">
                 Have a Question or Insight? Share it with Us!
               </h2>
 
@@ -99,7 +109,10 @@ const QaSection = () => {
                   <FaQuestionCircle className="mr-2" />
                   Ask
                 </button>
-                <Link to="/answer" className="btn-2 w-full sm:w-auto text-center">
+                <Link
+                  to="/answer"
+                  className="btn-2 w-full sm:w-auto text-center"
+                >
                   <AiOutlineComment className="mr-2" />
                   Answer
                 </Link>

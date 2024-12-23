@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { FaTimes } from "react-icons/fa";
+import { FaPlus, FaTimes } from "react-icons/fa";
 import customFetch from "@/utils/customFetch";
 import { useNavigate } from "react-router-dom";
 const QuestionModal = ({ isOpen, onClose, refetchQuestions }) => {
@@ -30,11 +30,11 @@ const QuestionModal = ({ isOpen, onClose, refetchQuestions }) => {
   };
 
   const removeTag = (tagToRemove) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+    setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       handleAddTag(e);
     }
@@ -42,7 +42,7 @@ const QuestionModal = ({ isOpen, onClose, refetchQuestions }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!questionText.trim()) {
       toast.error("Please enter your question");
       return;
@@ -53,11 +53,11 @@ const QuestionModal = ({ isOpen, onClose, refetchQuestions }) => {
       await customFetch.post("/qa-section/", {
         questionText,
         context,
-        tags
+        tags,
       });
-      
+
       toast.success("Question posted successfully!");
-      navigate('/answer');
+      navigate("/answer");
       if (refetchQuestions) {
         refetchQuestions();
       }
@@ -73,7 +73,9 @@ const QuestionModal = ({ isOpen, onClose, refetchQuestions }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 backdrop-blur-sm">
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl scale-100">
-        <h3 className="text-2xl font-bold mb-4 text-gray-800 sticky top-0 bg-white pt-2">Ask a Question</h3>
+        <h3 className="text-2xl font-bold mb-4 text-gray-800 sticky top-0 bg-white pt-2">
+          Ask a Question
+        </h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -131,7 +133,7 @@ const QuestionModal = ({ isOpen, onClose, refetchQuestions }) => {
                 onClick={handleAddTag}
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
-                Add
+                <FaPlus size={12} />
               </button>
             </div>
             <p className="text-sm text-gray-500 italic mt-1">
@@ -140,11 +142,7 @@ const QuestionModal = ({ isOpen, onClose, refetchQuestions }) => {
           </div>
 
           <div className="flex justify-end gap-3 pt-3 sticky bottom-0 bg-white pb-2">
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="px-5 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-100 transition-colors duration-200"
-            >
+            <button type="button" onClick={handleCancel} className="btn-red">
               Cancel
             </button>
             <button

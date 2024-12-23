@@ -10,9 +10,11 @@ const QaCommentOutlet = () => {
   const { answer, setTotalComments } = useOutletContext();
   const [comments, setComments] = useState([]);
   const fetchComments = async () => {
-    const { data } = await customFetch.get(`/qa-section/answer/${answer._id}/all-comments`)
+    const { data } = await customFetch.get(
+      `/qa-section/answer/${answer._id}/all-comments`
+    );
     setComments(data.comments);
-  }
+  };
   const addComment = async (e) => {
     if (!user) {
       toast.error("Please login to add a comment");
@@ -27,23 +29,27 @@ const QaCommentOutlet = () => {
       });
       e.target.reset();
       await fetchComments();
-      setTotalComments(prev => prev + 1);
+      setTotalComments((prev) => prev + 1);
     } catch (error) {
       console.log(error);
     }
   };
   const handleDeleteComment = async (commentId) => {
     try {
-      await customFetch.delete(`/qa-section/question/answer/comments/${commentId}`);
+      await customFetch.delete(
+        `/qa-section/question/answer/comments/${commentId}`
+      );
       await fetchComments();
-      setTotalComments(prev => prev - 1);
+      setTotalComments((prev) => prev - 1);
     } catch (error) {
       console.log({ error });
     }
   };
   const handleLikeComment = async (commentId) => {
     try {
-      await customFetch.patch(`/qa-section/question/answer/comments/${commentId}/like`);
+      await customFetch.patch(
+        `/qa-section/question/answer/comments/${commentId}/like`
+      );
     } catch (error) {
       console.log({ likeError: error });
     }
@@ -61,4 +67,4 @@ const QaCommentOutlet = () => {
     />
   );
 };
-export default QaCommentOutlet
+export default QaCommentOutlet;

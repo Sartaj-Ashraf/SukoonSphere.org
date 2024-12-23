@@ -42,7 +42,7 @@ function FilterQuizzesByCategory() {
               }}
             >
               <option disabled selected>
-              Filter by a category
+                Filter by a category
               </option>
               {allCategories.map((tag) => (
                 <option key={tag} value={tag} className="text-[var(--primary)]">
@@ -59,7 +59,7 @@ function FilterQuizzesByCategory() {
               <FaSearch className="size-5" />
             </button>
             <Link
-                to="/all-quizzes"
+              to="/all-quizzes"
               className="p-3 bg-gray-100 hover:bg-gray-200 text-[var(--primary)] rounded-lg shadow-sm hover:shadow-xl transform hover:scale-105 transition-all duration-300"
             >
               <RxReset className="size-5" />

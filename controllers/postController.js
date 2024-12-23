@@ -444,7 +444,7 @@ export const getAllRepliesByCommentId = async (req, res) => {
       }
     },
     {
-      $sort: { createdAt: -1 }
+      $sort: { createdAt: 1 }
     }
   ]);
 
@@ -750,7 +750,7 @@ export const updatePostCommentReply = async (req, res) => {
       createdAt: reply.createdAt,
       updatedAt: reply.updatedAt,
       createdBy: reply.createdBy._id,
-      parentId: reply.parentId._id,
+      // parentId: reply.parentId._id,
       username: reply.createdBy.name,
       userAvatar: reply.createdBy.avatar,
       commentUsername: reply.replyTo.name,
