@@ -149,7 +149,7 @@ const Articles = () => {
   console.log("All articles:", allArticles);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-4">
       {/* Header Section */}
       {/* <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-[var(--grey--900)] mb-4">
@@ -195,7 +195,7 @@ const Articles = () => {
         </div>
 
         {/* Filter buttons */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mt-4 md:mt-0">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mt-2 md:mt-0">
           <div className="flex flex-wrap gap-2">
             {filterOptions.map((option) => (
               <button
@@ -214,7 +214,6 @@ const Articles = () => {
           </div>
         </div>
       </div>
-
       {/* Articles Grid */}
       {allArticles.length === 0 ? (
         <div className="text-center p-4 md:p-8 bg-white rounded-lg shadow-md">
