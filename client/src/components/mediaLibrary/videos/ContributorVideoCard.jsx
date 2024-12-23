@@ -1,4 +1,5 @@
 import DeleteModal from "@/components/shared/DeleteModal";
+import PostActions from "@/components/shared/PostActions";
 import EditVideoModel from "@/pages/contributors/models/EditVideoModel";
 import customFetch from "@/utils/customFetch";
 import React, { useState } from "react";
@@ -38,19 +39,12 @@ const ContributorVideoCard = ({ video, refetchVideos }) => {
                         alt={video.title}
                         className="w-full h-48 object-cover"
                     />
-                    <div className="absolute top-2 right-2 flex gap-2">
-                        <button
-                            onClick={() => setShowEditModal(true)}
-                            className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
-                        >
-                            <FaEdit className="w-4 h-4" />
-                        </button>
-                        <button
-                            onClick={   () => setShowDeleteModal(true)}
-                            className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                        >
-                            <FaTrash className="w-4 h-4" />
-                        </button>
+                    <div className="absolute top-2 right-2 flex items-center gap-2 bg-gray-200 rounded-full p-2">
+                    <PostActions
+                        handleEdit={() => setShowEditModal(true)}
+                        handleDelete={ () => setShowDeleteModal(true)}
+                      />
+                     
                     </div>
                 </div>
                 <div className="p-4">

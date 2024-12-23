@@ -12,12 +12,13 @@ const Answer = ({ answer: initialAnswer, user, answerCount }) => {
   const navigate = useNavigate();
   const [showAnswerDeleteModal, setShowAnswerDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [isLiked, setIsLiked] = useState(initialAnswer.likes?.includes(user?._id));
+  const [isLiked, setIsLiked] = useState(
+    initialAnswer.likes?.includes(user?._id)
+  );
   const [likeCount, setLikeCount] = useState(initialAnswer.totalLikes || 0);
   const [answer, setAnswer] = useState(initialAnswer);
   const [editedContext, setEditedContext] = useState(answer.context);
   const [isEditing, setIsEditing] = useState(false);
-
 
   const handleDeleteAnswer = async () => {
     try {
@@ -25,7 +26,7 @@ const Answer = ({ answer: initialAnswer, user, answerCount }) => {
       setShowAnswerDeleteModal(false);
 
       toast.success("Answer deleted successfully");
-      answerCount === 1 ? navigate('/qa-section') : window.location.reload();
+      answerCount === 1 ? navigate("/qa-section") : window.location.reload();
     } catch (error) {
       console.log(error);
     }
@@ -101,16 +102,13 @@ const Answer = ({ answer: initialAnswer, user, answerCount }) => {
               className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary min-h-[100px] resize-none"
             />
             <div className="flex justify-end gap-3 pt-3 border-t">
-              <button
-                onClick={handleCancelEdit}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
-              >
+              <button onClick={handleCancelEdit} className="btn-red">
                 Cancel
               </button>
               <button
                 onClick={handleSaveEdit}
                 disabled={!editedContext.trim()}
-                className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-2"
               >
                 Save Changes
               </button>
@@ -141,7 +139,10 @@ const Answer = ({ answer: initialAnswer, user, answerCount }) => {
         </Link>
         {answer.editedAt && (
           <span className="text-xs text-gray-400 ml-auto">
-            edited {formatDistanceToNow(new Date(answer.editedAt), { addSuffix: true })}
+            edited{" "}
+            {formatDistanceToNow(new Date(answer.editedAt), {
+              addSuffix: true,
+            })}
           </span>
         )}
       </div>

@@ -30,7 +30,9 @@ const QaRepliesOutlet = () => {
   };
   const deleteReply = async (replyId) => {
     try {
-        await customFetch.delete(`/qa-section/question/answer/comments/reply/${replyId}`);
+      await customFetch.delete(
+        `/qa-section/question/answer/comments/reply/${replyId}`
+      );
       fetchReplies();
     } catch (error) {
       console.log(error);
@@ -38,7 +40,9 @@ const QaRepliesOutlet = () => {
   };
   const likeReply = async (replyId) => {
     try {
-      await customFetch.patch(`/qa-section/question/answer/comments/reply/${replyId}/like`);
+      await customFetch.patch(
+        `/qa-section/question/answer/comments/reply/${replyId}/like`
+      );
     } catch (error) {
       console.log(error);
     }

@@ -32,10 +32,7 @@ const PlaylistVideos = () => {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)]  rounded-xl p-8 space-y-6 text-center">
-          <div className="bg-blue-100 p-6 rounded-full">
-            <FaFilm className="w-16 h-16 text-blue-600 animate-pulse" />
-          </div>
+        <div className="h-full flex justify-center itms-center text-center text-gray-500 ">
           <div className="max-w-md">
             <h2 className="text-2xl font-bold text-[var(--grey--900)] mb-3">
               Empty Playlist

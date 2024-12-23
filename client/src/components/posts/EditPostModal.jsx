@@ -30,7 +30,7 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
       setSelectedImage(null);
     }
     const fileInput = document.querySelector('input[type="file"]');
-    if (fileInput) fileInput.value = '';
+    if (fileInput) fileInput.value = "";
   };
 
   const handleAddTag = (e) => {
@@ -56,28 +56,24 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
       setIsSubmitting(true);
       const formData = new FormData();
       formData.append("description", description);
-      
+
       // Handle tags as JSON string
       formData.append("tags", JSON.stringify(tags));
 
       if (selectedImage?.file) {
         formData.append("imageUrl", selectedImage.file);
       }
-      
+
       // Add a flag to indicate image removal
       if (!selectedImage) {
         formData.append("removeImage", "true");
       }
 
-      const { data } = await customFetch.patch(
-        `/posts/${post._id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const { data } = await customFetch.patch(`/posts/${post._id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       toast.success("Post updated successfully!");
       if (onPostUpdated) {
@@ -108,7 +104,7 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
           </button>
         </div>
 
-        <form 
+        <form
           onSubmit={handleSubmit}
           className="space-y-4"
           encType="multipart/form-data"
@@ -156,7 +152,9 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
               <div className="w-full px-4 py-3 rounded-lg border-2 border-dashed border-purple-300 hover:border-purple-500 transition-all">
                 <label className="flex items-center justify-center cursor-pointer gap-2">
                   <FaImage className="text-gray-400" />
-                  <span className="text-sm text-blue-600 hover:text-blue-500">Upload image</span>
+                  <span className="text-sm text-blue-600 hover:text-blue-500">
+                    Upload image
+                  </span>
                   <input
                     type="file"
                     name="imageUrl"
@@ -178,7 +176,7 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
                 placeholder="Add a tag..."
                 className="flex-1 px-3 py-1.5 bg-[var(--pure)] rounded-lg border border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-primary text-sm"
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     e.preventDefault();
                     handleAddTag(e);
                   }
@@ -217,7 +215,7 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="btn-red"
               disabled={isSubmitting}
             >
               Cancel
@@ -225,7 +223,7 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2"
+              className="btn-2 gap-2"
             >
               <FaShare />
               {isSubmitting ? "Updating..." : "Update"}

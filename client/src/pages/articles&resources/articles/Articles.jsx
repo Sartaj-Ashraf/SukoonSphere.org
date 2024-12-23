@@ -1,36 +1,63 @@
-import { useEffect, useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { useInView } from 'react-intersection-observer';
-import { useSearchParams } from 'react-router-dom';
-import customFetch from '@/utils/customFetch';
-import { Link } from 'react-router-dom';
-import { FaBookOpen, FaCalendarAlt, FaUser, FaSpinner, FaSearch } from 'react-icons/fa';
+import { useEffect, useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
+import { useSearchParams } from "react-router-dom";
+import customFetch from "@/utils/customFetch";
+import { Link } from "react-router-dom";
+import {
+  FaBookOpen,
+  FaCalendarAlt,
+  FaUser,
+  FaSpinner,
+  FaSearch,
+} from "react-icons/fa";
 import { IoCloseOutline } from "react-icons/io5";
+import { PageIntro } from "@/components";
+import {
+  FiAlertTriangle,
+  FiCalendar,
+  FiClock,
+  FiDollarSign,
+  FiHeart,
+} from "react-icons/fi";
+import { MdMultipleStop } from "react-icons/md";
 
 const Articles = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentFilter = searchParams.get('filter') || 'newest';
-  const searchQuery = searchParams.get('search') || '';
+  const currentFilter = searchParams.get("filter") || "newest";
+  const searchQuery = searchParams.get("search") || "";
   const [searchInput, setSearchInput] = useState(searchQuery);
   const { ref, inView } = useInView();
 
   // Filter options
   const filterOptions = [
-    { value: 'newest', label: 'Newest First' },
-    { value: 'oldest', label: 'Oldest First' },
-    { value: 'title', label: 'A-Z by Title' },
+    {
+      value: "newest",
+      label: "Newest First",
+      icon: <FiClock className="w-4 h-4" />,
+    },
+    {
+      value: "oldest",
+      label: "Oldest First",
+      icon: <FiCalendar className="w-4 h-4" />,
+    },
+    {
+      value: "title",
+      label: "A-Z",
+      icon: <MdMultipleStop className="w-4 h-4" />,
+    },
   ];
 
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchInput !== searchQuery) {
-        setSearchParams(prev => {
+        setSearchParams((prev) => {
           const newParams = new URLSearchParams(prev);
           if (searchInput) {
-            newParams.set('search', searchInput);
+            newParams.set("search", searchInput);
           } else {
-            newParams.delete('search');
+            newParams.delete("search");
           }
           return newParams;
         });
@@ -41,12 +68,12 @@ const Articles = () => {
   }, [searchInput, searchQuery, setSearchParams]);
 
   const handleFilterChange = (value) => {
-    setSearchParams(prev => {
+    setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
-      newParams.set('filter', value);
+      newParams.set("filter", value);
       return newParams;
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Set up infinite query
@@ -56,22 +83,24 @@ const Articles = () => {
     hasNextPage,
     isFetchingNextPage,
     status,
-    refetch
+    refetch,
   } = useInfiniteQuery({
-    queryKey: ['articles', currentFilter, searchQuery],
+    queryKey: ["articles", currentFilter, searchQuery],
     queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams({
         page: pageParam,
         limit: 9,
         sortBy: currentFilter,
-        ...(searchQuery && { search: searchQuery })
+        ...(searchQuery && { search: searchQuery }),
       });
       const response = await customFetch.get(`articles?${params}`);
       console.log("Response from articles:", response.data);
       return response.data;
     },
     getNextPageParam: (lastPage) => {
-      return lastPage.pagination.hasNextPage ? lastPage.pagination.currentPage + 1 : undefined;
+      return lastPage.pagination.hasNextPage
+        ? lastPage.pagination.currentPage + 1
+        : undefined;
     },
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -90,7 +119,7 @@ const Articles = () => {
     }
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center">
         <FaSpinner className="w-8 h-8 text-blue-500 animate-spin mb-4" />
@@ -99,7 +128,7 @@ const Articles = () => {
     );
   }
 
-  if (status === 'error') {
+  if (status === "error") {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center">
         <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg max-w-md text-center">
@@ -116,13 +145,13 @@ const Articles = () => {
     );
   }
 
-  const allArticles = data?.pages.flatMap(page => page.articles) || [];
+  const allArticles = data?.pages.flatMap((page) => page.articles) || [];
   console.log("All articles:", allArticles);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header Section */}
-      <div className="text-center mb-12">
+      {/* <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-[var(--grey--900)] mb-4">
           Articles & Resources
         </h1>
@@ -130,12 +159,14 @@ const Articles = () => {
           Explore our collection of articles written by mental health professionals and experts. 
           Find valuable insights, tips, and information about mental health and well-being.
         </p>
-      </div>
+      </div> */}
+      <PageIntro
+        title="Articles"
+        description="Explore our collection of articles written by mental health professionals and experts. Find valuable insights, tips, and information about mental health and well-being."
+      ></PageIntro>
 
       {/* Search and Filter Section */}
       <div className="flex flex-col gap-4 mb-6 bg-white rounded-lg shadow-md p-4 md:p-6">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-800">Articles</h2>
-        
         {/* Search bar */}
         <div className="relative">
           <input
@@ -149,10 +180,10 @@ const Articles = () => {
           {searchInput && (
             <button
               onClick={() => {
-                setSearchInput('');
-                setSearchParams(prev => {
+                setSearchInput("");
+                setSearchParams((prev) => {
                   const newParams = new URLSearchParams(prev);
-                  newParams.delete('search');
+                  newParams.delete("search");
                   return newParams;
                 });
               }}
@@ -170,12 +201,13 @@ const Articles = () => {
               <button
                 key={option.value}
                 onClick={() => handleFilterChange(option.value)}
-                className={`px-3 py-1.5 text-sm rounded-full transition-colors flex items-center gap-1 ${
+                className={`px-3 py-1.5 text-sm rounded-full transition-colors flex items-center gap-2 ${
                   currentFilter === option.value
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? "bg-[var(--primary)] text-white"
+                    : " text-gray-700 hover:bg-gray-200"
                 }`}
               >
+                {option.icon}
                 <span>{option.label}</span>
               </button>
             ))}
@@ -223,20 +255,26 @@ const Articles = () => {
                   <h2 className="text-xl font-semibold text-[var(--grey--900)] group-hover:text-blue-600 transition-colors duration-200 mb-3">
                     {article.title}
                   </h2>
-                  
+
                   {/* Article Metadata */}
                   <div className="flex items-center justify-between text-sm text-[var(--grey--500)] pt-4 border-t border-gray-100">
                     <div className="flex items-center">
                       {article.authorAvatar ? (
-                        <img src={`${article.authorAvatar}`} alt="" className="w-6 h-6 mr-2 object-cover rounded-full" />
+                        <img
+                          src={`${article.authorAvatar}`}
+                          alt=""
+                          className="w-6 h-6 mr-2 object-cover rounded-full"
+                        />
                       ) : (
                         <FaUser className="w-4 h-4 mr-2" />
                       )}
-                      <span>{article.authorName || 'Anonymous'}</span>
+                      <span>{article.authorName || "Anonymous"}</span>
                     </div>
                     <div className="flex items-center">
                       <FaCalendarAlt className="w-4 h-4 mr-2" />
-                      <span>{new Date(article.createdAt).toLocaleDateString()}</span>
+                      <span>
+                        {new Date(article.createdAt).toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -246,10 +284,7 @@ const Articles = () => {
 
           {/* Load More Trigger */}
           {hasNextPage && (
-            <div
-              ref={ref}
-              className="flex justify-center py-4"
-            >
+            <div ref={ref} className="flex justify-center py-4">
               {isFetchingNextPage ? (
                 <FaSpinner className="w-6 h-6 text-blue-500 animate-spin" />
               ) : (

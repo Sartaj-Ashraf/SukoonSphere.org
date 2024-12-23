@@ -100,7 +100,7 @@ const CreateArticleModel = ({ setShowModal, onArticleCreated }) => {
               className="btn-2 flex items-center justify-center gap-2"
             >
               <FaCheckCircle />
-              Createthis
+              Create
             </button>
             <button
               type="button"

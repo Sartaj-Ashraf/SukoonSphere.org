@@ -5,7 +5,13 @@ import { toast } from "react-toastify";
 import { useUser } from "@/context/UserContext";
 import { FaReply } from "react-icons/fa";
 
-const RepliesSection = ({ addReply, replies, fetchReplies, deleteReply, likeReply }) => {
+const RepliesSection = ({
+  addReply,
+  replies,
+  fetchReplies,
+  deleteReply,
+  likeReply,
+}) => {
   const { user } = useUser();
   const { commentId } = useParams();
 
@@ -31,24 +37,26 @@ const RepliesSection = ({ addReply, replies, fetchReplies, deleteReply, likeRepl
           name="content"
           placeholder="Write a reply..."
           className="w-full p-3 pr-14 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none text-gray-700"
-          rows='1'
+          rows="1"
         />
         <button
           type="submit"
-          className="absolute bottom-4 right-3 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1">
+          className="absolute bottom-4 right-3 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1"
+        >
           <FaReply className="w-2 h-2 md:w-3 md:h-3" />
         </button>
       </Form>
       <div className="space-y-4 mt-3 px-4 max-h-[400px] overflow-y-auto no-scrollbar">
-        {replies && replies.map((reply) => (
-          <Reply
-            key={reply._id}
-            reply={reply}
-            handleDeleteReply={deleteReply}
-            handleLikeReply={likeReply}
-            handleSubmit={(e) => handleSubmit(e, reply._id)}
-          />
-        ))}
+        {replies &&
+          replies.map((reply) => (
+            <Reply
+              key={reply._id}
+              reply={reply}
+              handleDeleteReply={deleteReply}
+              handleLikeReply={likeReply}
+              handleSubmit={(e) => handleSubmit(e, reply._id)}
+            />
+          ))}
       </div>
     </div>
   );

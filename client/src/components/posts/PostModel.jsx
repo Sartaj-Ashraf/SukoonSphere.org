@@ -30,7 +30,7 @@ const PostModal = ({ onClose }) => {
   };
 
   const removeTag = (tagToRemove) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+    setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   const handleSubmit = async (e) => {
@@ -43,30 +43,32 @@ const PostModal = ({ onClose }) => {
     try {
       setIsSubmitting(true);
       const formData = new FormData();
-      formData.append('description', description);
-      
+      formData.append("description", description);
+
       if (selectedImage?.file) {
-        formData.append('imageUrl', selectedImage.file);
+        formData.append("imageUrl", selectedImage.file);
       }
 
       // Add each tag
       if (tags.length > 0) {
-        tags.forEach(tag => formData.append('tags[]', tag));
+        tags.forEach((tag) => formData.append("tags[]", tag));
       }
 
       const response = await customFetch.post("/posts", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
-      
+
       if (response.status === 201) {
         toast.success("Post created successfully!");
         window.location.reload();
       }
     } catch (error) {
-      console.error('Error creating post:', error);
-      toast.error(error?.response?.data?.msg || "An error occurred during post creation.");
+      console.error("Error creating post:", error);
+      toast.error(
+        error?.response?.data?.msg || "An error occurred during post creation."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -88,7 +90,7 @@ const PostModal = ({ onClose }) => {
           </button>
         </div>
 
-        <form 
+        <form
           onSubmit={handleSubmit}
           className="space-y-4"
           encType="multipart/form-data"
@@ -119,8 +121,9 @@ const PostModal = ({ onClose }) => {
                     type="button"
                     onClick={() => {
                       setSelectedImage(null);
-                      const fileInput = document.querySelector('input[type="file"]');
-                      if (fileInput) fileInput.value = '';
+                      const fileInput =
+                        document.querySelector('input[type="file"]');
+                      if (fileInput) fileInput.value = "";
                     }}
                     className="ml-auto text-red-500 hover:text-red-600"
                   >
@@ -132,7 +135,9 @@ const PostModal = ({ onClose }) => {
               <div className="w-full px-4 py-3 rounded-lg border-2 border-dashed border-purple-300 hover:border-purple-500 transition-all">
                 <label className="flex items-center justify-center cursor-pointer gap-2">
                   <FaImage className="text-gray-400" />
-                  <span className="text-sm text-blue-600 hover:text-blue-500">Upload image</span>
+                  <span className="text-sm text-blue-600 hover:text-blue-500">
+                    Upload image
+                  </span>
                   <input
                     type="file"
                     name="imageUrl"
@@ -153,7 +158,7 @@ const PostModal = ({ onClose }) => {
                 onChange={(e) => setTagInput(e.target.value)}
                 placeholder="Add a tag..."
                 className="flex-1 px-3 py-1.5 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                onKeyPress={(e) => e.key === 'Enter' && handleAddTag(e)}
+                onKeyPress={(e) => e.key === "Enter" && handleAddTag(e)}
               />
               <button
                 onClick={handleAddTag}
@@ -183,17 +188,13 @@ const PostModal = ({ onClose }) => {
           </div>
 
           <div className="flex justify-end gap-3 pt-3 border-t">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
-            >
+            <button type="button" onClick={onClose} className="btn-red">
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2"
+              className="btn-2 flex gap-2"
             >
               <FaShare />
               {isSubmitting ? "Sharing..." : "Share"}

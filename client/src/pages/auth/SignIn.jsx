@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import customFetch from "@/utils/customFetch";
 import { Form, useNavigate } from "react-router-dom";
 import img_bg from "../../assets/images/bg_login.png";
 import { Link } from "react-router-dom";
@@ -28,7 +27,6 @@ const SignIn = () => {
         setError(result.error);
       }
     } catch (error) {
-      toast.error('An unexpected error occurred, please try again later!');
       setError('An unexpected error occurred');
       console.error(error);
     }

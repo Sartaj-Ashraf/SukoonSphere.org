@@ -1,7 +1,7 @@
-import React from 'react';
-import PodcastCard from './PodcastCard';
+import React from "react";
+import PodcastCard from "./PodcastCard";
 
-const PodcastsGrid = ({ podcasts, loading, error ,isPlayList }) => {
+const PodcastsGrid = ({ podcasts, loading, error, isPlayList }) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -22,7 +22,11 @@ const PodcastsGrid = ({ podcasts, loading, error ,isPlayList }) => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ">
       {podcasts && podcasts.length > 0 ? (
         podcasts.map((podcast) => (
-          <PodcastCard key={podcast._id} podcast={podcast} isPlayList={isPlayList} />
+          <PodcastCard
+            key={podcast._id}
+            podcast={podcast}
+            isPlayList={isPlayList}
+          />
         ))
       ) : (
         <div className="text-center text-gray-500 col-span-full py-12">

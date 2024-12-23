@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLoaderData } from "react-router-dom";
 import { FaUsers, FaUser, FaEye } from "react-icons/fa";
+import { PageIntro } from "@/components";
 
 function OurTeam() {
   // Fetch data from the loader (replace with actual data)
@@ -18,47 +19,13 @@ function OurTeam() {
 
   return (
     <>
-      <div className="container mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-4">
+        <PageIntro
+          title={" SukoonSphere Contributors"}
+          description={` Our qualified physicians and mental health expertsensure compassionate, accurate, and inclusive content that
+            prioritizes your well-being.`}
+        />
         <div className="text-center max-w-4xl mx-auto space-y-6">
-          <div className="relative inline-block">
-            <h2
-              className="text-3xl md:text-5xl font-extrabold text-[var(--grey--900)] 
-            relative z-10  bg-clip-text
-            transition-all duration-300 
-            hover:scale-[1.02]"
-            >
-              SukoonSphere Contributors
-            </h2>
-            <div
-              className="absolute -bottom-2 left-0 right-0 h-2 
-            bg-gradient-to-r from-[#3498db]/50 to-[#2c3e50]/50 
-            blur-lg opacity-50 
-            transform -skew-x-6"
-            ></div>
-          </div>
-
-          <p
-            className="text-lg md:text-xl text-[var(--grey--800)] 
-          leading-relaxed 
-          max-w-2xl mx-auto 
-          px-4 
-          transition-colors 
-          hover:text-[var(--grey--900)] 
-          group"
-          >
-            <span className="relative inline-block">
-              Our qualified physicians and mental health experts
-              <span
-                className="absolute bottom-0 left-0 w-full h-0.5 
-              bg-gradient-to-r from-[#3498db] to-[#2c3e50] 
-              opacity-0 group-hover:opacity-100 
-              transition-opacity duration-300"
-              ></span>
-            </span>{" "}
-            ensure compassionate, accurate, and inclusive content that
-            prioritizes your well-being.
-          </p>
-
           <div className="my-8 flex justify-center ">
             <div
               className="inline-flex items-center space-x-3 

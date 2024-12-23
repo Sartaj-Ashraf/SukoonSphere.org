@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { FaPlay, FaPlus, FaEllipsisV, FaTrash, FaPencilAlt } from "react-icons/fa";
+import {
+  FaPlay,
+  FaPlus,
+  FaEllipsisV,
+  FaTrash,
+  FaPencilAlt,
+} from "react-icons/fa";
 import { Link } from "react-router-dom";
 import CreateNewPodcast from "../../../pages/contributors/models/CreateNewPodcast";
 import EditPodcastModel from "../../../pages/contributors/models/EditPodcastModel";
@@ -64,13 +70,6 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
                 alt={playlist.title}
                 className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="absolute bottom-4 left-4 flex items-center space-x-3">
-                  <button className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg transform hover:scale-105 transition-all">
-                    <FaPlay className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -79,15 +78,18 @@ const PodcastPlaylistCard = ({ playlist, isContributor, fetchData }) => {
             <div>
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-grow pr-4">
-                  <h3 className="text-lg md:text-2xl font-bold text-gray-800 mb-3 hover:text-blue-600 transition-colors">
-                    {playlist.title}
-                  </h3>
+                  <Link to={`/podcasts/playlist/${playlist._id}`}>
+                    <h2 className="text-lg md:text-2xl font-bold text-gray-800 mb-3 hover:text-blue-600 transition-colors">
+                      {playlist.title}
+                    </h2>
+                  </Link>
                   <p className="text-gray-600 text-base mb-4 line-clamp-2 leading-relaxed">
                     {playlist.description}
                   </p>
                   <div className="flex items-center space-x-4">
                     <span className="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
-                      {playlist.episodes.length} {playlist.episodes.length <= 1 ? "Episode" : "Episodes"}
+                      {playlist.episodes.length}{" "}
+                      {playlist.episodes.length <= 1 ? "Episode" : "Episodes"}
                     </span>
                   </div>
                 </div>

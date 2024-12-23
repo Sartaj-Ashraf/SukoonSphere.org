@@ -8,11 +8,14 @@ const CommentSection = ({
   comments,
   handleDeleteComment,
   handleLikeComment,
-  toggleReply
+  toggleReply,
 }) => {
   return (
     <div className="bg-white rounded-xl border border-gray-200  my-2">
-      <Form onSubmit={addComment} className="relative px-4 py-2 border-b-2 border-gray-100">
+      <Form
+        onSubmit={addComment}
+        className="relative px-4 py-2 border-b-2 border-gray-100"
+      >
         <textarea
           name="content"
           placeholder="Add a comment..."
@@ -35,12 +38,24 @@ const CommentSection = ({
       </Form>
 
       <div className="px-2">
-        <span className="text-sm font-medium text-gray-500 p-2 inline-block">Comments</span>
+        <span className="text-sm font-medium text-gray-500 p-2 inline-block">
+          Comments
+        </span>
         <div className="max-h-[400px] overflow-y-auto no-scrollbar py-2">
           {comments &&
             comments.map((comment) => (
-              <div key={comment._id} className="p-2 border-b  border-gray-100 last:border-b-0">
-                <Comment {...{comment, handleDeleteComment, handleLikeComment, toggleReply}} />
+              <div
+                key={comment._id}
+                className="p-2 border-b  border-gray-100 last:border-b-0"
+              >
+                <Comment
+                  {...{
+                    comment,
+                    handleDeleteComment,
+                    handleLikeComment,
+                    toggleReply,
+                  }}
+                />
               </div>
             ))}
         </div>

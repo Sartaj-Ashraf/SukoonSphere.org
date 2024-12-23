@@ -49,10 +49,6 @@ const AllPodcastPlaylists = () => {
 
   return (
     <div className=" mx-auto  py-2 min-h-screen">
-      <h1 className="text-3xl font-bold mb-4 text-center text-gray-800 flex items-center justify-center gap-3">
-        <FaPodcast className="text-[var(--primary)]" size={36} />
-        Podcast Playlists
-      </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {playlists && playlists.length > 0 ? (
           playlists.map((playlist) => (
@@ -127,8 +123,12 @@ const AllPodcastPlaylists = () => {
           ))
         ) : (
           <div className="text-center text-gray-500 col-span-full py-12">
-            <p className="text-xl">No playlists found</p>
-            <p className="text-sm mt-2">Create a playlist to get started</p>
+            <h2 className="text-2xl font-bold text-[var(--grey--900)] mb-3">
+              No playlists found
+            </h2>
+            <p className="text-[var(--grey--800)] mb-6">
+              No playlist found. This collection is currently empty.
+            </p>
           </div>
         )}
       </div>

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import customFetch from "@/utils/customFetch";
 
-
 const EditComment = ({ comment, onClose, onUpdate }) => {
   const [editedContent, setEditedContent] = useState(comment.content);
 
@@ -13,12 +12,14 @@ const EditComment = ({ comment, onClose, onUpdate }) => {
     }
 
     try {
-      const endpoint = comment.answerId 
-        ? `/qa-section/answer/comments/${comment._id}`  // QA comment
-        : `/posts/comments/${comment._id}`;  // Post comment
+      const endpoint = comment.answerId
+        ? `/qa-section/answer/comments/${comment._id}` // QA comment
+        : `/posts/comments/${comment._id}`; // Post comment
 
-      const response = await customFetch.patch(endpoint, { content: editedContent });
-      
+      const response = await customFetch.patch(endpoint, {
+        content: editedContent,
+      });
+
       // Preserve all original comment properties while updating with new data
       const updatedComment = {
         ...comment,
@@ -26,10 +27,12 @@ const EditComment = ({ comment, onClose, onUpdate }) => {
         createdBy: comment.createdBy, // Preserve the createdBy field
         likes: response.data.comment.likes || comment.likes,
         replies: response.data.comment.replies || comment.replies,
-        totalLikes: response.data.comment.totalLikes || comment.likes?.length || 0,
-        totalReplies: response.data.comment.totalReplies || comment.replies?.length || 0,
+        totalLikes:
+          response.data.comment.totalLikes || comment.likes?.length || 0,
+        totalReplies:
+          response.data.comment.totalReplies || comment.replies?.length || 0,
         username: response.data.comment.username || comment.username,
-        userAvatar: response.data.comment.userAvatar || comment.userAvatar
+        userAvatar: response.data.comment.userAvatar || comment.userAvatar,
       };
 
       onUpdate(updatedComment);
@@ -50,16 +53,13 @@ const EditComment = ({ comment, onClose, onUpdate }) => {
         className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary min-h-[100px] resize-none"
       />
       <div className="flex justify-end gap-3 pt-3 border-t">
-        <button
-          onClick={onClose}
-          className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
-        >
+        <button onClick={onClose} className="btn-red">
           Cancel
         </button>
         <button
           onClick={handleSave}
           disabled={!editedContent.trim()}
-          className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-2"
         >
           Save Changes
         </button>
