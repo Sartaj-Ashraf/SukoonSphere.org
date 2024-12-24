@@ -32,7 +32,7 @@ const SingleVideos = () => {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] rounded-xl p-8 space-y-6 text-center">
+        <div className="flex flex-col items-center justify-center  rounded-xl p-8 space-y-4 text-center">
           <div className="bg-blue-100 p-6 rounded-full">
             <FaFilm className="w-16 h-16 text-blue-600 animate-pulse" />
           </div>

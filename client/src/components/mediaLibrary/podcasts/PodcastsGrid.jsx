@@ -30,7 +30,7 @@ const PodcastsGrid = ({ podcasts, loading, error, isPlayList }) => {
         ))
       ) : (
         <div className="text-center text-gray-500 col-span-full py-12">
-          <p className="text-xl">No podcasts found</p>
+          <h2 className="text-2xl font-bold text-[var(--grey--900)] mb-3">No podcasts found</h2>
           <p className="text-sm mt-2">Check back later for new content</p>
         </div>
       )}

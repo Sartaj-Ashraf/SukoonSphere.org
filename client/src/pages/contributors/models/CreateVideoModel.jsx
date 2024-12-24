@@ -73,7 +73,7 @@ const CreateVideoModel = ({ setShowModal }) => {
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)]">
+                <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto max-h-[calc(100vh-200px)] p-2">
                     <div>
                         <input
                             type="text"

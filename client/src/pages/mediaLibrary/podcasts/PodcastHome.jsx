@@ -28,7 +28,7 @@ const PodcastHome = () => {
               }
             >
               <FaVideo className="inline-block mr-2 -mt-1" />
-              podcasts
+              Podcasts
             </NavLink>
             <NavLink
               to="/podcasts/playlists"

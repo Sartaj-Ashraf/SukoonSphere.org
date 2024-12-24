@@ -51,8 +51,8 @@ const QuestionCard = ({ question }) => {
         </div>
       </div>
 
-      <div className="mb-6">
-        <h3 className="text-base md:text-xl mb-2 font-bold text-[var(--grey--900)] hover:text-[var(--ternery)] transition-colors duration-200">
+      <div className="mb-4">
+        <h3 className="text-lg md:text-2xl mb-2 font-bold text-[var(--grey--900)] hover:text-[var(--ternery)] transition-colors duration-200">
           {questionText}
         </h3>
         <p className="text-base mb-2 leading-relaxed text-[var(--grey--800)]">{context}</p>
