@@ -40,7 +40,7 @@ const PodcastHome = () => {
                 } w-1/2 py-2 px-1 text-center border-b-2 font-medium text-sm transition-colors duration-200`
               }
             >
-              <FaList className="inline-block mr-2 -mt-1" />
+              <FaList className="inline-block mr-2 -mt-1 " />
               Playlists
             </NavLink>
           </nav>
