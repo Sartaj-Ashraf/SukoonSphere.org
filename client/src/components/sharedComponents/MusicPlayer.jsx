@@ -11,15 +11,16 @@ const MusicPlayer = ({ currentAudio, currentPodcast, onNext, onPrevious }) => {
 
   useEffect(() => {
     if (currentAudio) {
-      console.log('Setting audio source:', currentAudio);
       audioRef.current.src = currentAudio;
       audioRef.current.load();
-      audioRef.current.play().then(() => {
-        setIsPlaying(true);
-      }).catch(error => {
-        console.error("Error playing audio:", error);
-        setIsPlaying(false);
-      });
+      if (isPlaying) {
+        audioRef.current.play().catch(error => {
+          console.error("Error playing audio:", error);
+          setIsPlaying(false);
+        });
+      }
+    } else {
+      setIsPlaying(false);
     }
   }, [currentAudio]);
 
@@ -29,16 +30,17 @@ const MusicPlayer = ({ currentAudio, currentPodcast, onNext, onPrevious }) => {
     }
   }, [isLooping]);
 
-  const togglePlay = () => {
-    if (audioRef.current.paused) {
-      audioRef.current.play().then(() => {
+  const togglePlay = async () => {
+    try {
+      if (audioRef.current.paused) {
+        await audioRef.current.play();
         setIsPlaying(true);
-      }).catch(error => {
-        console.error("Error playing audio:", error);
+      } else {
+        audioRef.current.pause();
         setIsPlaying(false);
-      });
-    } else {
-      audioRef.current.pause();
+      }
+    } catch (error) {
+      console.error("Error toggling play:", error);
       setIsPlaying(false);
     }
   };
@@ -150,7 +152,7 @@ const MusicPlayer = ({ currentAudio, currentPodcast, onNext, onPrevious }) => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 lg:sticky lg:top-24 lg:h-[500px] w-full lg:w-96 mx-auto z-50">
+    <div className="fixed bottom-16 left-0 right-0 lg:sticky lg:top-24 lg:h-[500px] w-full lg:w-96 mx-auto ">
       <div 
         className="relative h-20 lg:h-full p-2 lg:p-6 bg-white/10 backdrop-blur-lg lg:rounded-xl text-white font-sans overflow-hidden"
         style={{
@@ -211,19 +213,23 @@ const MusicPlayer = ({ currentAudio, currentPodcast, onNext, onPrevious }) => {
           onEnded={() => {
             setIsPlaying(false);
             if (isLooping) {
-              audioRef.current.play();
+              audioRef.current.play().catch(console.error);
             } else if (onNext) {
               onNext();
             }
           }}
-          onError={(e) => console.error("Error playing audio:", e)}
+          onError={(e) => {
+            console.error("Error playing audio:", e);
+            setIsPlaying(false);
+          }}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
         />
 
         {/* Desktop View */}
         <div className="hidden lg:block relative z-10">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
-            <span className="font-medium">Now Playing</span>
             <button 
               className={`bg-transparent border-0 ${currentAudio ? 'text-white hover:text-gray-200' : 'text-gray-400'} cursor-pointer p-1`}
               onClick={handleDownload}
