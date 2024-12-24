@@ -19,6 +19,7 @@ import {
   FaSearch,
   FaPlus,
   FaTimesCircle,
+  FaImage,
 } from "react-icons/fa";
 import { IoCloseOutline } from "react-icons/io5";
 import DeleteModal from "@/components/shared/DeleteModal";
@@ -330,15 +331,22 @@ const Articles = () => {
                     {/* Image Upload */}
                     <div className="col-span-2">
                       <label className="block text-sm font-medium text-[var(--grey--700)] mb-2">
-                        Featured Image
+                        Cover Image
                       </label>
-                      <div className="mt-1 flex items-center gap-4">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                        />
+                      <div className="w-1/2 px-4 py-3 rounded-lg border-2 border-dashed border-purple-300 hover:border-purple-500 transition-all">
+                        <label className="flex items-center justify-center cursor-pointer gap-2">
+                          <FaImage className="text-gray-400" />
+                          <span className="text-sm text-blue-600 hover:text-blue-500">
+                            Upload image
+                          </span>
+                          <input
+                            type="file"
+                            name="imageUrl"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                          />
+                        </label>
                         {imagePreview && (
                           <div className="relative w-24 h-24 rounded-lg overflow-hidden">
                             <img
