@@ -229,7 +229,7 @@ const Answer = () => {
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="Search questions..."
-                  className="w-full bg-[var(--white-color)] py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full bg-[var(--white-color)] py-2 px-3 border  rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
                 />
                 {searchInput && (
                   <button
@@ -367,7 +367,7 @@ const Answer = () => {
                             value={newAnswer}
                             onChange={(e) => setNewAnswer(e.target.value)}
                             placeholder="Write your answer here..."
-                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary min-h-[100px] resize-none"
+                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all duration-300 placeholder-ternary min-h-[100px] resize-none"
                           />
                           {actionData?.error && (
                             <p className="text-red-500 text-sm mt-1">

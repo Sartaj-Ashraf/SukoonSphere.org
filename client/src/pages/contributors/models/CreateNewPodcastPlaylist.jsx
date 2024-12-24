@@ -76,11 +76,11 @@ const CreateNewPodcastPlaylist = ({ setShowModal }) => {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-12 bg-black bg-opacity-50 backdrop-blur-sm">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 md:p-6 bg-black bg-opacity-50 backdrop-blur-sm">
             <div className="p-4 bg-white w-full max-w-lg rounded-xl shadow-2xl transform transition-all relative z-50">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-[var(--primary)] flex items-center gap-2">
-                        <FaList className="text-primary" />
+                        <FaList className="text-[var(--primary)]" />
                         Create New Podcast Playlist
                     </h2>
                     <button
@@ -98,7 +98,7 @@ const CreateNewPodcastPlaylist = ({ setShowModal }) => {
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="Enter playlist title..."
-                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary"
+                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border  focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all duration-300 placeholder-ternary"
                         />
                     </div>
 
@@ -107,7 +107,7 @@ const CreateNewPodcastPlaylist = ({ setShowModal }) => {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Enter playlist description..."
-                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary min-h-[100px]"
+                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border  focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all duration-300 placeholder-ternary min-h-[100px]"
                         />
                     </div>
 
@@ -119,7 +119,7 @@ const CreateNewPodcastPlaylist = ({ setShowModal }) => {
                             type="file"
                             accept="image/*"
                             onChange={handleImageChange}
-                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border  focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all duration-300"
                         />
                     </div>
 

@@ -75,11 +75,11 @@ const EditVideoModel = ({ video, setShowModal, refetchVideos }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-10">
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-10 px-2">
       <div className="bg-[var(--body)] rounded-2xl p-6 w-[600px] shadow-2xl transform transition-all duration-300">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-[var(--primary)] flex items-center gap-2">
-            <FaVideo className="text-primary" />
+            <FaVideo className="text-[var(--primary)]" />
             Edit Video
           </h2>
           <button
@@ -102,7 +102,7 @@ const EditVideoModel = ({ video, setShowModal, refetchVideos }) => {
               name="title"
               defaultValue={video.title}
               placeholder="Video title"
-              className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary"
+              className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]transition-all duration-300 placeholder-ternary"
               required
             />
           </div>
@@ -112,7 +112,7 @@ const EditVideoModel = ({ video, setShowModal, refetchVideos }) => {
               name="description"
               defaultValue={video.description}
               placeholder="Video description..."
-              className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary min-h-[100px]"
+              className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]transition-all duration-300 placeholder-ternary min-h-[100px]"
               required
             />
           </div>
@@ -121,7 +121,7 @@ const EditVideoModel = ({ video, setShowModal, refetchVideos }) => {
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+              className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]transition-all duration-300"
             >
               <option value="single">Single Video</option>
               <option value="playlist">Playlist</option>
@@ -134,7 +134,7 @@ const EditVideoModel = ({ video, setShowModal, refetchVideos }) => {
               name="videoUrl"
               defaultValue={video.videoUrl}
               placeholder="Video URL"
-              className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary"
+              className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]transition-all duration-300 placeholder-ternary"
               required
             />
           </div>

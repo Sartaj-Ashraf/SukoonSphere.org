@@ -58,11 +58,11 @@ const CreateVideoModel = ({ setShowModal }) => {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-12 bg-black bg-opacity-50 backdrop-blur-sm overflow-hidden">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 md:p-6 bg-black bg-opacity-50 backdrop-blur-sm overflow-hidden">
             <div className="p-4 bg-white w-full max-w-lg rounded-xl shadow-2xl transform transition-all relative z-50 overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-[var(--primary)] flex items-center gap-2">
-                        <FaVideo className="text-primary" />
+                        <FaVideo className="text-[var(--primary)]" />
                         Create New Video
                     </h2>
                     <button
@@ -80,7 +80,7 @@ const CreateVideoModel = ({ setShowModal }) => {
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="Enter video title..."
-                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary"
+                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all duration-300 placeholder-ternary"
 
                         />
                     </div>
@@ -90,7 +90,7 @@ const CreateVideoModel = ({ setShowModal }) => {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Enter video description..."
-                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary min-h-[100px]"
+                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border  focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all duration-300 placeholder-ternary min-h-[100px]"
                         />
                     </div>
 
@@ -98,7 +98,7 @@ const CreateVideoModel = ({ setShowModal }) => {
                         <select
                             value={type}
                             onChange={(e) => setType(e.target.value)}
-                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all duration-300"
                         >
                             <option value="single">Single Video</option>
                             <option value="playlist">Playlist</option>
@@ -111,20 +111,20 @@ const CreateVideoModel = ({ setShowModal }) => {
                             value={videoUrl}
                             onChange={(e) => setVideoUrl(e.target.value)}
                             placeholder="Enter video embedded URL..."
-                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary"
+                            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all duration-300 placeholder-ternary"
 
                         />
                     </div>
 
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
+                        <label className="block text-gray-700 text-sm font-bold mb-2 ">
                             Cover Image*
                         </label>
                         <input
                             type="file"
                             accept="image/*"
                             onChange={handleFileChange}
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="shadow appearance-none border  w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline rounded-lg"
 
                         />
                     </div>
