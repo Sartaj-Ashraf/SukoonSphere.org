@@ -36,7 +36,7 @@ const RepliesSection = ({
         <textarea
           name="content"
           placeholder="Write a reply..."
-          className="w-full p-3 pr-14 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none text-gray-700"
+          className="w-full p-3 pr-14 border  rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent resize-none text-gray-700"
           rows="1"
         />
         <button

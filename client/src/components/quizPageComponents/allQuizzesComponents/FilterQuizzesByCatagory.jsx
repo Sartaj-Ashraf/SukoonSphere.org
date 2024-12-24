@@ -33,7 +33,7 @@ function FilterQuizzesByCategory() {
           <div className="w-full lg:w-1/3">
             <select
               name="category"
-              className="w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg text-[var(--black-color)] cursor-pointer focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all duration-300 appearance-none"
+              className="w-full py-3 px-4 bg-gray-50 border rounded-lg text-[var(--black-color)] cursor-pointer focus:outline-none  focus:ring-2 focus:ring-[var(--primary)] transition-all duration-300 appearance-none"
               style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23666666'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
                 backgroundPosition: "right 1rem center",

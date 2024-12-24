@@ -67,7 +67,7 @@ const CreateArticleModel = ({ setShowModal, onArticleCreated }) => {
             placeholder="Enter article title..."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary"
+            className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-[var(--primary)]transition-all duration-300 placeholder-ternary"
           />
           <div className="relative">
             <label className="block mb-2 text-[var(--black)] text-sm font-medium">

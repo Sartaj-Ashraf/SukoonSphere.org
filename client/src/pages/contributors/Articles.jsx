@@ -323,7 +323,7 @@ const Articles = () => {
                         name="title"
                         value={modalTitle}
                         onChange={(e) => setModalTitle(e.target.value)}
-                        className="mt-1 block w-full rounded-lg border border-gray-200 bg-[var(--pure)] px-4 py-2 text-[var(--grey--900)] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                        className="mt-1 block w-full rounded-lg border border-gray-200 bg-[var(--pure)] px-4 py-2 text-[var(--grey--900)] focus:border-blue-500 focus:ring-2 focus:ring-[var(--primary)] transition-all duration-200"
                         required
                       />
                     </div>

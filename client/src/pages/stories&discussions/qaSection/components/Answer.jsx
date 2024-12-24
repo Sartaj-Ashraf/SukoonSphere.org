@@ -99,7 +99,7 @@ const Answer = ({ answer: initialAnswer, user, answerCount }) => {
               value={editedContext}
               onChange={(e) => setEditedContext(e.target.value)}
               placeholder="Edit your answer..."
-              className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary min-h-[100px] resize-none"
+              className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all duration-300 placeholder-ternary min-h-[100px] resize-none"
             />
             <div className="flex justify-end gap-3 pt-3 border-t">
               <button onClick={handleCancelEdit} className="btn-red">

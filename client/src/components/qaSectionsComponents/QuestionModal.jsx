@@ -71,8 +71,8 @@ const QuestionModal = ({ isOpen, onClose, refetchQuestions }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 backdrop-blur-sm">
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl scale-100">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 backdrop-blur-sm px-2 ">
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-4 md:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl scale-100 ">
         <h3 className="text-2xl font-bold mb-4 text-gray-800 sticky top-0 bg-white pt-2">
           Ask a Question
         </h3>
@@ -84,7 +84,7 @@ const QuestionModal = ({ isOpen, onClose, refetchQuestions }) => {
               value={questionText}
               onChange={(e) => setQuestionText(e.target.value)}
               placeholder="Your Question"
-              className="input w-full p-3 rounded-lg bg-gray-50 text-gray-800 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+              className="input w-full p-3 rounded-lg bg-gray-50 text-gray-800 border border-gray-200  focus:ring-2 focus:ring-[var(--primary)]  transition-all duration-200"
             />
           </div>
 
@@ -94,7 +94,7 @@ const QuestionModal = ({ isOpen, onClose, refetchQuestions }) => {
               onChange={(e) => setContext(e.target.value)}
               placeholder="More Details"
               rows="3"
-              className="textarea w-full p-3 rounded-lg bg-gray-50 text-gray-800 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+              className="textarea w-full p-3 rounded-lg bg-gray-50 text-gray-800 border border-gray-200  focus:ring-2 focus:ring-[var(--primary)] transition-all duration-200"
             />
           </div>
 
@@ -126,7 +126,7 @@ const QuestionModal = ({ isOpen, onClose, refetchQuestions }) => {
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Add a tag"
-                className="flex-1 p-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                className="flex-1 p-2 rounded-lg bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-[var(--primary)] transition-all duration-200"
               />
               <button
                 type="button"

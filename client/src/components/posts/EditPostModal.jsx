@@ -89,11 +89,11 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-10">
-      <div className="bg-[var(--body)] rounded-2xl p-6 w-[500px] shadow-2xl transform transition-all duration-300">
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-10 px-2">
+      <div className="bg-[var(--body)] rounded-2xl p-4 md:p-6 w-[500px] shadow-2xl transform transition-all duration-300">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-[var(--primary)] flex items-center gap-2">
-            <FaShare className="text-primary" />
+            <FaShare className="text-[var(--primary)]" />
             Edit Your Story
           </h2>
           <button
@@ -114,7 +114,7 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What's on your mind? Share your thoughts, experiences or questions..."
-              className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border border-var(--primary) focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 placeholder-ternary min-h-[100px]"
+              className="w-full px-4 py-3 bg-[var(--pure)] rounded-lg border  focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all duration-300 placeholder-ternary min-h-[100px]"
               required
             />
           </div>
@@ -174,7 +174,7 @@ const EditPostModal = ({ post, onClose, onPostUpdated }) => {
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 placeholder="Add a tag..."
-                className="flex-1 px-3 py-1.5 bg-[var(--pure)] rounded-lg border border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                className="flex-1 px-3 py-1.5 bg-[var(--pure)] rounded-lg border  focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-sm"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
