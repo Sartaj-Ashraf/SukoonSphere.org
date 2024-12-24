@@ -103,21 +103,6 @@ const HowToCreateAVideo = () => {
                       />
                     </div>
                   </div>
-
-                  <div className="border rounded-lg p-4 bg-white">
-                    <p className="font-medium mb-2">
-                      Method 2: From YouTube URL Bar
-                    </p>
-                    <ol className=" text-xs md:text-base list-decimal ml-4 space-y-2">
-                      <li>Go to your YouTube video</li>
-                      <li>Copy the URL from your browser's address bar</li>
-                      <img
-                        src={methodimg2}
-                        alt="YouTube URL bar"
-                        className="mt-2 rounded-lg border shadow-sm md:w-3/4"
-                      />
-                    </ol>
-                  </div>
                 </div>
               </div>
 

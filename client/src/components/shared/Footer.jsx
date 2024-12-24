@@ -7,7 +7,6 @@ import links from "@/utils/SharedComp/PageLinks";
 import { FaCircleDot } from "react-icons/fa6";
 import { Link, NavLink } from "react-router-dom";
 
-
 const Footer = () => {
   return (
     // Dont make any changes to the footer section
@@ -21,7 +20,8 @@ const Footer = () => {
               Website Under Development
             </h2>
             <p className="text-slate-300">
-              We're working hard to improve your experience. If you encounter any bugs or issues, please let us know.
+              We're working hard to improve your experience. If you encounter
+              any bugs or issues, please let us know.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
@@ -32,7 +32,8 @@ const Footer = () => {
               </Link>
             </div>
             <p className="text-sm text-slate-400">
-              Your feedback helps us improve. Thank you for your patience and support.
+              Your feedback helps us improve. Thank you for your patience and
+              support.
             </p>
             {/* <div className="flex items-center gap-4 mt-6">
               <span className="text-slate-300">Follow us on</span>
@@ -60,11 +61,16 @@ const Footer = () => {
                 <ul className="space-y-3">
                   {links.slice(0, 3).map((link, index) => (
                     <li key={`${link.name}-${index}`}>
-                      <span className="text-slate-300 font-medium">{link.name}</span>
+                      <span className="text-slate-300 font-medium">
+                        {link.name}
+                      </span>
                       {link.sublinks && (
                         <ul className="mt-2 ml-4 space-y-2">
                           {link.sublinks.map((sublink) => (
-                            <li key={sublink.name} className="flex items-center gap-2">
+                            <li
+                              key={sublink.name}
+                              className="flex items-center gap-2"
+                            >
                               <FaCircleDot className="w-2 h-2 text-slate-500" />
                               <NavLink
                                 to={sublink.address}
@@ -79,7 +85,6 @@ const Footer = () => {
                     </li>
                   ))}
                 </ul>
-
               </div>
 
               {/* Know Us */}
@@ -88,13 +93,18 @@ const Footer = () => {
                   Know Us
                 </h3>
                 <ul className="space-y-3">
-                  {links.slice(4,).map((link, index) => (
+                  {links.slice(4).map((link, index) => (
                     <li key={`${link.name}-${index}`}>
-                      <span className="text-slate-300 font-medium">{link.name}</span>
+                      <span className="text-slate-300 font-medium">
+                        {link.name}
+                      </span>
                       {link.sublinks && (
                         <ul className="mt-2 ml-4 space-y-2">
                           {link.sublinks.map((sublink) => (
-                            <li key={sublink.name} className="flex items-center gap-2">
+                            <li
+                              key={sublink.name}
+                              className="flex items-center gap-2"
+                            >
                               <FaCircleDot className="w-2 h-2 text-slate-500" />
                               <NavLink
                                 to={sublink.address}
@@ -108,24 +118,6 @@ const Footer = () => {
                       )}
                     </li>
                   ))}
-                </ul>
-              </div>
-
-              {/* RECO BY NMHP */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-bold tracking-wider text-slate-400 uppercase">
-                  RECO BY NMHP
-                </h3>
-                <ul className="space-y-3">
-                  <li>
-                    <Link
-                      to="https://www.nmhp.org/"
-                      target="_blank"
-                      className="text-slate-300 hover:text-amber-400 font-medium"
-                    >
-                      National Mental Health Program
-                    </Link>
-                  </li>
                 </ul>
               </div>
             </div>
@@ -136,8 +128,8 @@ const Footer = () => {
         <div className="mt-2 lg:mt-12 pt-2 lg:pt-8 border-t border-slate-800">
           <div className="text-slate-400 space-y-2">
             <p className="text-sm">
-              SukoonSphere's content is for informational and educational purposes
-              only. Our website is not intended to be a substitute for
+              SukoonSphere's content is for informational and educational
+              purposes only. Our website is not intended to be a substitute for
               professional medical advice, diagnosis, or treatment.
             </p>
             <p className="text-sm">© 2024 Inc. — All rights reserved.</p>
@@ -147,7 +139,5 @@ const Footer = () => {
     </footer>
   );
 };
-
-
 
 export default Footer;

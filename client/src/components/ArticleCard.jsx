@@ -1,7 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import PostActions from '@/components/shared/PostActions';
-import { FaBookOpen, FaCalendarAlt, FaEdit, FaTrash } from 'react-icons/fa';
+import React from "react";
+import { Link } from "react-router-dom";
+import PostActions from "@/components/shared/PostActions";
+import { FaBookOpen, FaCalendarAlt, FaEdit, FaTrash } from "react-icons/fa";
 
 const ArticleCard = ({ article, isOwnProfile, onEdit, onDelete }) => {
   return (
@@ -9,16 +9,16 @@ const ArticleCard = ({ article, isOwnProfile, onEdit, onDelete }) => {
       {/* Card Image */}
       {article.imageUrl ? (
         <div className="aspect-video w-full overflow-hidden">
-          <img 
-            src={article.imageUrl} 
+          <img
+            src={article.imageUrl}
             alt={article.title}
             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />
-        </div> 
+        </div>
       ) : (
-        <FaBookOpen className="w-12 h-12 text-blue-200 group-hover:scale-110 transition-transform duration-200" />
+        <FaBookOpen className="w-24 h-12 text-blue-200 group-hover:scale-110 transition-transform duration-200" />
       )}
-      
+
       {/* Card Header */}
       <div className="p-4 flex-grow">
         <Link
@@ -29,17 +29,18 @@ const ArticleCard = ({ article, isOwnProfile, onEdit, onDelete }) => {
             {article.title}
           </h2>
         </Link>
-        
+
         {/* Meta Information */}
         <div className="flex items-center gap-2 text-sm text-[var(--grey--600)] mb-4">
           <FaCalendarAlt className="w-4 h-4" />
-          <span>{new Date(article.createdAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-          })}</span>
+          <span>
+            {new Date(article.createdAt).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          </span>
         </div>
-
       </div>
 
       {/* Card Footer */}
