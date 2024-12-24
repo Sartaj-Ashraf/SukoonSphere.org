@@ -6,10 +6,10 @@ import { Link } from 'react-router-dom'
 function MentalHealth() {
     return (
         <>
-            <div className="p-4  lg:p-8 rounded-lg max-w-7xl mx-auto space-y-16">
-                <h2 className="text-lg font-bold mb-2 text-[2rem] md:text-[2.5rem] lg:text-[3.5rem] sm:leading-[3.5rem] text-[var(--grey--900)]">Mental health</h2>
+            <div className="p-4  lg:p-8 rounded-lg max-w-7xl mx-auto space-y-8 md:space-y-16">
+                <h2 className=" font-bold text-[2rem] md:text-[2.5rem] text-[var(--grey--900)]">Mental health</h2>
                 {/* Overview Section */}
-                <section className="mb-8 grid grid-cols-12 gap-6" data-aos="fade-up" data-aos-duration="1500">
+                <section className=" mb-8 grid grid-cols-12 gap-6" data-aos="fade-up" data-aos-duration="1500">
                     <div className="col-span-12 order-2 lg:order-1 lg:col-span-6 gap-4">
                         <img src="https://media.licdn.com/dms/image/D5612AQEAqaIf0Cs-Hg/article-cover_image-shrink_720_1280/0/1710397777437?e=2147483647&v=beta&t=soZaslp-9gmLUCwNt2SiEgi46mgsyI7yBQrVm1L3fW8"
                             alt="Image loading..."
@@ -69,14 +69,14 @@ function MentalHealth() {
                     </ul>
                 </section>
 
-                {/* Helping Others Section */}
+                {/* Helping Others Section
                 <section className="mb-8" data-aos="fade-up" data-aos-duration="1500">
                     <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--primary)' }}>
                         {MentalHeathSummary.heplingOthers.title}
                     </h2>
                     <p className="text-[var(--grey--800)] text-base">{MentalHeathSummary.heplingOthers.description}</p>
                     <Link to="/contact-us" className=" mt-4 btn-1 glossy-effect-bar w-1/4" >One-on-One counselling</Link>
-                </section>
+                </section> */}
 
                 {/* Causes Section */}
                 <section className="mb-8 grid grid-cols-12 gap-6" data-aos="fade-up" data-aos-duration="1500">

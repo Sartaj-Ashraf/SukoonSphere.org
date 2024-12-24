@@ -174,7 +174,7 @@ const Articles = () => {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search articles..."
-            className="w-full bg-[var(--white-color)] py-2 px-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-1/3 bg-[var(--white-color)] py-2 px-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           {searchInput && (
