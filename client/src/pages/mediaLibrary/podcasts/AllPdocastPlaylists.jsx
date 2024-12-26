@@ -7,6 +7,7 @@ import {
   FaCalendarAlt,
   FaPlay,
   FaChevronRight,
+  FaProjectDiagram,
 } from "react-icons/fa";
 
 const AllPodcastPlaylists = () => {
@@ -31,26 +32,34 @@ const AllPodcastPlaylists = () => {
     fetchPlaylists();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-4 border-[var(--primary-color)] border-t-transparent"></div>
+  //     </div>
+  //   );
+  // }
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <p className="text-red-500 text-lg">{error}</p>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-[60vh]">
+  //       <p className="text-red-500 text-lg">{error}</p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className=" mx-auto  py-2 min-h-screen">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {playlists && playlists.length > 0 ? (
+        {loading ? (
+          <div className="col-span-full flex justify-center items-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center text-red-500 py-4 flex items-center justify-center col-span-full capitalize">
+            {error}
+          </div>
+        ) : playlists && playlists.length > 0 ? (
           playlists.map((playlist) => (
             <div
               key={playlist._id}
@@ -123,12 +132,19 @@ const AllPodcastPlaylists = () => {
           ))
         ) : (
           <div className="text-center text-gray-500 col-span-full py-12">
-            <h2 className="text-2xl font-bold text-[var(--grey--900)] mb-3">
-              No playlists found
-            </h2>
-            <p className="text-[var(--grey--800)] mb-6">
-              No playlist found. This collection is currently empty.
-            </p>
+            <div className="flex flex-col items-center justify-center  rounded-xl p-8 space-y-4 text-center">
+              <div className="bg-blue-100 p-6 rounded-full">
+                <FaProjectDiagram className="w-16 h-16 text-[var(--primary)] animate-pulse" />
+              </div>
+              <div className="max-w-md">
+                <h2 className="text-2xl font-bold text-[var(--grey--900)] mb-3">
+                  No Playlists Found
+                </h2>
+                <p className="text-[var(--grey--800)] mb-6">
+                  No playlists found. This collection is currently empty.
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </div>

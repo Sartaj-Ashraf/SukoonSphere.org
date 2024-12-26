@@ -3,17 +3,13 @@ import React, { useState } from "react";
 import { useLoaderData, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useUser } from "@/context/UserContext";
-import { FaUserPlus,  FaSearch } from "react-icons/fa";
-
-
+import { FaUserPlus, FaSearch } from "react-icons/fa";
 
 const UserFollowers = () => {
-  const data = useLoaderData();
-  const { user: currentUser } = useUser();
+  // const data = useLoaderData();
+  const { loading, followers } = useLoaderData();
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState({});
-
-  const followers = data?.followers || [];
 
   const handleFollowUnfollow = async (followerId) => {
     if (isLoading[followerId]) return;
@@ -78,10 +74,14 @@ const UserFollowers = () => {
       </div>
 
       {/* Followers Grid */}
-      {filteredFollowers.length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
+        </div>
+      ) : filteredFollowers.length === 0 ? (
         <div className="text-center py-12 px-4">
           <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FaUserPlus className="w-10 h-10 text-gray-400" />
+            <FaUserPlus className="w-10 h-10 text-[var(--primary)]" />
           </div>
           <h2 className="text-xl font-semibold text-gray-700 mb-2">
             {searchQuery ? "No matching followers found" : "No followers yet"}
@@ -107,7 +107,9 @@ const UserFollowers = () => {
                   <img
                     src={
                       follower.avatar ||
-                      `https://ui-avatars.com/api/?name=${encodeURIComponent(follower.name || "User")}&background=random`
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        follower.name || "User"
+                      )}&background=random`
                     }
                     alt={follower.name || "User"}
                     className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 group-hover:border-blue-500 transition-colors duration-300"

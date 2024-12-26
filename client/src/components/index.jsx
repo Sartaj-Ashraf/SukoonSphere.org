@@ -1,4 +1,5 @@
 import LoadingSpinner from "@/components/loaders/LoadingSpinner";
+
 import { lazy, Suspense } from "react";
 // Utility function to create optimized component with fallback
 export const createOptimizedComponent = (importFn) => {
@@ -13,6 +14,9 @@ export const createOptimizedComponent = (importFn) => {
 
 export { default as Header } from "./shared/Header";
 export { default as Footer } from "./shared/Footer";
+export const LightLoader = createOptimizedComponent(
+  () => import("./loaders/LightLoader")
+);
 export const Like = createOptimizedComponent(() => import("./shared/Like"));
 export const Follow = createOptimizedComponent(() => import("./shared/Follow"));
 export const Spinner = createOptimizedComponent(
