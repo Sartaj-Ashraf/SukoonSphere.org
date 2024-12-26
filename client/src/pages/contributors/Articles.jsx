@@ -1,8 +1,5 @@
 import { useState, useEffect, useRef, useMemo, memo } from "react";
-import { Editor } from "@tinymce/tinymce-react";
-import ReactQuill from "react-quill";
 import JoditEditor from "jodit-react";
-import "react-quill/dist/quill.snow.css";
 import customFetch from "@/utils/customFetch";
 import {
   useParams,
@@ -13,33 +10,20 @@ import {
 import { toast } from "react-toastify";
 import {
   FaTimes,
-  FaEdit,
-  FaTrash,
   FaSpinner,
-  FaSearch,
   FaPlus,
   FaTimesCircle,
   FaImage,
 } from "react-icons/fa";
-import { IoCloseOutline } from "react-icons/io5";
 import DeleteModal from "@/components/shared/DeleteModal";
-import PostActions from "@/components/shared/PostActions";
 import ArticleGallery from "@/components/ArticleGallery";
 import ArticleCard from "../../components/ArticleCard";
 import Pagination from "../../components/Pagination";
 import { FiCalendar, FiClock } from "react-icons/fi";
 import { MdMultipleStop } from "react-icons/md";
+import { useUser } from "@/context/UserContext";
 
 const Articles = () => {
-  const editor = useRef(null);
-  // const config = useMemo(
-  //   {
-  //     readonly: false, // all options from https://xdsoft.net/jodit/docs/,
-  //     placeholder: placeholder || 'Start typings...'
-  //   },
-  //   [placeholder]
-  // );
-
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -50,7 +34,7 @@ const Articles = () => {
   const [deletingArticleId, setDeletingArticleId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [pagination, setPagination] = useState(null);
-  const user = useOutletContext();
+  const { user } = useUser();
 
   const { id: paramsId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -62,12 +46,12 @@ const Articles = () => {
   const filterOptions = [
     {
       value: "newest",
-      label: "Newest First",
+      label: "Newest",
       icon: <FiClock className="w-4 h-4" />,
     },
     {
       value: "oldest",
-      label: "Oldest First",
+      label: "Oldest",
       icon: <FiCalendar className="w-4 h-4" />,
     },
     {
@@ -146,7 +130,7 @@ const Articles = () => {
   const handleDelete = async () => {
     try {
       await customFetch.delete(`/articles/${deletingArticleId}`);
-      await fetchUserArticles(); // Refresh the list after delete
+      await fetchUserArticles();
       toast.success("Article deleted successfully");
       setIsDeleteModalOpen(false);
       setDeletingArticleId(null);
@@ -225,16 +209,7 @@ const Articles = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <FaSpinner className="w-8 h-8 text-blue-500 animate-spin" />
-      </div>
-    );
-  }
-
   const isOwnProfile = user?._id === paramsId;
-
   const ArticleModal = memo(
     ({
       isOpen,
@@ -421,45 +396,53 @@ const Articles = () => {
       <div className="flex flex-col gap-4 mb-6">
         {/* Header Section */}
         <div className="bg-white rounded-xl">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Your Articles
-              </h2>
-              <p className="mt-2 text-[var(--grey--800)]">
-                Don't know how to upload an article? Check out our{" "}
-                <Link
-                  to="/user-manual/create-article"
-                  className="text-blue-500 hover:underline"
-                >
-                  user manual
-                </Link>{" "}
-                for a step-by-step guide.
-              </p>
-            </div>
-            {isOwnProfile && (
+          {isOwnProfile ? (
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Your Articles
+                </h2>
+                <p className="mt-2 text-[var(--grey--800)]">
+                  Don't know how to upload an article? Check out our{" "}
+                  <Link
+                    to="/user-manual/create-article"
+                    className="text-blue-500 hover:underline"
+                  >
+                    user manual
+                  </Link>{" "}
+                  for a step-by-step guide.
+                </p>
+              </div>
               <button
-                onClick={handleCreate}
+                onClick={() => {
+                  if (window.innerWidth < 768) {
+                    toast.warning(
+                      "Creating an article requires a laptop view. Please switch to a larger screen size."
+                    );
+                  } else {
+                    handleCreate();
+                  }
+                }}
                 className="btn-2 flex gap-2 items-center"
               >
                 Create Article
                 <FaPlus className="w-4 h-4" />
               </button>
-            )}
-          </div>
+            </div>
+          ) : null}
         </div>
 
         {/* Filters Section */}
-        <div className="bg-white rounded-xl shadow-sm p-4">
-          <div className="flex flex-wrap gap-3">
+        <div className="bg-white rounded-xl shadow-sm p-2">
+          <div className="flex flex-wrap gap-2">
             {filterOptions.map((option) => (
               <button
                 key={option.value}
                 onClick={() => handleFilterChange(option.value)}
-                className={`flex items-center px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium gap-2 ${
+                className={`flex items-center px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium gap-2 ${
                   currentFilter === option.value
                     ? "bg-[var(--primary)] text-white shadow-sm"
-                    : " text-[var(--grey--700)] hover:bg-gray-100"
+                    : " text-[var(--grey--800)] hover:bg-gray-100"
                 }`}
               >
                 {option.icon}
@@ -469,7 +452,11 @@ const Articles = () => {
           </div>
         </div>
       </div>
-      {error ? (
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
+        </div>
+      ) : error ? (
         <div className="text-center p-4 bg-red-100 rounded-lg text-red-700">
           {error}
         </div>

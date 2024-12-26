@@ -18,7 +18,7 @@ const customFetch = axios.create({
 customFetch.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 400 && error.response?.data?.message === 'Authentication failed') {
+    if (error.response?.status === 401) {
       // Clear user data from localStorage on authentication error
       localStorage.removeItem('user');
       localStorage.removeItem('isAuthenticated');

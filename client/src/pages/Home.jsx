@@ -1,13 +1,22 @@
 import React, { Fragment, lazy, Suspense } from "react";
 import LoadingSpinner from "@/components/loaders/LoadingSpinner";
+import { LightLoader } from "@/components";
 
 // Lazy load components
 const TopIntro = lazy(() => import("../components/homeComponents/TopIntro"));
-const TodaysQuote = lazy(() => import("../components/homeComponents/TodaysQuote"));
-const TodaysQuiz = lazy(() => import("../components/homeComponents/TodaysQuiz"));
+const TodaysQuote = lazy(
+  () => import("../components/homeComponents/TodaysQuote")
+);
+const TodaysQuiz = lazy(
+  () => import("../components/homeComponents/TodaysQuiz")
+);
 const OurStory = lazy(() => import("../components/homeComponents/OurStory"));
-const Infography = lazy(() => import("../components/homeComponents/Infography"));
-const DisorderTags = lazy(() => import("../components/homeComponents/DisorderTags"));
+const Infography = lazy(
+  () => import("../components/homeComponents/Infography")
+);
+const DisorderTags = lazy(
+  () => import("../components/homeComponents/DisorderTags")
+);
 const OurTeam = lazy(() => import("../components/homeComponents/OurTeam"));
 
 const Home = () => {
@@ -16,6 +25,8 @@ const Home = () => {
       <Suspense fallback={<LoadingSpinner />}>
         <TopIntro />
       </Suspense>
+
+      {/* <LightLoader /> */}
       <Suspense fallback={<LoadingSpinner />}>
         <DisorderTags />
       </Suspense>
@@ -40,14 +51,8 @@ const Home = () => {
       <Suspense fallback={<LoadingSpinner />}>
         <OurTeam />
       </Suspense>
-
-
     </Fragment>
   );
 };
 
 export default Home;
-
-
-
-

@@ -12,7 +12,7 @@ import {
   FaSearch,
 } from "react-icons/fa";
 import { IoCloseOutline } from "react-icons/io5";
-import { PageIntro } from "@/components";
+import { LightLoader, PageIntro } from "@/components";
 import {
   FiAlertTriangle,
   FiCalendar,
@@ -21,6 +21,7 @@ import {
   FiHeart,
 } from "react-icons/fi";
 import { MdMultipleStop } from "react-icons/md";
+import LoadingSpinner from "@/components/loaders/LoadingSpinner";
 
 const Articles = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -33,12 +34,12 @@ const Articles = () => {
   const filterOptions = [
     {
       value: "newest",
-      label: "Newest First",
+      label: "Newest",
       icon: <FiClock className="w-4 h-4" />,
     },
     {
       value: "oldest",
-      label: "Oldest First",
+      label: "Oldest",
       icon: <FiCalendar className="w-4 h-4" />,
     },
     {
@@ -94,7 +95,6 @@ const Articles = () => {
         ...(searchQuery && { search: searchQuery }),
       });
       const response = await customFetch.get(`articles?${params}`);
-      console.log("Response from articles:", response.data);
       return response.data;
     },
     getNextPageParam: (lastPage) => {
@@ -119,15 +119,6 @@ const Articles = () => {
     }
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  if (status === "loading") {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center">
-        <FaSpinner className="w-8 h-8 text-blue-500 animate-spin mb-4" />
-        <p className="text-[var(--grey--600)] text-lg">Loading articles...</p>
-      </div>
-    );
-  }
-
   if (status === "error") {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center">
@@ -146,24 +137,14 @@ const Articles = () => {
   }
 
   const allArticles = data?.pages.flatMap((page) => page.articles) || [];
-  console.log("All articles:", allArticles);
 
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-4">
       {/* Header Section */}
-      {/* <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-[var(--grey--900)] mb-4">
-          Articles & Resources
-        </h1>
-        <p className="text-[var(--grey--600)] max-w-2xl mx-auto">
-          Explore our collection of articles written by mental health professionals and experts. 
-          Find valuable insights, tips, and information about mental health and well-being.
-        </p>
-      </div> */}
       <PageIntro
         title="Articles"
         description="Explore our collection of articles written by mental health professionals and experts. Find valuable insights, tips, and information about mental health and well-being."
-      ></PageIntro>
+      />
 
       {/* Search and Filter Section */}
       <div className="flex flex-col gap-4 mb-6 bg-white rounded-lg shadow-md p-4 md:p-6">
@@ -174,7 +155,7 @@ const Articles = () => {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search articles..."
-            className="w-1/3 bg-[var(--white-color)] py-2 px-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+            className="w-full md:w-1/3 lg:w-1/4 bg-[var(--white-color)] py-2 px-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
           />
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           {searchInput && (
@@ -215,15 +196,26 @@ const Articles = () => {
         </div>
       </div>
       {/* Articles Grid */}
-      {allArticles.length === 0 ? (
-        <div className="text-center p-4 md:p-8 bg-white rounded-lg shadow-md">
-          <FaBookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-[var(--grey--600)] text-lg mb-4">
-            No articles found
-          </p>
-          <p className="text-[var(--grey--500)]">
-            Try adjusting your search or filters
-          </p>
+      {status === "loading" ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
+        </div>
+      ) : true ? (
+        <div className="text-center p-4 md:p-8 rounded-lg ">
+          <div className="flex flex-col items-center justify-center  rounded-xl p-8 space-y-4 text-center">
+            <div className="bg-blue-100 p-6 rounded-full">
+              <FaBookOpen className="w-16 h-16 text-var(--primary) animate-pulse" />
+            </div>
+            <div className="max-w-md">
+              <h2 className="text-2xl font-bold text-[var(--grey--900)] mb-3">
+                No articles found
+              </h2>
+              <p className="text-[var(--grey--800)] mb-6">
+                Try adjusting your search and filters or check back later for
+                updated articles.
+              </p>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="space-y-8">

@@ -15,26 +15,22 @@ const PlaylistVideos = () => {
 
   const hasVideos = videos && videos.length > 0;
 
-  if (isLoading) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[var(--primary-color)] border-t-transparent"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="p-4">
-      {hasVideos ? (
+      {isLoading ? (
+        <div className="col-span-full flex justify-center items-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
+        </div>
+      ) : hasVideos ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {videos.map((video) => (
             <VideoCard key={video._id} video={video} />
           ))}
         </div>
       ) : (
-        <div className="h-full flex flex-col items-center justify-center itms-center text-center text-gray-500 ">
-           <div className="bg-blue-100 p-6 rounded-full">
-            <FaFilm className="w-16 h-16 text-blue-600 animate-pulse" />
+        <div className="flex flex-col items-center justify-center  rounded-xl p-8 space-y-4 text-center">
+          <div className="bg-blue-100 p-6 rounded-full">
+            <FaFilm className="w-16 h-16 text-var(--primary) animate-pulse" />
           </div>
           <div className="max-w-md">
             <h2 className="text-2xl font-bold text-[var(--grey--900)] mb-3">
