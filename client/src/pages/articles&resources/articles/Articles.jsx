@@ -138,6 +138,8 @@ const Articles = () => {
 
   const allArticles = data?.pages.flatMap((page) => page.articles) || [];
 
+  console.log({ allArticles });
+
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-4">
       {/* Header Section */}
@@ -200,7 +202,7 @@ const Articles = () => {
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
         </div>
-      ) : true ? (
+      ) : allArticles?.length === 0 ? (
         <div className="text-center p-4 md:p-8 rounded-lg ">
           <div className="flex flex-col items-center justify-center  rounded-xl p-8 space-y-4 text-center">
             <div className="bg-blue-100 p-6 rounded-full">
