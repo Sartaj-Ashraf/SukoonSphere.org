@@ -8,13 +8,17 @@ import {
   FaClock,
   FaExclamationCircle,
 } from "react-icons/fa";
+import { LuTableOfContents } from "react-icons/lu";
 import "./Article.css";
+import { FaArrowTrendDown } from "react-icons/fa6";
 
 const Article = () => {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
+  const [toc, setToc] = useState([]);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -33,7 +37,32 @@ const Article = () => {
 
     fetchArticle();
   }, [id]);
-  console.log({ article });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPosition = window.scrollY;
+      const progressPercentage = Math.round(
+        (scrollPosition / totalHeight) * 100
+      );
+      setProgress(progressPercentage);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const headings = Array.from(
+      document.querySelectorAll(".article-body h1, .article-body h2")
+    );
+    const newToc = headings.map((heading) => ({
+      text: heading.innerText,
+      slug: heading.id,
+    }));
+    setToc(newToc);
+  }, [article]);
 
   const cleanContent = (content) => {
     try {
@@ -59,9 +88,8 @@ const Article = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center">
-        <FaSpinner className="w-8 h-8 text-blue-500 animate-spin mb-4" />
-        <p className="text-[var(--grey--600)] text-lg">Loading article...</p>
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
       </div>
     );
   }
@@ -95,9 +123,9 @@ const Article = () => {
   const readingTime = getReadingTime(article.content);
 
   return (
-    <div className="article-container">
-      <article className="article-content">
-        <header className="article-header space-y-6">
+    <div className="relative bg-[var(--white-color)] grid grid-cols-12 gap-8">
+      <article className="article-content col-span-8">
+        <header className=" relative article-header space-y-6">
           <div className="meta-item flex items-center justify-center gap-2 ">
             {article.authorAvatar ? (
               <img
@@ -110,7 +138,7 @@ const Article = () => {
             )}
             <span>{article.authorName || "Anonymous"}</span>
           </div>
-          <h2 className="text-base md:text-[1.75rem] font-bold sm:leading-[2.5rem]">
+          <h2 className=" md:text-[1.75rem] font-bold sm:leading-[2.5rem] text-var(--primary)">
             {article.title}
           </h2>
           <div className="article-meta flex items-center justify-center">
@@ -132,7 +160,7 @@ const Article = () => {
             </div>
           </div>
           <div className="article-progress">
-            <div className="progress-bar" />
+            <div className="progress-bar" style={{ width: `${progress}%` }} />
           </div>
         </header>
 
@@ -152,6 +180,34 @@ const Article = () => {
           </div>
         </footer>
       </article>
+      <section className="sticky top-40 col-span-4 mt-8 shadow-sm p-4 fit-content">
+        <h2 className="text-2xl font-bold mb-4 flex gap-3 items-center">
+          {" "}
+          <LuTableOfContents />
+          Dive straight to:
+        </h2>
+        <ol className="pl-8 list-disc">
+          {toc.map((item, index) => (
+            <li key={index} className="mb-2 flex items-center gap-2">
+              <FaArrowTrendDown />
+
+              <a
+                href={`#${item.slug}`}
+                className="text-gray-900 hover:text-[var(--ternery)] hover:underline transition-colors duration-200"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const element = document.getElementById(item.slug);
+                  if (element) {
+                    element.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+              >
+                {item.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
     </div>
   );
 };
