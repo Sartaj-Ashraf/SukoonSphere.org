@@ -124,8 +124,8 @@ const Article = () => {
 
   return (
     <div className="relative bg-[var(--white-color)] grid grid-cols-12 gap-8">
-      <article className="article-content col-span-8">
-        <header className=" relative article-header space-y-6">
+      <article className="article-content order-2 lg:order-1 col-span-12 md:col-span-8">
+        <header className="relative article-header space-y-6">
           <div className="meta-item flex items-center justify-center gap-2 ">
             {article.authorAvatar ? (
               <img
@@ -160,7 +160,7 @@ const Article = () => {
             </div>
           </div>
           <div className="article-progress">
-            <div className="progress-bar" style={{ width: `${progress}%` }} />
+            <div className="progress-bar " style={{ width: `${progress}%` }} />
           </div>
         </header>
 
@@ -180,33 +180,40 @@ const Article = () => {
           </div>
         </footer>
       </article>
-      <section className="sticky top-40 col-span-4 mt-8 shadow-sm p-4 fit-content">
-        <h2 className="text-2xl font-bold mb-4 flex gap-3 items-center">
-          {" "}
-          <LuTableOfContents />
-          Dive straight to:
-        </h2>
-        <ol className="pl-8 list-disc">
-          {toc.map((item, index) => (
-            <li key={index} className="mb-2 flex items-center gap-2">
-              <FaArrowTrendDown />
+      <section
+        className={` col-span-12 md:col-span-4 mt-8 shadow-sm order-1 lg:order-2 p-2 
+          `}
+      >
+        <div className="table-of-contents">
+          <h2 className="text-2xl font-bold mb-4 flex gap-3 items-center">
+            {" "}
+            <LuTableOfContents />
+            Dive straight to:
+          </h2>
+          <div>
+            <ol className="pl-8 list-disc">
+              {toc.map((item, index) => (
+                <li key={index} className="mb-2 flex items-center gap-2">
+                  <FaArrowTrendDown />
 
-              <a
-                href={`#${item.slug}`}
-                className="text-gray-900 hover:text-[var(--ternery)] hover:underline transition-colors duration-200"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const element = document.getElementById(item.slug);
-                  if (element) {
-                    element.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-              >
-                {item.text}
-              </a>
-            </li>
-          ))}
-        </ol>
+                  <a
+                    href={`#${item.slug}`}
+                    className="text-gray-900 hover:text-[var(--ternery)] hover:underline transition-colors duration-200"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const element = document.getElementById(item.slug);
+                      if (element) {
+                        element.scrollIntoView({ behavior: "smooth" });
+                      }
+                    }}
+                  >
+                    {item.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
       </section>
     </div>
   );

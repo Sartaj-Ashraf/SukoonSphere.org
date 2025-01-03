@@ -78,10 +78,6 @@
 }
 
 .article-progress {
-  position: sticky;
-  top: 40px;
-  left: 0;
-  right: 0;
   height: 8px;
   background: rgba(0, 0, 0, 0.05);
   margin: -3rem -3rem 3rem -3rem;
@@ -93,6 +89,12 @@
   background: #4299e1;
   width: 0;
   transition: width 0.2s ease;
+}
+
+.table-of-contents {
+  position: sticky;
+  top: 80px;
+  z-index: 1000;
 }
 
 /* Base typography settings */
@@ -185,6 +187,7 @@
 }
 
 .article-body li {
+  padding-left: 0px;
   list-style-type: disc;
   position: relative;
   margin-bottom: 0.5rem;
@@ -343,6 +346,9 @@
     padding: 1.5rem;
     margin: 2rem 0;
   }
+  .table-of-contents {
+    position: relative;
+  }
 }
 
 /* Print styles */
@@ -380,7 +386,3 @@
 /* ul > li {
   list-style-type: upper-alpha !important;
 } */
-
-.upper-alpha {
-  list-style-type: upper-alpha !important;
-}
