@@ -11,11 +11,15 @@ import {
 import { LuTableOfContents } from "react-icons/lu";
 import "./Article.css";
 import { FaArrowTrendDown } from "react-icons/fa6";
+import { FaVolumeUp, FaVolumeMute, FaMale, FaFemale } from "react-icons/fa";
 
 const Article = () => {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [utterance, setUtterance] = useState(null);
+  const [voiceGender, setVoiceGender] = useState('female'); // default to female
   const { id } = useParams();
   const [toc, setToc] = useState([]);
   const [progress, setProgress] = useState(0);
@@ -64,6 +68,15 @@ const Article = () => {
     setToc(newToc);
   }, [article]);
 
+  useEffect(() => {
+    const synth = window.speechSynthesis;
+    return () => {
+      if (utterance) {
+        synth.cancel();
+      }
+    };
+  }, [utterance]);
+
   const cleanContent = (content) => {
     try {
       return content
@@ -84,6 +97,93 @@ const Article = () => {
     const wordCount = content.replace(/<[^>]*>/g, "").split(/\s+/).length;
     const readingTime = Math.ceil(wordCount / wordsPerMinute);
     return readingTime;
+  };
+
+  const handleTextToSpeech = () => {
+    const synth = window.speechSynthesis;
+
+    if (isPlaying) {
+      synth.cancel();
+      setIsPlaying(false);
+      return;
+    }
+
+    const voices = synth.getVoices();
+    // Prioritized list of male voices
+    const maleVoicePreferences = [
+      'Microsoft David Desktop',
+      'Google UK English Male',
+      'Microsoft David',
+      'en-GB-Standard-B',
+      'en-US-Standard-B'
+    ];
+
+    // Find appropriate voice based on selected gender
+    const selectedVoice = voices.find(voice => {
+      const voiceName = voice.name.toLowerCase();
+      if (voiceGender === 'male') {
+        // First try to find from preferred list
+        return maleVoicePreferences.some(preferred => 
+          voiceName.includes(preferred.toLowerCase())
+        );
+      } else {
+        return voiceName.includes('female') || 
+               voiceName.includes('zira') || 
+               voiceName.includes('helena');
+      }
+    }) || voices.find(voice => {
+      // Fallback to any gender-matching voice
+      const voiceName = voice.name.toLowerCase();
+      return voiceGender === 'male' 
+        ? (voiceName.includes('male') || voiceName.includes('david'))
+        : (voiceName.includes('female') || voiceName.includes('zira'));
+    }) || voices[0];
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = cleanContent(article.content);
+    const cleanText = tempDiv.textContent || tempDiv.innerText || "";
+    const chunks = cleanText.match(/[^.!?]+[.!?]+/g) || [];
+    
+    let currentChunk = 0;
+    
+    const speakNextChunk = () => {
+      if (currentChunk < chunks.length) {
+        const newUtterance = new SpeechSynthesisUtterance(chunks[currentChunk]);
+        if (selectedVoice) {
+          newUtterance.voice = selectedVoice;
+        }
+
+        // Optimized voice parameters
+        if (voiceGender === 'male') {
+          newUtterance.pitch = 0.85;  // Deeper voice
+          newUtterance.rate = 0.92;   // Slightly slower for authority
+          newUtterance.volume = 1;    // Full volume
+        } else {
+          newUtterance.pitch = 1.1;   // Higher pitch for female
+          newUtterance.rate = 0.95;   // Slightly faster for female
+          newUtterance.volume = 1;    // Full volume
+        }
+        
+        newUtterance.onend = () => {
+          currentChunk++;
+          if (currentChunk < chunks.length) {
+            setTimeout(() => speakNextChunk(), 200); // Add small pause between chunks
+          } else {
+            setIsPlaying(false);
+          }
+        };
+
+        newUtterance.onerror = () => {
+          console.error('Speech synthesis error');
+          setIsPlaying(false);
+        };
+
+        synth.speak(newUtterance);
+      }
+    };
+
+    setIsPlaying(true);
+    speakNextChunk();
   };
 
   if (loading) {
@@ -157,6 +257,59 @@ const Article = () => {
             <div className="meta-item">
               <FaClock className="meta-icon" />
               <span>{readingTime} min read</span>
+            </div>
+            <div className="meta-separator" />
+            <div className="meta-item">
+              <div className="inline-flex items-center bg-white rounded-full shadow-md hover:shadow-lg transition-all duration-300 p-1">
+                <div className="flex space-x-1">
+                  <button
+                    onClick={() => setVoiceGender('female')}
+                    className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${
+                      voiceGender === 'female'
+                        ? 'bg-pink-500 text-white scale-110'
+                        : 'text-pink-500 hover:bg-pink-50'
+                    }`}
+                    title="Female Voice"
+                  >
+                    <FaFemale className={`w-4 h-4 ${voiceGender === 'female' ? 'animate-pulse' : ''}`} />
+                  </button>
+                  <button
+                    onClick={() => setVoiceGender('male')}
+                    className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${
+                      voiceGender === 'male'
+                        ? 'bg-blue-500 text-white scale-110'
+                        : 'text-blue-500 hover:bg-blue-50'
+                    }`}
+                    title="Male Voice"
+                  >
+                    <FaMale className={`w-4 h-4 ${voiceGender === 'male' ? 'animate-pulse' : ''}`} />
+                  </button>
+                </div>
+                <div className="w-[1px] bg-gray-200 mx-1 h-6 self-center"></div>
+                <button
+                  onClick={handleTextToSpeech}
+                  className={`flex items-center justify-center space-x-2 px-4 py-1.5 rounded-full transition-all duration-300 ${
+                    isPlaying
+                      ? 'bg-red-500 text-white hover:bg-red-600'
+                      : 'bg-primary text-white hover:bg-primary/90'
+                  }`}
+                  title={isPlaying ? 'Stop Reading' : 'Start Reading'}
+                >
+                  <div className="flex items-center gap-2">
+                    {isPlaying ? (
+                      <>
+                        <FaVolumeMute className="w-4 h-4" />
+                        <span className="text-sm font-medium">Stop</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaVolumeUp className={`w-4 h-4 ${!isPlaying && voiceGender ? 'animate-bounce' : ''}`} />
+                        <span className="text-sm font-medium">Listen</span>
+                      </>
+                    )}
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
           <div className="article-progress">
