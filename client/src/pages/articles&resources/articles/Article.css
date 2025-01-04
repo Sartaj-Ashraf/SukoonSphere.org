@@ -34,15 +34,6 @@
   letter-spacing: 0.05em;
 }
 
-/* .article-header h1 {
-  font-size: 3rem;
-  font-weight: 800;
-  color: var(--grey--900);
-  line-height: 1.2;
-  margin-bottom: 1.5rem;
-  transition: color 0.3s ease;
-} */
-
 .article-meta {
   display: flex;
   align-items: center;
