@@ -12,12 +12,17 @@ import {
   FaVolumeMute,
   FaMale,
   FaFemale,
+  FaHeart,
+  FaRegHeart,
 } from "react-icons/fa";
-import { LuTableOfContents } from "react-icons/lu";
+import {
+  LuTableOfContents
+} from "react-icons/lu";
 import { FaArrowTrendDown } from "react-icons/fa6";
 import "./Article.css";
 import "./scrollbar.css";
 import SimilarArticles from "../../../components/articleComponents/SimilarArticles";
+import ArticleComments from "../../../components/articleComponents/ArticleComments";
 
 const Article = () => {
   const [article, setArticle] = useState(null);
@@ -30,6 +35,8 @@ const Article = () => {
   const [toc, setToc] = useState([]);
   const [isTocOpen, setIsTocOpen] = useState(false);
   const [similarArticles, setSimilarArticles] = useState([]);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -38,6 +45,12 @@ const Article = () => {
         const response = await customFetch.get(`articles/${id}`);
         setArticle(response.data.article);
         setSimilarArticles(response.data.similarArticles);
+        setLikeCount(response.data.article.likes.length);
+        // Check if the current user has liked the article
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+        if (currentUser && response.data.article.likes.includes(currentUser.userId)) {
+          setIsLiked(true);
+        }
         setError(null);
       } catch (err) {
         setError("Failed to load article. Please try again later.");
@@ -176,6 +189,17 @@ const Article = () => {
 
   const toggleToc = () => {
     setIsTocOpen(!isTocOpen);
+  };
+
+  const handleLike = async () => {
+    try {
+      const response = await customFetch.patch(`articles/${id}/like`);
+      setArticle(response.data.article);
+      setLikeCount(response.data.article.likes.length);
+      setIsLiked(!isLiked);
+    } catch (error) {
+      console.error('Error liking article:', error);
+    }
   };
 
   if (loading) {
@@ -372,6 +396,14 @@ const Article = () => {
                     </button>
                   </div>
                 </div>
+                <div className="meta-item like-button" onClick={handleLike}>
+                  {isLiked ? (
+                    <FaHeart className="meta-icon liked" />
+                  ) : (
+                    <FaRegHeart className="meta-icon" />
+                  )}
+                  <span>{likeCount} likes</span>
+                </div>
               </div>
             </header>
 
@@ -380,9 +412,13 @@ const Article = () => {
               dangerouslySetInnerHTML={{ __html: cleanContent(article.content) }}
             />
 
-            <SimilarArticles similarArticles={similarArticles} />
+            <div className="mt-12">
+              <SimilarArticles similarArticles={similarArticles} />
+            </div>
 
-          
+            <div className="mt-12 border-t pt-8">
+              <ArticleComments articleId={id} />
+            </div>
           </article>
 
           {/* Desktop Table of Contents */}

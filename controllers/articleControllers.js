@@ -2,7 +2,7 @@ import Article from "../models/articles/articleModel.js";
 import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import User from "../models/userModel.js";
-import { UnauthenticatedError } from "../errors/customErors.js";
+import { UnauthenticatedError, BadRequestError } from "../errors/customErors.js";
 
 // Get all articles with pagination, search, and filters
 export const getAllArticles = async (req, res) => {
@@ -367,5 +367,30 @@ export const getArticlesByUserId = async (req, res) => {
     });
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
+  }
+};
+
+// Like/Unlike article
+export const likeArticle = async (req, res) => {
+  const userId = req.user.userId;
+  const articleId = req.params.id;
+
+  const article = await Article.findById(articleId);
+  if (!article) {
+    throw new BadRequestError("Article not found");
+  }
+
+  if (article?.likes?.includes(userId)) {
+    article.likes = article.likes.filter((id) => id.toString() !== userId.toString());
+    await article.save();
+    return res
+      .status(StatusCodes.OK)
+      .json({ message: "Article unliked successfully", article });
+  } else {
+    article.likes.push(userId);
+    await article.save();
+    return res
+      .status(StatusCodes.OK)
+      .json({ message: "Article liked successfully", article });
   }
 };
