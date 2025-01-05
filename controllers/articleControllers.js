@@ -105,6 +105,7 @@ export const getSingleArticle = async (req, res) => {
   try {
     const { id } = req.params;
     
+    // Get the main article
     const article = await Article.aggregate([
       {
         $match: {
@@ -139,8 +140,64 @@ export const getSingleArticle = async (req, res) => {
     if (!article.length) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "Article not found" });
     }
+
+    // Get similar articles based on title
+    const mainArticle = article[0];
+    const similarArticles = await Article.aggregate([
+      {
+        $match: {
+          _id: { $ne: new mongoose.Types.ObjectId(id) },
+          deleted: { $ne: true }
+        }
+      },
+      {
+        $addFields: {
+          titleSimilarity: {
+            $regexMatch: {
+              input: { $toLower: "$title" },
+              regex: { $toLower: mainArticle.title.split(' ').filter(word => word.length > 3).join('|') }
+            }
+          }
+        }
+      },
+      {
+        $match: {
+          titleSimilarity: true
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "author",
+          foreignField: "_id",
+          as: "authorDetails"
+        }
+      },
+      {
+        $addFields: {
+          authorName: { $arrayElemAt: ["$authorDetails.name", 0] },
+          authorAvatar: { $arrayElemAt: ["$authorDetails.avatar", 0] },
+          authorId: { $arrayElemAt: ["$authorDetails._id", 0] },
+        }
+      },
+      {
+        $project: {
+          content: 0,
+          authorDetails: 0,
+          deleted: 0,
+          __v: 0,
+          titleSimilarity: 0
+        }
+      },
+      {
+        $limit: 3
+      }
+    ]);
     
-    res.status(StatusCodes.OK).json(article[0]);
+    res.status(StatusCodes.OK).json({
+      article: mainArticle,
+      similarArticles
+    });
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
   }

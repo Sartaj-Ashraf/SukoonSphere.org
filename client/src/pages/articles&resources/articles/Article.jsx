@@ -16,6 +16,8 @@ import {
 import { LuTableOfContents } from "react-icons/lu";
 import { FaArrowTrendDown } from "react-icons/fa6";
 import "./Article.css";
+import "./scrollbar.css";
+import SimilarArticles from "../../../components/articleComponents/SimilarArticles";
 
 const Article = () => {
   const [article, setArticle] = useState(null);
@@ -27,13 +29,15 @@ const Article = () => {
   const { id } = useParams();
   const [toc, setToc] = useState([]);
   const [isTocOpen, setIsTocOpen] = useState(false);
+  const [similarArticles, setSimilarArticles] = useState([]);
 
   useEffect(() => {
     const fetchArticle = async () => {
       try {
         setLoading(true);
         const response = await customFetch.get(`articles/${id}`);
-        setArticle(response.data);
+        setArticle(response.data.article);
+        setSimilarArticles(response.data.similarArticles);
         setError(null);
       } catch (err) {
         setError("Failed to load article. Please try again later.");
@@ -231,9 +235,9 @@ const Article = () => {
 
       {/* Mobile TOC Dropdown */}
       <div 
-        className={`lg:hidden fixed top-0 left-0 right-0 z-50 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${isTocOpen ? 'translate-y-0' : '-translate-y-full'} max-h-screen overflow-y-auto`}
+        className={`lg:hidden fixed top-[60px] left-0 right-0 z-50 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${isTocOpen ? 'translate-y-0' : '-translate-y-full'}`}
       >
-        <div className="p-6">
+        <div className="px-6 py-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
           <div className="table-of-contents">
             <h2 className="hidden text-xl font-bold mb-6 lg:flex items-center justify-between gap-3 text-primary">
               <div className="flex items-center gap-3">
@@ -296,35 +300,47 @@ const Article = () => {
                 {article.title}klsalk
               </h2>
               <div className="article-meta flex flex-col lg:flex-row items-center justify-center lg:items-center px-4 gap-4">
-                  <div className=" flex items-center justify-center gap-4"> 
+                <div className="flex items-center justify-center gap-4"> 
                   <div className="meta-item flex  items-center gap-2">
-                  <FaCalendarAlt className="meta-icon" />
-                  <span>
-                    {new Date(article.createdAt).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </span>
-                </div>
-                <div className="meta-item flex items-center gap-2">
-                  <FaClock className="meta-icon" />
-                  <span>{readingTime} min read</span>
-                </div>
+                    <FaCalendarAlt className="meta-icon" />
+                    <span>
+                      {new Date(article.createdAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </span>
                   </div>
-                <div className="meta-item flex items-center gap-2">
+                  <div className="meta-separator" />
+                  <div className="meta-item flex items-center gap-2">
+                    <FaClock className="meta-icon" />
+                    <span>{readingTime} min read</span>
+                  </div>
+                </div>
+
+                <div className="meta-separator hidden lg:block" />
+
+                <div className="meta-item">
                   <div className="inline-flex items-center bg-white rounded-full shadow-md hover:shadow-lg transition-all duration-300 p-1">
                     <div className="flex space-x-1">
                       <button
                         onClick={() => setVoiceGender('female')}
-                        className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${voiceGender === 'female' ? 'bg-pink-500 text-white scale-110' : 'text-pink-500 hover:bg-pink-50'}`}
+                        className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${
+                          voiceGender === 'female'
+                            ? 'bg-pink-500 text-white scale-110'
+                            : 'text-pink-500 hover:bg-pink-50'
+                        }`}
                         title="Female Voice"
                       >
                         <FaFemale className={`w-4 h-4 ${voiceGender === 'female' ? 'animate-pulse' : ''}`} />
                       </button>
                       <button
                         onClick={() => setVoiceGender('male')}
-                        className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${voiceGender === 'male' ? 'bg-blue-500 text-white scale-110' : 'text-blue-500 hover:bg-blue-50'}`}
+                        className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${
+                          voiceGender === 'male'
+                            ? 'bg-blue-500 text-white scale-110'
+                            : 'text-blue-500 hover:bg-blue-50'
+                        }`}
                         title="Male Voice"
                       >
                         <FaMale className={`w-4 h-4 ${voiceGender === 'male' ? 'animate-pulse' : ''}`} />
@@ -333,7 +349,11 @@ const Article = () => {
                     <div className="w-[1px] bg-gray-200 mx-1 h-6 self-center"></div>
                     <button
                       onClick={handleTextToSpeech}
-                      className={`flex items-center justify-center space-x-2 px-4 py-1.5 rounded-full transition-all duration-300 ${isPlaying ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-primary text-white hover:bg-primary/90'}`}
+                      className={`flex items-center justify-center space-x-2 px-4 py-1.5 rounded-full transition-all duration-300 ${
+                        isPlaying
+                          ? 'bg-red-500 text-white hover:bg-red-600'
+                          : 'bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90'
+                      }`}
                       title={isPlaying ? 'Stop Reading' : 'Start Reading'}
                     >
                       <div className="flex items-center gap-2">
@@ -360,16 +380,9 @@ const Article = () => {
               dangerouslySetInnerHTML={{ __html: cleanContent(article.content) }}
             />
 
-            <footer className="article-footer mt-8">
-              <div className="article-tags flex flex-wrap gap-2">
-                {article.tags &&
-                  article.tags.map((tag, index) => (
-                    <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-200 transition-all duration-200">
-                      #{tag}
-                    </span>
-                  ))}
-              </div>
-            </footer>
+            <SimilarArticles similarArticles={similarArticles} />
+
+          
           </article>
 
           {/* Desktop Table of Contents */}
@@ -380,8 +393,8 @@ const Article = () => {
                   <LuTableOfContents className="text-ternary" />
                   Quick Navigation
                 </h2>
-                <nav className="toc-nav">
-                  <ol className="space-y-3">
+                <nav className="toc-nav max-h-[60vh] overflow-y-auto custom-scrollbar">
+                  <ol className="space-y-3 pr-4">
                     {toc.map((item, index) => (
                       <li 
                         key={index} 
