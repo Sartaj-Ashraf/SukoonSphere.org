@@ -266,6 +266,27 @@
   color: var(--grey--900);
 }
 
+/* Like button styles */
+.like-button {
+  cursor: pointer;
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.like-button:hover {
+  transform: scale(1.1);
+}
+
+.like-button .meta-icon.liked {
+  color: #e74c3c;
+}
+
+.like-button .meta-icon {
+  font-size: 1.2rem;
+}
+
 /* Loading state */
 .loading-container {
   display: flex;

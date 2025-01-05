@@ -30,6 +30,18 @@ const ArticleSchema = new mongoose.Schema(
     imagePublicId: {
       type: String,
     },
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User", 
+      },
+    ],
+    comments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ArticleComment",
+      },
+    ],
     // status: {
     //   type: String,
     //   default: "pending",
