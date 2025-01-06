@@ -87,13 +87,14 @@ const ArticleCommentCard = ({ comment, articleId, onCommentUpdate }) => {
     try {
       await customFetch.post(`/articles/comments/${comment._id}/replies`, {
         content: replyContent,
+        replyToUserId: comment.createdBy._id,
       });
       setReplyContent("");
       setShowReplyForm(false);
       onCommentUpdate();
       toast.success("Reply added successfully");
     } catch (error) {
-      toast.error("Failed to add reply");
+      toast.error(error.response?.data?.msg || "Failed to add reply");
     }
   };
 

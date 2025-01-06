@@ -122,15 +122,36 @@ export const getSingleArticle = async (req, res) => {
         }
       },
       {
+        $lookup: {
+          from: "articlecomments",
+          let: { articleId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$articleId", "$$articleId"] },
+                deleted: { $ne: true }
+              }
+            },
+            {
+              $count: "total"
+            }
+          ],
+          as: "commentCount"
+        }
+      },
+      {
         $addFields: {
           authorName: { $arrayElemAt: ["$authorDetails.name", 0] },
           authorAvatar: { $arrayElemAt: ["$authorDetails.avatar", 0] },
           authorId: { $arrayElemAt: ["$authorDetails._id", 0] },
+          totalLikes: { $size: { $ifNull: ["$likes", []] } },
+          totalComments: { $ifNull: [{ $arrayElemAt: ["$commentCount.total", 0] }, 0] }
         }
       },
       {
         $project: {
           authorDetails: 0,
+          commentCount: 0,
           deleted: 0,
           __v: 0
         }
@@ -174,16 +195,37 @@ export const getSingleArticle = async (req, res) => {
         }
       },
       {
+        $lookup: {
+          from: "articlecomments",
+          let: { articleId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$articleId", "$$articleId"] },
+                deleted: { $ne: true }
+              }
+            },
+            {
+              $count: "total"
+            }
+          ],
+          as: "commentCount"
+        }
+      },
+      {
         $addFields: {
           authorName: { $arrayElemAt: ["$authorDetails.name", 0] },
           authorAvatar: { $arrayElemAt: ["$authorDetails.avatar", 0] },
           authorId: { $arrayElemAt: ["$authorDetails._id", 0] },
+          totalLikes: { $size: { $ifNull: ["$likes", []] } },
+          totalComments: { $ifNull: [{ $arrayElemAt: ["$commentCount.total", 0] }, 0] }
         }
       },
       {
         $project: {
           content: 0,
           authorDetails: 0,
+          commentCount: 0,
           deleted: 0,
           __v: 0,
           titleSimilarity: 0

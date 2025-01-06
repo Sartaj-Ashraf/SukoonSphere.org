@@ -75,6 +75,10 @@ export const createArticleReply = async (req, res) => {
   const { content, parentId = null, replyToUserId } = req.body;
   const userId = req.user.userId;
 
+  if (!replyToUserId) {
+    throw new BadRequestError("replyToUserId is required");
+  }
+
   const comment = await ArticleComment.findById(commentId);
   if (!comment) {
     throw new BadRequestError("Comment not found");
@@ -103,7 +107,12 @@ export const createArticleReply = async (req, res) => {
     }
   }
 
-  res.status(StatusCodes.CREATED).json({ reply });
+  // Populate the reply with user details before sending response
+  const populatedReply = await ArticleReply.findById(reply._id)
+    .populate("createdBy", "name avatar")
+    .populate("replyTo", "name");
+
+  res.status(StatusCodes.CREATED).json({ reply: populatedReply });
 };
 
 // Get all replies for a comment
