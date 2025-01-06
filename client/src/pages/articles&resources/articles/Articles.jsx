@@ -10,18 +10,14 @@ import {
   FaUser,
   FaSpinner,
   FaSearch,
+  FaRegHeart,
+  FaRegCommentAlt,
 } from "react-icons/fa";
 import { IoCloseOutline } from "react-icons/io5";
-import { LightLoader, PageIntro } from "@/components";
-import {
-  FiAlertTriangle,
-  FiCalendar,
-  FiClock,
-  FiDollarSign,
-  FiHeart,
-} from "react-icons/fi";
+import { PageIntro } from "@/components";
+import { FiCalendar, FiClock } from "react-icons/fi";
 import { MdMultipleStop } from "react-icons/md";
-import LoadingSpinner from "@/components/loaders/LoadingSpinner";
+import { BiUpvote } from "react-icons/bi";
 
 const Articles = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -138,8 +134,6 @@ const Articles = () => {
 
   const allArticles = data?.pages.flatMap((page) => page.articles) || [];
 
-  console.log({ allArticles });
-
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-4">
       {/* Header Section */}
@@ -228,7 +222,6 @@ const Articles = () => {
                 to={`/articles/article/${article._id}`}
                 className="group bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-200 flex flex-col"
               >
-                {/* Article Preview Image */}
                 <div className="relative h-48 bg-gradient-to-r from-blue-50 to-indigo-50 overflow-hidden">
                   <div className="absolute inset-0 flex items-center justify-center">
                     {article.imageUrl ? (
@@ -243,31 +236,45 @@ const Articles = () => {
                   </div>
                 </div>
 
-                {/* Article Content */}
                 <div className="p-6 flex-1 flex flex-col">
-                  <h2 className="text-xl font-semibold text-[var(--grey--900)] group-hover:text-blue-600 transition-colors duration-200 mb-3">
+                  <h2 className="text-xl font-semibold text-[var(--grey--900)] group-hover:text-blue-600 transition-colors duration-200 mb-3 line-clamp-2">
                     {article.title}
                   </h2>
-
-                  {/* Article Metadata */}
-                  <div className="flex items-center justify-between text-sm text-[var(--grey--500)] pt-4 border-t border-gray-100">
-                    <div className="flex items-center">
-                      {article.authorAvatar ? (
-                        <img
-                          src={`${article.authorAvatar}`}
-                          alt=""
-                          className="w-6 h-6 mr-2 object-cover rounded-full"
-                        />
-                      ) : (
-                        <FaUser className="w-4 h-4 mr-2" />
-                      )}
-                      <span>{article.authorName || "Anonymous"}</span>
+                  <div className="flex flex-col gap-3 mt-auto">
+                    <div className="flex items-center justify-end gap-4 text-sm">
+                      <div className="flex items-center gap-2">
+                        <BiUpvote className="w-5 h-5 text-[var(--grey--900)]" />
+                        <span className="text-[var(--grey--600)]">
+                          {article.likes?.length || 0}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <FaRegCommentAlt className="w-4 h-4 text-[var(--grey--900)]" />
+                        <span className="text-[var(--grey--600)]">
+                          {article.comments?.length || 0}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center">
-                      <FaCalendarAlt className="w-4 h-4 mr-2" />
-                      <span>
-                        {new Date(article.createdAt).toLocaleDateString()}
-                      </span>
+
+                    <div className="flex items-center justify-between text-sm text-[var(--grey--600)] pt-4 border-t border-gray-100">
+                      <div className="flex items-center">
+                        {article.authorAvatar ? (
+                          <img
+                            src={article.authorAvatar}
+                            alt={article.authorName}
+                            className="w-6 h-6 mr-2 object-cover rounded-full"
+                          />
+                        ) : (
+                          <FaUser className="w-4 h-4 mr-2" />
+                        )}
+                        <span>{article.authorName || "Anonymous"}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <FaCalendarAlt className="w-4 h-4 mr-2 text-[var(--grey--900)]" />
+                        <span>
+                          {new Date(article.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -275,13 +282,12 @@ const Articles = () => {
             ))}
           </div>
 
-          {/* Load More Trigger */}
           {hasNextPage && (
             <div ref={ref} className="flex justify-center py-4">
               {isFetchingNextPage ? (
                 <FaSpinner className="w-6 h-6 text-blue-500 animate-spin" />
               ) : (
-                <div className="h-8" /> // Spacer for intersection observer
+                <div className="h-8" />
               )}
             </div>
           )}

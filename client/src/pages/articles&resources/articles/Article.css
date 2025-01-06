@@ -1,3 +1,49 @@
+/* Font imports */
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+.article-body {
+  font-family: "Source Serif Pro", Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+  line-height: 1.9;
+  color: var(--grey-800);
+  overflow: hidden;
+}
+
+.article-body h1,
+.article-body h2,
+.article-body h3,
+.article-body h4 {
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.article-body blockquote {
+  font-family: "Source Serif Pro", Georgia, serif;
+  font-style: italic;
+}
+
+.article-meta,
+.meta-item,
+.article-tag {
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.article-category {
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  letter-spacing: 0.05em;
+}
 .article-container {
   max-width: 1000px;
   margin: 0 auto;
@@ -73,14 +119,14 @@
   top: 0;
   left: 0;
   height: 4px; /* Adjusted height for better visibility */
-  background-color: #8bc34a; /* Distinct background color */
+  background-color: var(--primary); /* Distinct background color */
   z-index: 1000; /* Ensure it stays on top of other elements */
   transition: width 0.1s ease; /* Smooth transition */
 }
 
 .table-of-contents {
   position: sticky;
-  top: 80px;
+  top: 20px;
   z-index: 1000;
 }
 
@@ -163,22 +209,30 @@
   background-color: rgba(37, 99, 235, 0.05);
 }
 
-/* Improved list styling */
 .article-body ul,
 .article-body ol {
   margin: 1.75rem 0;
-  /* padding-left: 2.5rem; */
+  padding-left: 2.5rem;
   font-family: "Lora", Georgia, serif;
   color: #4b5563;
-  /* list-style-type: disc; */
 }
 
 .article-body li {
   padding-left: 0px;
-  list-style-type: disc;
   position: relative;
   margin-bottom: 0.5rem;
   line-height: 1.75;
+}
+
+/* Preserve list style from rich text editor */
+.article-body ol[style*="list-style-type"],
+.article-body ul[style*="list-style-type"] {
+  list-style-type: inherit;
+}
+
+.article-body ol[style*="list-style-type"] li,
+.article-body ul[style*="list-style-type"] li {
+  list-style-type: inherit;
 }
 
 .article-body li::marker {
@@ -236,9 +290,8 @@
 .article-body img {
   max-width: 100%;
   height: auto;
-  border-radius: 1rem;
+  border-radius: 8px;
   margin: 2.5rem 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .article-tags {
@@ -370,10 +423,6 @@
   .article-content {
     box-shadow: none;
     padding: 0;
-  }
-
-  .article-progress {
-    display: none;
   }
 
   .article-body {

@@ -84,7 +84,7 @@ const ArticleComments = ({ articleId }) => {
   const allComments = data?.pages.flatMap((page) => page.comments) || [];
 
   return (
-    <div className="mt-8 sticky top-20">
+    <div className="mt-8">
       {/* Comment Form */}
       <form onSubmit={handleSubmitComment} className="mb-6">
         <textarea

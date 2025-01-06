@@ -14,11 +14,12 @@ import {
 import { LuTableOfContents } from "react-icons/lu";
 import { FaArrowTrendDown, FaArrowTrendUp } from "react-icons/fa6";
 import "./Article.css";
-import "./scrollbar.css";
+
 import SimilarArticles from "../../../components/articleComponents/SimilarArticles";
 import CommentPopup from "@/components/articleComponents/CommentPopup";
 import { toast } from "react-toastify";
 import { BiUpvote } from "react-icons/bi";
+import LoadingSpinner from "@/components/loaders/LoadingSpinner";
 
 const Article = () => {
   const [article, setArticle] = useState(null);
@@ -26,7 +27,7 @@ const Article = () => {
   const [error, setError] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [utterance, setUtterance] = useState(null);
-  const [voiceGender, setVoiceGender] = useState('female');
+  const [voiceGender, setVoiceGender] = useState("female");
   const { id } = useParams();
   const [toc, setToc] = useState([]);
   const [isTocOpen, setIsTocOpen] = useState(false);
@@ -47,13 +48,13 @@ const Article = () => {
         setArticle(articleData);
         setSimilarArticles(response.data.similarArticles);
         setLikeCount(articleData.likes?.length || 0);
-        
+
         // Check if the current user has liked the article
         const currentUser = JSON.parse(localStorage.getItem("user"));
         if (currentUser && articleData.likes) {
           setIsLiked(articleData.likes.includes(currentUser._id));
         }
-        
+
         setError(null);
       } catch (err) {
         setError("Failed to load article. Please try again later.");
@@ -80,13 +81,13 @@ const Article = () => {
     try {
       const response = await customFetch.patch(`articles/${id}/like`);
       const updatedArticle = response.data.article;
-      
+
       setIsLiked(!isLiked);
       setLikeCount(updatedArticle.likes.length);
-      
-      setArticle(prev => ({
+
+      setArticle((prev) => ({
         ...prev,
-        likes: updatedArticle.likes
+        likes: updatedArticle.likes,
       }));
     } catch (error) {
       console.error("Error liking article:", error);
@@ -99,7 +100,7 @@ const Article = () => {
   const handleScroll = () => {
     const totalHeight =
       document.documentElement.scrollHeight - window.innerHeight;
-    const progress = (window.scrollY / totalHeight) * 90;
+    const progress = (window.scrollY / totalHeight) * 100;
     setScrollProgress(progress);
   };
 
@@ -242,11 +243,7 @@ const Article = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -281,7 +278,7 @@ const Article = () => {
     <div className="relative bg-white">
       {/* Mobile TOC Navbar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-[60] bg-white shadow-md">
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between p-6">
           <button
             onClick={toggleToc}
             className="flex items-center gap-2 text-[var(--primary) hover:text-ternary transition-colors duration-200"
@@ -302,9 +299,9 @@ const Article = () => {
 
       {/* Mobile TOC Dropdown */}
       <div
-        className={`lg:hidden  fixed top-[60px] left-0 right-0 z-50 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${isTocOpen ? "translate-y-0" : "-translate-y-full"}`}
+        className={`lg:hidden overflow-x-hidden fixed top-[50px] left-0 right-0 z-50 bg-white shadow-sm transform transition-transform duration-300 ease-in-out ${isTocOpen ? "translate-y-0" : "-translate-y-full"}`}
       >
-        <div className="px-6 py-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+        <div className="px-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
           <div className="table-of-contents">
             <h2 className="hidden text-xl font-bold mb-6 lg:flex items-center justify-between gap-3 text-[var(--primary)]">
               <div className="flex items-center gap-3">
@@ -343,14 +340,14 @@ const Article = () => {
 
       {/* Mobile TOC Overlay */}
       <div
-        className={`lg:hidden fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 ${isTocOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        className={`lg:hidden overflow-x-hidden fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 ${isTocOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         onClick={toggleToc}
       />
 
       <div className="container mx-auto px-4 lg:px-8 ">
         <div className="grid grid-cols-12 gap-6 lg:gap-12">
           <article className="col-span-12 lg:col-span-8 order-2 lg:order-1 mt-4 lg:mt-8">
-            <header className="max-w-4xl mx-auto px-4 py-4 space-y-3">
+            <header className="max-w-4xl mx-auto px-4 py-4 space-y-3 border-b-2 border-gray-200">
               {/* Title */}
               <h2 className="text-3xl font-bold leading-tight text-gray-900">
                 {article.title || "Every book I read in 2024, with commentary"}
@@ -364,12 +361,14 @@ const Article = () => {
                     <img
                       src={article?.authorAvatar}
                       alt={article?.authorName}
-                      className="w-8 h-8 rounded-full object-cover"
+                      className="w-10 h-10 rounded-full object-cover"
                     />
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">
-                          {article?.author?.name || article?.authorName || "Anonymous"}
+                        <span className="font-medium md:font-semibold text-sm md:text-base text-[var(--primary)]">
+                          {article?.author?.name ||
+                            article?.authorName ||
+                            "Anonymous"}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-[var(--grey--800)]">
@@ -395,7 +394,7 @@ const Article = () => {
                   <div className="flex items-center gap-4">
                     {/* Upvote Button */}
                     <div
-                      className={`meta-item upvote-button ${isLikeLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      className={`meta-item upvote-button ${isLikeLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                       onClick={handleLike}
                     >
                       <div className="flex items-center justify-center gap-2 w-8 h-8 rounded-full border border-gray-300 hover:border-gray-400 transition-colors">
@@ -415,7 +414,7 @@ const Article = () => {
                     {/* Comment Button */}
                     <button
                       onClick={() => setIsCommentOpen(true)}
-                      className="flex items-center gap-2 text-[var(--grey--800)] hover:text-gray-700"
+                      className="flex items-center gap-2 text-[var(--grey--800)] hover:text-[var(--ternery)]"
                     >
                       <FaRegCommentAlt className="w-5 h-5" />
                       <span>{article.totalComments || 0}</span>
@@ -500,15 +499,11 @@ const Article = () => {
                 __html: cleanContent(article.content),
               }}
             />
-
-            <div className="mt-12">
-              <SimilarArticles similarArticles={similarArticles} />
-            </div>
           </article>
 
           {/* Desktop Table of Contents */}
           <section className="hidden lg:block col-span-12 lg:col-span-4 order-1 lg:order-2">
-            <div className="sticky top-24 bg-white rounded-xl shadow-md p-6">
+            <div className="sticky top-14 bg-white rounded-xl shadow-md p-6">
               <div className="table-of-contents">
                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-[var(--primary)] ">
                   <LuTableOfContents className="text-[var(--primary)] " />
@@ -541,6 +536,9 @@ const Article = () => {
               </div>
             </div>
           </section>
+        </div>
+        <div className="mt-12">
+          <SimilarArticles similarArticles={similarArticles} />
         </div>
       </div>
       <CommentPopup
