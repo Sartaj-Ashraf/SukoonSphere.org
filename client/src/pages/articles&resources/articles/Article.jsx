@@ -13,13 +13,18 @@ import {
   FaFemale,
   FaHeart,
   FaRegHeart,
+  FaRegCommentAlt,
+  FaPlay,
+  FaShare,
 } from "react-icons/fa";
 import { LuTableOfContents } from "react-icons/lu";
-import { FaArrowTrendDown } from "react-icons/fa6";
+import { FaArrowTrendDown, FaArrowTrendUp } from "react-icons/fa6";
 import "./Article.css";
 import "./scrollbar.css";
 import SimilarArticles from "../../../components/articleComponents/SimilarArticles";
 import ArticleComments from "../../../components/articleComponents/ArticleComments";
+import { BiDownvote, BiUpvote } from "react-icons/bi";
+import CommentPopup from "@/components/articleComponents/CommentPopup";
 
 const Article = () => {
   const [article, setArticle] = useState(null);
@@ -35,11 +40,12 @@ const Article = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isCommentOpen, setIsCommentOpen] = useState(false);
 
   const handleScroll = () => {
     const totalHeight =
       document.documentElement.scrollHeight - window.innerHeight;
-    const progress = (window.scrollY / totalHeight) * 100;
+    const progress = (window.scrollY / totalHeight) * 90;
     setScrollProgress(progress);
   };
 
@@ -273,7 +279,7 @@ const Article = () => {
             )}
             <span className="font-medium">Contents</span>
           </button>
-          <h3 className="text-sm font-medium text-gray-500 truncate max-w-[200px]">
+          <h3 className="text-sm font-medium text-[var(--grey--800)] truncate max-w-[200px]">
             {article.title}
           </h3>
         </div>
@@ -281,7 +287,7 @@ const Article = () => {
 
       {/* Mobile TOC Dropdown */}
       <div
-        className={`lg:hidden fixed top-[60px] left-0 right-0 z-50 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${isTocOpen ? "translate-y-0" : "-translate-y-full"}`}
+        className={`lg:hidden  fixed top-[60px] left-0 right-0 z-50 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${isTocOpen ? "translate-y-0" : "-translate-y-full"}`}
       >
         <div className="px-6 py-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
           <div className="table-of-contents">
@@ -329,112 +335,148 @@ const Article = () => {
       <div className="container mx-auto px-4 lg:px-8 ">
         <div className="grid grid-cols-12 gap-6 lg:gap-12">
           <article className="col-span-12 lg:col-span-8 order-2 lg:order-1 mt-4 lg:mt-8">
-            <header className="relative article-header space-y-6 mb-8">
-              <div className="meta-item flex items-center justify-center gap-2">
-                {article.authorAvatar ? (
-                  <img
-                    src={article.authorAvatar}
-                    alt={article.authorName}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <FaUser className="meta-icon" />
-                )}
-                <span>{article.authorName || "Anonymous"}</span>
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-[var(--primary)] text-center">
-                {article.title}
+            <header className="max-w-4xl mx-auto px-4 py-4 space-y-3">
+              {/* Title */}
+              <h2 className="text-3xl font-bold leading-tight text-gray-900">
+                {article.title || "Every book I read in 2024, with commentary"}
               </h2>
-              <div className="article-meta flex flex-col lg:flex-row items-center justify-center lg:items-center px-4 gap-4">
-                <div className="flex items-center justify-center gap-4">
-                  <div className="meta-item flex  items-center gap-2">
-                    <FaCalendarAlt className="meta-icon" />
-                    <span>
-                      {new Date(article.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </div>
-                  <div className="meta-separator" />
-                  <div className="meta-item flex items-center gap-2">
-                    <FaClock className="meta-icon" />
-                    <span>{readingTime} min read</span>
+
+              {/* Author and Meta Info Bar */}
+              <div className="flex flex-col md:flex-row justify-between py-4 space-y-2 md:space-y-0">
+                <div className="flex gap-3">
+                  {/* Author Section */}
+                  <div className="flex gap-3">
+                    <img
+                      src={article?.authorAvatar}
+                      alt={article?.authorName}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-900">
+                          {article?.authorName || "Anonymous"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-[var(--grey--800)]">
+                        <span>{readingTime || "10"} min read</span>
+                        <span>·</span>
+                        <span>
+                          {new Date(article.createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="meta-separator hidden lg:block" />
-
-                <div className="meta-item">
-                  <div className="inline-flex items-center bg-white rounded-full shadow-md hover:shadow-lg transition-all duration-300 p-1">
-                    <div className="flex space-x-1">
-                      <button
-                        onClick={() => setVoiceGender("female")}
-                        className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${
-                          voiceGender === "female"
-                            ? "bg-pink-500 text-white scale-110"
-                            : "text-pink-500 hover:bg-pink-50"
-                        }`}
-                        title="Female Voice"
-                      >
-                        <FaFemale
-                          className={`w-4 h-4 ${voiceGender === "female" ? "animate-pulse" : ""}`}
-                        />
-                      </button>
-                      <button
-                        onClick={() => setVoiceGender("male")}
-                        className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${
-                          voiceGender === "male"
-                            ? "bg-blue-500 text-white scale-110"
-                            : "text-blue-500 hover:bg-blue-50"
-                        }`}
-                        title="Male Voice"
-                      >
-                        <FaMale
-                          className={`w-4 h-4 ${voiceGender === "male" ? "animate-pulse" : ""}`}
-                        />
-                      </button>
-                    </div>
-                    <div className="w-[1px] bg-gray-200 mx-1 h-6 self-center"></div>
-                    <button
-                      onClick={handleTextToSpeech}
-                      className={`flex items-center justify-center space-x-2 px-4 py-1.5 rounded-full transition-all duration-300 ${
-                        isPlaying
-                          ? "bg-red-500 text-white hover:bg-red-600"
-                          : "bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90"
-                      }`}
-                      title={isPlaying ? "Stop Reading" : "Start Reading"}
+                {/* Action Buttons */}
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-4">
+                    {/* Upvote Button */}
+                    <div
+                      className="meta-item upvote-button"
+                      onClick={handleLike}
                     >
-                      <div className="flex items-center gap-2">
-                        {isPlaying ? (
-                          <>
-                            <FaVolumeMute className="w-4 h-4" />
-                            <span className="text-sm font-medium">Stop</span>
-                          </>
+                      <div className="flex items-center justify-center gap-2 w-8 h-8 rounded-full border border-gray-300 hover:border-gray-400 transition-colors cursor-pointer">
+                        {isLiked ? (
+                          <BiUpvote className="meta-icon liked text-[var(--ternery)]" />
                         ) : (
-                          <>
-                            <FaVolumeUp
-                              className={`w-4 h-4 ${!isPlaying && voiceGender ? "animate-bounce" : ""}`}
-                            />
-                            <span className="text-sm font-medium">Listen</span>
-                          </>
+                          <BiUpvote className="meta-icon text-[var(--primary)]" />
                         )}
                       </div>
+                      <span className="text-sm text-[var(--grey--800)]">
+                        {likeCount}
+                      </span>
+                    </div>
+
+                    {/* Comment Button */}
+                    <button
+                      onClick={() => setIsCommentOpen(true)}
+                      className="flex items-center gap-2 text-[var(--grey--800)] hover:text-gray-700"
+                    >
+                      <FaRegCommentAlt className="w-5 h-5" />
+                      <span>150</span>
                     </button>
+
+                    {/* Listen Button Group */}
+                    <div className="inline-flex items-center rounded-full shadow-sm hover:shadow-md transition-all duration-300 p-1">
+                      <div className="flex space-x-1">
+                        {/* Female Voice Button */}
+                        <button
+                          onClick={() => setVoiceGender("female")}
+                          className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${
+                            voiceGender === "female"
+                              ? "bg-pink-500 text-white scale-110"
+                              : "text-pink-500 hover:bg-pink-50"
+                          }`}
+                          title="Female Voice"
+                        >
+                          <FaFemale
+                            className={`w-4 h-4 ${voiceGender === "female" ? "animate-pulse" : ""}`}
+                          />
+                        </button>
+                        {/* Male Voice Button */}
+                        <button
+                          onClick={() => setVoiceGender("male")}
+                          className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${
+                            voiceGender === "male"
+                              ? "bg-blue-500 text-white scale-110"
+                              : "text-blue-500 hover:bg-blue-50"
+                          }`}
+                          title="Male Voice"
+                        >
+                          <FaMale
+                            className={`w-4 h-4 ${voiceGender === "male" ? "animate-pulse" : ""}`}
+                          />
+                        </button>
+                      </div>
+
+                      <div className="w-[1px] bg-gray-200 mx-1 h-6 self-center"></div>
+
+                      {/* Play/Stop Button */}
+                      <button
+                        onClick={handleTextToSpeech}
+                        className={`flex items-center justify-center space-x-2 px-4 py-1.5 rounded-full transition-all duration-300 ${
+                          isPlaying
+                            ? "bg-red-500 text-white hover:bg-red-600"
+                            : "bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90"
+                        }`}
+                        title={isPlaying ? "Stop Reading" : "Start Reading"}
+                      >
+                        <div className="flex items-center gap-2">
+                          {isPlaying ? (
+                            <>
+                              <FaVolumeMute className="w-4 h-4" />
+                              <span className="text-sm font-medium">Stop</span>
+                            </>
+                          ) : (
+                            <>
+                              <FaVolumeUp
+                                className={`w-4 h-4 ${!isPlaying && voiceGender ? "animate-bounce" : ""}`}
+                              />
+                              <span className="text-sm font-medium">
+                                Listen
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="meta-item like-button" onClick={handleLike}>
-                  {isLiked ? (
-                    <FaHeart className="meta-icon liked" />
-                  ) : (
-                    <FaRegHeart className="meta-icon" />
-                  )}
-                  <span>{likeCount} likes</span>
                 </div>
               </div>
             </header>
-            <div className="progress-bar" style={{ width: `${scrollProgress}%` }}></div>
+
+            <div
+              className="progress-bar"
+              style={{ width: `${scrollProgress}%` }}
+            ></div>
             <div
               className="article-body prose prose-lg max-w-none"
               dangerouslySetInnerHTML={{
@@ -444,10 +486,6 @@ const Article = () => {
 
             <div className="mt-12">
               <SimilarArticles similarArticles={similarArticles} />
-            </div>
-
-            <div className="mt-12 border-t pt-8">
-              <ArticleComments articleId={id} />
             </div>
           </article>
 
@@ -488,6 +526,11 @@ const Article = () => {
           </section>
         </div>
       </div>
+      <CommentPopup
+        isOpen={isCommentOpen}
+        onClose={() => setIsCommentOpen(false)}
+        articleId={id}
+      />
     </div>
   );
 };
