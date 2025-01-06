@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { useUser } from '@/context/UserContext';
-import { toast } from 'react-toastify';
-import customFetch from '@/utils/customFetch';
-import { formatDistanceToNow } from 'date-fns';
-import { FaThumbsUp } from 'react-icons/fa';
-import DeleteModal from '../shared/DeleteModal';
-import PostActions from '../shared/PostActions';
+import React, { useState } from "react";
+import { useUser } from "@/context/UserContext";
+import { toast } from "react-toastify";
+import customFetch from "@/utils/customFetch";
+import { formatDistanceToNow } from "date-fns";
+import { FaThumbsUp } from "react-icons/fa";
+import DeleteModal from "../shared/DeleteModal";
+import PostActions from "../shared/PostActions";
+import UserAvatar from "../shared/UserAvatar";
 
 const ArticleCommentReply = ({ reply, commentId, onReplyUpdate }) => {
   const { user } = useUser();
@@ -16,20 +17,20 @@ const ArticleCommentReply = ({ reply, commentId, onReplyUpdate }) => {
 
   const handleLike = async () => {
     if (!user) {
-      toast.error('Please login to like replies!');
+      toast.error("Please login to like replies!");
       return;
     }
     try {
       await customFetch.patch(`/articles/replies/${reply._id}/like`);
       onReplyUpdate();
     } catch (error) {
-      toast.error('Failed to like reply');
+      toast.error("Failed to like reply");
     }
   };
 
   const handleEdit = () => {
     if (!user || user._id !== reply.createdBy._id) {
-      toast.error('You can only edit your own replies!');
+      toast.error("You can only edit your own replies!");
       return;
     }
     setIsEditing(true);
@@ -37,7 +38,7 @@ const ArticleCommentReply = ({ reply, commentId, onReplyUpdate }) => {
 
   const handleSaveEdit = async () => {
     if (!editContent.trim()) {
-      toast.error('Reply cannot be empty!');
+      toast.error("Reply cannot be empty!");
       return;
     }
     try {
@@ -46,9 +47,9 @@ const ArticleCommentReply = ({ reply, commentId, onReplyUpdate }) => {
       });
       setIsEditing(false);
       onReplyUpdate();
-      toast.success('Reply updated successfully');
+      toast.success("Reply updated successfully");
     } catch (error) {
-      toast.error('Failed to update reply');
+      toast.error("Failed to update reply");
     }
   };
 
@@ -61,10 +62,10 @@ const ArticleCommentReply = ({ reply, commentId, onReplyUpdate }) => {
     try {
       await customFetch.delete(`/articles/replies/${reply._id}`);
       onReplyUpdate();
-      toast.success('Reply deleted successfully');
+      toast.success("Reply deleted successfully");
       setShowDeleteModal(false);
     } catch (error) {
-      toast.error('Failed to delete reply');
+      toast.error("Failed to delete reply");
     } finally {
       setIsDeleting(false);
     }
@@ -76,18 +77,15 @@ const ArticleCommentReply = ({ reply, commentId, onReplyUpdate }) => {
         {/* Reply Header */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <img
-              src={reply.createdBy.avatar || '/default-avatar.png'}
-              alt={reply.createdBy.name}
-              className="w-6 h-6 rounded-full"
+            <UserAvatar
+              createdBy={reply.createdBy.name}
+              username={reply.createdBy.name}
+              userAvatar={reply.createdBy.avatar}
+              createdAt={reply.createdAt}
+              size="verySmall"
             />
-            <div>
-              <p className="font-semibold text-sm">{reply.createdBy.name}</p>
-              <p className="text-xs text-gray-500">
-                {formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true })}
-              </p>
-            </div>
           </div>
+
           {user && user._id === reply.createdBy._id && (
             <PostActions handleEdit={handleEdit} handleDelete={handleDelete} />
           )}
@@ -99,16 +97,10 @@ const ArticleCommentReply = ({ reply, commentId, onReplyUpdate }) => {
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full p-3 pr-14 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent resize-none text-gray-700"
               rows="2"
             />
             <div className="flex gap-2 mt-2">
-              <button
-                onClick={handleSaveEdit}
-                className="btn-2 !py-1 text-sm"
-              >
-                Save
-              </button>
               <button
                 onClick={() => {
                   setIsEditing(false);
@@ -118,13 +110,16 @@ const ArticleCommentReply = ({ reply, commentId, onReplyUpdate }) => {
               >
                 Cancel
               </button>
+              <button onClick={handleSaveEdit} className="btn-2 !py-1 text-sm">
+                Save
+              </button>
             </div>
           </div>
         ) : (
           <p className="text-sm mt-1">
             {reply.replyTo && reply.replyTo._id !== reply.commentId && (
               <span className="text-primary font-medium">
-                @{reply.replyTo.name}{' '}
+                @{reply.replyTo.name}{" "}
               </span>
             )}
             {reply.content}
@@ -137,8 +132,8 @@ const ArticleCommentReply = ({ reply, commentId, onReplyUpdate }) => {
             onClick={handleLike}
             className={`flex items-center gap-1 ${
               user && reply.likes.includes(user._id)
-                ? 'text-primary'
-                : 'text-gray-500'
+                ? "text-primary"
+                : "text-gray-500"
             }`}
           >
             <FaThumbsUp />

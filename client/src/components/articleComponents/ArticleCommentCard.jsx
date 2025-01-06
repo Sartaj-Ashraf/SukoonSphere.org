@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import { useUser } from '@/context/UserContext';
-import { toast } from 'react-toastify';
-import customFetch from '@/utils/customFetch';
-import { formatDistanceToNow } from 'date-fns';
-import { FaReply, FaThumbsUp } from 'react-icons/fa';
-import ArticleCommentReply from './ArticleCommentReply';
-import DeleteModal from '../shared/DeleteModal';
-import PostActions from '../shared/PostActions';
+import React, { useState } from "react";
+import { useUser } from "@/context/UserContext";
+import { toast } from "react-toastify";
+import customFetch from "@/utils/customFetch";
+import { formatDistanceToNow } from "date-fns";
+import { FaReply, FaThumbsUp } from "react-icons/fa";
+import ArticleCommentReply from "./ArticleCommentReply";
+import DeleteModal from "../shared/DeleteModal";
+import PostActions from "../shared/PostActions";
+import UserAvatar from "../shared/UserAvatar";
 
 const ArticleCommentCard = ({ comment, articleId, onCommentUpdate }) => {
   const { user } = useUser();
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
-  const [replyContent, setReplyContent] = useState('');
+  const [replyContent, setReplyContent] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -20,20 +21,20 @@ const ArticleCommentCard = ({ comment, articleId, onCommentUpdate }) => {
 
   const handleLike = async () => {
     if (!user) {
-      toast.error('Please login to like comments!');
+      toast.error("Please login to like comments!");
       return;
     }
     try {
       await customFetch.patch(`/articles/comments/${comment._id}/like`);
       onCommentUpdate();
     } catch (error) {
-      toast.error('Failed to like comment');
+      toast.error("Failed to like comment");
     }
   };
 
   const handleEdit = () => {
     if (!user || user._id !== comment.createdBy._id) {
-      toast.error('You can only edit your own comments!');
+      toast.error("You can only edit your own comments!");
       return;
     }
     setIsEditing(true);
@@ -41,7 +42,7 @@ const ArticleCommentCard = ({ comment, articleId, onCommentUpdate }) => {
 
   const handleSaveEdit = async () => {
     if (!editContent.trim()) {
-      toast.error('Comment cannot be empty!');
+      toast.error("Comment cannot be empty!");
       return;
     }
     try {
@@ -50,9 +51,9 @@ const ArticleCommentCard = ({ comment, articleId, onCommentUpdate }) => {
       });
       setIsEditing(false);
       onCommentUpdate();
-      toast.success('Comment updated successfully');
+      toast.success("Comment updated successfully");
     } catch (error) {
-      toast.error('Failed to update comment');
+      toast.error("Failed to update comment");
     }
   };
 
@@ -65,10 +66,10 @@ const ArticleCommentCard = ({ comment, articleId, onCommentUpdate }) => {
     try {
       await customFetch.delete(`/articles/comments/${comment._id}`);
       onCommentUpdate();
-      toast.success('Comment deleted successfully');
+      toast.success("Comment deleted successfully");
       setShowDeleteModal(false);
     } catch (error) {
-      toast.error('Failed to delete comment');
+      toast.error("Failed to delete comment");
     } finally {
       setIsDeleting(false);
     }
@@ -76,23 +77,23 @@ const ArticleCommentCard = ({ comment, articleId, onCommentUpdate }) => {
 
   const handleSubmitReply = async () => {
     if (!user) {
-      toast.error('Please login to reply!');
+      toast.error("Please login to reply!");
       return;
     }
     if (!replyContent.trim()) {
-      toast.error('Reply cannot be empty!');
+      toast.error("Reply cannot be empty!");
       return;
     }
     try {
       await customFetch.post(`/articles/comments/${comment._id}/replies`, {
         content: replyContent,
       });
-      setReplyContent('');
+      setReplyContent("");
       setShowReplyForm(false);
       onCommentUpdate();
-      toast.success('Reply added successfully');
+      toast.success("Reply added successfully");
     } catch (error) {
-      toast.error('Failed to add reply');
+      toast.error("Failed to add reply");
     }
   };
 
@@ -102,17 +103,13 @@ const ArticleCommentCard = ({ comment, articleId, onCommentUpdate }) => {
         {/* Comment Header */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <img
-              src={comment.createdBy.avatar || '/default-avatar.png'}
-              alt={comment.createdBy.name}
-              className="w-8 h-8 rounded-full"
+            <UserAvatar
+              createdBy={comment.createdBy.name}
+              username={comment.createdBy.name}
+              userAvatar={comment.createdBy.avatar}
+              createdAt={comment.createdAt}
+              size="verySmall"
             />
-            <div>
-              <p className="font-semibold">{comment.createdBy.name}</p>
-              <p className="text-sm text-gray-500">
-                {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
-              </p>
-            </div>
           </div>
           {user && user._id === comment.createdBy._id && (
             <PostActions handleEdit={handleEdit} handleDelete={handleDelete} />
@@ -125,24 +122,21 @@ const ArticleCommentCard = ({ comment, articleId, onCommentUpdate }) => {
             <textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full p-3 pr-14 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent resize-none text-gray-700"
               rows="3"
             />
             <div className="flex gap-2 mt-2">
-              <button
-                onClick={handleSaveEdit}
-                className="btn-2 !py-1"
-              >
-                Save
-              </button>
               <button
                 onClick={() => {
                   setIsEditing(false);
                   setEditContent(comment.content);
                 }}
-                className="btn-3 !py-1"
+                className="btn-red !py-1"
               >
                 Cancel
+              </button>
+              <button onClick={handleSaveEdit} className="btn-2 !py-1">
+                Save
               </button>
             </div>
           </div>
@@ -156,8 +150,8 @@ const ArticleCommentCard = ({ comment, articleId, onCommentUpdate }) => {
             onClick={handleLike}
             className={`flex items-center gap-1 ${
               user && comment.likes.includes(user._id)
-                ? 'text-primary'
-                : 'text-gray-500'
+                ? "text-primary"
+                : "text-gray-500"
             }`}
           >
             <FaThumbsUp />
@@ -179,24 +173,21 @@ const ArticleCommentCard = ({ comment, articleId, onCommentUpdate }) => {
               value={replyContent}
               onChange={(e) => setReplyContent(e.target.value)}
               placeholder="Write your reply..."
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full p-3 pr-14 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent resize-none text-gray-700"
               rows="2"
             />
             <div className="flex gap-2 mt-2">
               <button
-                onClick={handleSubmitReply}
-                className="btn-2 !py-1"
-              >
-                Reply
-              </button>
-              <button
                 onClick={() => {
                   setShowReplyForm(false);
-                  setReplyContent('');
+                  setReplyContent("");
                 }}
-                className="btn-3 !py-1"
+                className="btn-red !py-1"
               >
                 Cancel
+              </button>
+              <button onClick={handleSubmitReply} className="btn-2 !py-1">
+                Reply
               </button>
             </div>
           </div>
@@ -210,9 +201,9 @@ const ArticleCommentCard = ({ comment, articleId, onCommentUpdate }) => {
               className="text-primary text-sm"
             >
               {showReplies
-                ? 'Hide Replies'
+                ? "Hide Replies"
                 : `Show ${comment.replies.length} ${
-                    comment.replies.length === 1 ? 'Reply' : 'Replies'
+                    comment.replies.length === 1 ? "Reply" : "Replies"
                   }`}
             </button>
             {showReplies && (

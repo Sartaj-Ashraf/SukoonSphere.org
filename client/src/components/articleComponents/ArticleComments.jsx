@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { useInView } from 'react-intersection-observer';
-import { useUser } from '@/context/UserContext';
-import { toast } from 'react-toastify';
-import customFetch from '@/utils/customFetch';
-import ArticleCommentCard from './ArticleCommentCard';
-import { FaSpinner } from 'react-icons/fa';
+import React, { useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
+import { useUser } from "@/context/UserContext";
+import { toast } from "react-toastify";
+import customFetch from "@/utils/customFetch";
+import ArticleCommentCard from "./ArticleCommentCard";
+import { FaSpinner } from "react-icons/fa";
 
 const ArticleComments = ({ articleId }) => {
   const { user } = useUser();
-  const [commentContent, setCommentContent] = useState('');
+  const [commentContent, setCommentContent] = useState("");
   const { ref, inView } = useInView();
 
   const {
@@ -20,7 +20,7 @@ const ArticleComments = ({ articleId }) => {
     status,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ['articleComments', articleId],
+    queryKey: ["articleComments", articleId],
     queryFn: async ({ pageParam = 1 }) => {
       const response = await customFetch.get(
         `/articles/${articleId}/comments?page=${pageParam}&limit=10`
@@ -39,11 +39,11 @@ const ArticleComments = ({ articleId }) => {
   const handleSubmitComment = async (e) => {
     e.preventDefault();
     if (!user) {
-      toast.error('Please login to comment!');
+      toast.error("Please login to comment!");
       return;
     }
     if (!commentContent.trim()) {
-      toast.error('Comment cannot be empty!');
+      toast.error("Comment cannot be empty!");
       return;
     }
 
@@ -51,11 +51,11 @@ const ArticleComments = ({ articleId }) => {
       await customFetch.post(`/articles/${articleId}/comments`, {
         content: commentContent,
       });
-      setCommentContent('');
+      setCommentContent("");
       refetch();
-      toast.success('Comment added successfully!');
+      toast.success("Comment added successfully!");
     } catch (error) {
-      toast.error(error.response?.data?.msg || 'Failed to add comment');
+      toast.error(error.response?.data?.msg || "Failed to add comment");
     }
   };
 
@@ -65,7 +65,7 @@ const ArticleComments = ({ articleId }) => {
     }
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div className="flex justify-center items-center py-4">
         <FaSpinner className="animate-spin h-6 w-6 text-primary" />
@@ -73,7 +73,7 @@ const ArticleComments = ({ articleId }) => {
     );
   }
 
-  if (status === 'error') {
+  if (status === "error") {
     return (
       <div className="text-center text-red-500 py-4">
         Error loading comments
@@ -84,24 +84,20 @@ const ArticleComments = ({ articleId }) => {
   const allComments = data?.pages.flatMap((page) => page.comments) || [];
 
   return (
-    <div className="mt-8">
-      <h3 className="text-xl font-semibold mb-4">Comments</h3>
-      
+    <div className="mt-8 sticky top-20">
       {/* Comment Form */}
       <form onSubmit={handleSubmitComment} className="mb-6">
         <textarea
           value={commentContent}
           onChange={(e) => setCommentContent(e.target.value)}
-          placeholder={user ? "Write your comment..." : "Please login to comment"}
-          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+          placeholder={
+            user ? "Write your comment..." : "Please login to comment"
+          }
+          className="w-full p-3 pr-14 border border-gray-100 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent resize-none text-gray-700"
           rows="3"
           disabled={!user}
         />
-        <button
-          type="submit"
-          disabled={!user}
-          className="btn-2 mt-2"
-        >
+        <button type="submit" disabled={!user} className="btn-2 mt-2">
           Post Comment
         </button>
       </form>

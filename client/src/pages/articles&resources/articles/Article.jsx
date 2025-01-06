@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import customFetch from "@/utils/customFetch";
 import {
-  FaSpinner,
   FaUser,
   FaCalendarAlt,
   FaClock,
@@ -14,15 +13,18 @@ import {
   FaFemale,
   FaHeart,
   FaRegHeart,
+  FaRegCommentAlt,
+  FaPlay,
+  FaShare,
 } from "react-icons/fa";
-import {
-  LuTableOfContents
-} from "react-icons/lu";
-import { FaArrowTrendDown } from "react-icons/fa6";
+import { LuTableOfContents } from "react-icons/lu";
+import { FaArrowTrendDown, FaArrowTrendUp } from "react-icons/fa6";
 import "./Article.css";
 import "./scrollbar.css";
 import SimilarArticles from "../../../components/articleComponents/SimilarArticles";
 import ArticleComments from "../../../components/articleComponents/ArticleComments";
+import { BiDownvote, BiUpvote } from "react-icons/bi";
+import CommentPopup from "@/components/articleComponents/CommentPopup";
 
 const Article = () => {
   const [article, setArticle] = useState(null);
@@ -30,13 +32,27 @@ const Article = () => {
   const [error, setError] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [utterance, setUtterance] = useState(null);
-  const [voiceGender, setVoiceGender] = useState('female');
+  const [voiceGender, setVoiceGender] = useState("female");
   const { id } = useParams();
   const [toc, setToc] = useState([]);
   const [isTocOpen, setIsTocOpen] = useState(false);
   const [similarArticles, setSimilarArticles] = useState([]);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [isCommentOpen, setIsCommentOpen] = useState(false);
+
+  const handleScroll = () => {
+    const totalHeight =
+      document.documentElement.scrollHeight - window.innerHeight;
+    const progress = (window.scrollY / totalHeight) * 90;
+    setScrollProgress(progress);
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -47,8 +63,11 @@ const Article = () => {
         setSimilarArticles(response.data.similarArticles);
         setLikeCount(response.data.article.likes.length);
         // Check if the current user has liked the article
-        const currentUser = JSON.parse(localStorage.getItem('user'));
-        if (currentUser && response.data.article.likes.includes(currentUser.userId)) {
+        const currentUser = JSON.parse(localStorage.getItem("user"));
+        if (
+          currentUser &&
+          response.data.article.likes.includes(currentUser.userId)
+        ) {
           setIsLiked(true);
         }
         setError(null);
@@ -116,38 +135,43 @@ const Article = () => {
 
     const voices = synth.getVoices();
     const maleVoicePreferences = [
-      'Microsoft David Desktop',
-      'Google UK English Male',
-      'Microsoft David',
-      'en-GB-Standard-B',
-      'en-US-Standard-B'
+      "Microsoft David Desktop",
+      "Google UK English Male",
+      "Microsoft David",
+      "en-GB-Standard-B",
+      "en-US-Standard-B",
     ];
 
-    const selectedVoice = voices.find(voice => {
-      const voiceName = voice.name.toLowerCase();
-      if (voiceGender === 'male') {
-        return maleVoicePreferences.some(preferred => 
-          voiceName.includes(preferred.toLowerCase())
-        );
-      } else {
-        return voiceName.includes('female') || 
-               voiceName.includes('zira') || 
-               voiceName.includes('helena');
-      }
-    }) || voices.find(voice => {
-      const voiceName = voice.name.toLowerCase();
-      return voiceGender === 'male' 
-        ? (voiceName.includes('male') || voiceName.includes('david'))
-        : (voiceName.includes('female') || voiceName.includes('zira'));
-    }) || voices[0];
+    const selectedVoice =
+      voices.find((voice) => {
+        const voiceName = voice.name.toLowerCase();
+        if (voiceGender === "male") {
+          return maleVoicePreferences.some((preferred) =>
+            voiceName.includes(preferred.toLowerCase())
+          );
+        } else {
+          return (
+            voiceName.includes("female") ||
+            voiceName.includes("zira") ||
+            voiceName.includes("helena")
+          );
+        }
+      }) ||
+      voices.find((voice) => {
+        const voiceName = voice.name.toLowerCase();
+        return voiceGender === "male"
+          ? voiceName.includes("male") || voiceName.includes("david")
+          : voiceName.includes("female") || voiceName.includes("zira");
+      }) ||
+      voices[0];
 
-    const tempDiv = document.createElement('div');
+    const tempDiv = document.createElement("div");
     tempDiv.innerHTML = cleanContent(article.content);
     const cleanText = tempDiv.textContent || tempDiv.innerText || "";
     const chunks = cleanText.match(/[^.!?]+[.!?]+/g) || [];
-    
+
     let currentChunk = 0;
-    
+
     const speakNextChunk = () => {
       if (currentChunk < chunks.length) {
         const newUtterance = new SpeechSynthesisUtterance(chunks[currentChunk]);
@@ -155,7 +179,7 @@ const Article = () => {
           newUtterance.voice = selectedVoice;
         }
 
-        if (voiceGender === 'male') {
+        if (voiceGender === "male") {
           newUtterance.pitch = 0.85;
           newUtterance.rate = 0.92;
           newUtterance.volume = 1;
@@ -164,7 +188,7 @@ const Article = () => {
           newUtterance.rate = 0.95;
           newUtterance.volume = 1;
         }
-        
+
         newUtterance.onend = () => {
           currentChunk++;
           if (currentChunk < chunks.length) {
@@ -175,7 +199,7 @@ const Article = () => {
         };
 
         newUtterance.onerror = () => {
-          console.error('Speech synthesis error');
+          console.error("Speech synthesis error");
           setIsPlaying(false);
         };
 
@@ -198,14 +222,14 @@ const Article = () => {
       setLikeCount(response.data.article.likes.length);
       setIsLiked(!isLiked);
     } catch (error) {
-      console.error('Error liking article:', error);
+      console.error("Error liking article:", error);
     }
   };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
       </div>
     );
   }
@@ -248,24 +272,28 @@ const Article = () => {
             className="flex items-center gap-2 text-[var(--primary) hover:text-ternary transition-colors duration-200"
             aria-label="Toggle Table of Contents"
           >
-            {isTocOpen ? <FaTimes className="w-5 h-5" /> : <FaBars className="w-5 h-5" />}
+            {isTocOpen ? (
+              <FaTimes className="w-5 h-5" />
+            ) : (
+              <FaBars className="w-5 h-5" />
+            )}
             <span className="font-medium">Contents</span>
           </button>
-          <h3 className="text-sm font-medium text-gray-500 truncate max-w-[200px]">
+          <h3 className="text-sm font-medium text-[var(--grey--800)] truncate max-w-[200px]">
             {article.title}
           </h3>
         </div>
       </div>
 
       {/* Mobile TOC Dropdown */}
-      <div 
-        className={`lg:hidden fixed top-[60px] left-0 right-0 z-50 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${isTocOpen ? 'translate-y-0' : '-translate-y-full'}`}
+      <div
+        className={`lg:hidden  fixed top-[60px] left-0 right-0 z-50 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${isTocOpen ? "translate-y-0" : "-translate-y-full"}`}
       >
         <div className="px-6 py-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
           <div className="table-of-contents">
-            <h2 className="hidden text-xl font-bold mb-6 lg:flex items-center justify-between gap-3 text-primary">
+            <h2 className="hidden text-xl font-bold mb-6 lg:flex items-center justify-between gap-3 text-[var(--primary)]">
               <div className="flex items-center gap-3">
-                <LuTableOfContents className="text-ternary " />
+                <LuTableOfContents className="text-[var(--primary)] " />
                 Quick Navigation
               </div>
             </h2>
@@ -299,125 +327,165 @@ const Article = () => {
       </div>
 
       {/* Mobile TOC Overlay */}
-      <div 
-        className={`lg:hidden fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 ${isTocOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+      <div
+        className={`lg:hidden fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 ${isTocOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         onClick={toggleToc}
       />
 
       <div className="container mx-auto px-4 lg:px-8 ">
         <div className="grid grid-cols-12 gap-6 lg:gap-12">
           <article className="col-span-12 lg:col-span-8 order-2 lg:order-1 mt-4 lg:mt-8">
-            <header className="relative article-header space-y-6 mb-8">
-              <div className="meta-item flex items-center justify-center gap-2">
-                {article.authorAvatar ? (
-                  <img
-                    src={article.authorAvatar}
-                    alt={article.authorName}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <FaUser className="meta-icon" />
-                )}
-                <span>{article.authorName || "Anonymous"}</span>
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-[var(--primary)] text-center">
-                {article.title}klsalk
+            <header className="max-w-4xl mx-auto px-4 py-4 space-y-3">
+              {/* Title */}
+              <h2 className="text-3xl font-bold leading-tight text-gray-900">
+                {article.title || "Every book I read in 2024, with commentary"}
               </h2>
-              <div className="article-meta flex flex-col lg:flex-row items-center justify-center lg:items-center px-4 gap-4">
-                <div className="flex items-center justify-center gap-4"> 
-                  <div className="meta-item flex  items-center gap-2">
-                    <FaCalendarAlt className="meta-icon" />
-                    <span>
-                      {new Date(article.createdAt).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </div>
-                  <div className="meta-separator" />
-                  <div className="meta-item flex items-center gap-2">
-                    <FaClock className="meta-icon" />
-                    <span>{readingTime} min read</span>
+
+              {/* Author and Meta Info Bar */}
+              <div className="flex flex-col md:flex-row justify-between py-4 space-y-2 md:space-y-0">
+                <div className="flex gap-3">
+                  {/* Author Section */}
+                  <div className="flex gap-3">
+                    <img
+                      src={article?.authorAvatar}
+                      alt={article?.authorName}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-900">
+                          {article?.authorName || "Anonymous"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-[var(--grey--800)]">
+                        <span>{readingTime || "10"} min read</span>
+                        <span>·</span>
+                        <span>
+                          {new Date(article.createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="meta-separator hidden lg:block" />
-
-                <div className="meta-item">
-                  <div className="inline-flex items-center bg-white rounded-full shadow-md hover:shadow-lg transition-all duration-300 p-1">
-                    <div className="flex space-x-1">
-                      <button
-                        onClick={() => setVoiceGender('female')}
-                        className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${
-                          voiceGender === 'female'
-                            ? 'bg-pink-500 text-white scale-110'
-                            : 'text-pink-500 hover:bg-pink-50'
-                        }`}
-                        title="Female Voice"
-                      >
-                        <FaFemale className={`w-4 h-4 ${voiceGender === 'female' ? 'animate-pulse' : ''}`} />
-                      </button>
-                      <button
-                        onClick={() => setVoiceGender('male')}
-                        className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${
-                          voiceGender === 'male'
-                            ? 'bg-blue-500 text-white scale-110'
-                            : 'text-blue-500 hover:bg-blue-50'
-                        }`}
-                        title="Male Voice"
-                      >
-                        <FaMale className={`w-4 h-4 ${voiceGender === 'male' ? 'animate-pulse' : ''}`} />
-                      </button>
-                    </div>
-                    <div className="w-[1px] bg-gray-200 mx-1 h-6 self-center"></div>
-                    <button
-                      onClick={handleTextToSpeech}
-                      className={`flex items-center justify-center space-x-2 px-4 py-1.5 rounded-full transition-all duration-300 ${
-                        isPlaying
-                          ? 'bg-red-500 text-white hover:bg-red-600'
-                          : 'bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90'
-                      }`}
-                      title={isPlaying ? 'Stop Reading' : 'Start Reading'}
+                {/* Action Buttons */}
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-4">
+                    {/* Upvote Button */}
+                    <div
+                      className="meta-item upvote-button"
+                      onClick={handleLike}
                     >
-                      <div className="flex items-center gap-2">
-                        {isPlaying ? (
-                          <>
-                            <FaVolumeMute className="w-4 h-4" />
-                            <span className="text-sm font-medium">Stop</span>
-                          </>
+                      <div className="flex items-center justify-center gap-2 w-8 h-8 rounded-full border border-gray-300 hover:border-gray-400 transition-colors cursor-pointer">
+                        {isLiked ? (
+                          <BiUpvote className="meta-icon liked text-[var(--ternery)]" />
                         ) : (
-                          <>
-                            <FaVolumeUp className={`w-4 h-4 ${!isPlaying && voiceGender ? 'animate-bounce' : ''}`} />
-                            <span className="text-sm font-medium">Listen</span>
-                          </>
+                          <BiUpvote className="meta-icon text-[var(--primary)]" />
                         )}
                       </div>
+                      <span className="text-sm text-[var(--grey--800)]">
+                        {likeCount}
+                      </span>
+                    </div>
+
+                    {/* Comment Button */}
+                    <button
+                      onClick={() => setIsCommentOpen(true)}
+                      className="flex items-center gap-2 text-[var(--grey--800)] hover:text-gray-700"
+                    >
+                      <FaRegCommentAlt className="w-5 h-5" />
+                      <span>150</span>
                     </button>
+
+                    {/* Listen Button Group */}
+                    <div className="inline-flex items-center rounded-full shadow-sm hover:shadow-md transition-all duration-300 p-1">
+                      <div className="flex space-x-1">
+                        {/* Female Voice Button */}
+                        <button
+                          onClick={() => setVoiceGender("female")}
+                          className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${
+                            voiceGender === "female"
+                              ? "bg-pink-500 text-white scale-110"
+                              : "text-pink-500 hover:bg-pink-50"
+                          }`}
+                          title="Female Voice"
+                        >
+                          <FaFemale
+                            className={`w-4 h-4 ${voiceGender === "female" ? "animate-pulse" : ""}`}
+                          />
+                        </button>
+                        {/* Male Voice Button */}
+                        <button
+                          onClick={() => setVoiceGender("male")}
+                          className={`flex items-center justify-center rounded-full w-8 h-8 transition-all duration-300 ${
+                            voiceGender === "male"
+                              ? "bg-blue-500 text-white scale-110"
+                              : "text-blue-500 hover:bg-blue-50"
+                          }`}
+                          title="Male Voice"
+                        >
+                          <FaMale
+                            className={`w-4 h-4 ${voiceGender === "male" ? "animate-pulse" : ""}`}
+                          />
+                        </button>
+                      </div>
+
+                      <div className="w-[1px] bg-gray-200 mx-1 h-6 self-center"></div>
+
+                      {/* Play/Stop Button */}
+                      <button
+                        onClick={handleTextToSpeech}
+                        className={`flex items-center justify-center space-x-2 px-4 py-1.5 rounded-full transition-all duration-300 ${
+                          isPlaying
+                            ? "bg-red-500 text-white hover:bg-red-600"
+                            : "bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90"
+                        }`}
+                        title={isPlaying ? "Stop Reading" : "Start Reading"}
+                      >
+                        <div className="flex items-center gap-2">
+                          {isPlaying ? (
+                            <>
+                              <FaVolumeMute className="w-4 h-4" />
+                              <span className="text-sm font-medium">Stop</span>
+                            </>
+                          ) : (
+                            <>
+                              <FaVolumeUp
+                                className={`w-4 h-4 ${!isPlaying && voiceGender ? "animate-bounce" : ""}`}
+                              />
+                              <span className="text-sm font-medium">
+                                Listen
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="meta-item like-button" onClick={handleLike}>
-                  {isLiked ? (
-                    <FaHeart className="meta-icon liked" />
-                  ) : (
-                    <FaRegHeart className="meta-icon" />
-                  )}
-                  <span>{likeCount} likes</span>
                 </div>
               </div>
             </header>
 
             <div
+              className="progress-bar"
+              style={{ width: `${scrollProgress}%` }}
+            ></div>
+            <div
               className="article-body prose prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ __html: cleanContent(article.content) }}
+              dangerouslySetInnerHTML={{
+                __html: cleanContent(article.content),
+              }}
             />
 
             <div className="mt-12">
               <SimilarArticles similarArticles={similarArticles} />
-            </div>
-
-            <div className="mt-12 border-t pt-8">
-              <ArticleComments articleId={id} />
             </div>
           </article>
 
@@ -425,17 +493,14 @@ const Article = () => {
           <section className="hidden lg:block col-span-12 lg:col-span-4 order-1 lg:order-2">
             <div className="sticky top-24 bg-white rounded-xl shadow-md p-6">
               <div className="table-of-contents">
-                <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-primary">
-                  <LuTableOfContents className="text-ternary" />
+                <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-[var(--primary)] ">
+                  <LuTableOfContents className="text-[var(--primary)] " />
                   Quick Navigation
                 </h2>
                 <nav className="toc-nav max-h-[60vh] overflow-y-auto custom-scrollbar">
                   <ol className="space-y-3 pr-4">
                     {toc.map((item, index) => (
-                      <li 
-                        key={index} 
-                        className="group"
-                      >
+                      <li key={index} className="group">
                         <a
                           href={`#${item.slug}`}
                           className="flex items-center gap-3 rounded-lg hover:bg-gray-50 transition-all duration-200"
@@ -461,6 +526,11 @@ const Article = () => {
           </section>
         </div>
       </div>
+      <CommentPopup
+        isOpen={isCommentOpen}
+        onClose={() => setIsCommentOpen(false)}
+        articleId={id}
+      />
     </div>
   );
 };
