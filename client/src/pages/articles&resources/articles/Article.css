@@ -68,19 +68,6 @@
   border-radius: 50%;
 }
 
-/* .article-progress {
-  height: 8px;
-  background: rgba(0, 0, 0, 0.05);
-  margin: -3rem -3rem 3rem -3rem;
-  z-index: 10;
-}
-
-.progress-bar {
-  height: 100%;
-  background: #4299e1;
-  width: 0;
-  transition: width 0.2s ease;
-} */
 .progress-bar {
   position: fixed;
   top: 0;
@@ -402,8 +389,3 @@
     display: none;
   }
 }
-
-/* Content css  */
-/* ul > li {
-  list-style-type: upper-alpha !important;
-} */

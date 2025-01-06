@@ -194,6 +194,24 @@ p {
   font-family: "Inter-samibold";
 }
 
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--grey--800);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--grey--900);
+}
+
 audio::-webkit-media-controls-play-button,
 audio::-webkit-media-controls-panel {
   background-color: rgb(187, 184, 184);
