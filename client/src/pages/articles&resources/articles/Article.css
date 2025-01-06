@@ -68,7 +68,7 @@
   border-radius: 50%;
 }
 
-.article-progress {
+/* .article-progress {
   height: 8px;
   background: rgba(0, 0, 0, 0.05);
   margin: -3rem -3rem 3rem -3rem;
@@ -80,6 +80,15 @@
   background: #4299e1;
   width: 0;
   transition: width 0.2s ease;
+} */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px; /* Adjusted height for better visibility */
+  background-color: #8bc34a; /* Distinct background color */
+  z-index: 1000; /* Ensure it stays on top of other elements */
+  transition: width 0.1s ease; /* Smooth transition */
 }
 
 .table-of-contents {
