@@ -1,30 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import customFetch from "@/utils/customFetch";
 import {
-  FaUser,
-  FaCalendarAlt,
-  FaClock,
   FaBars,
   FaTimes,
   FaVolumeUp,
   FaVolumeMute,
   FaMale,
   FaFemale,
-  FaHeart,
-  FaRegHeart,
   FaRegCommentAlt,
-  FaPlay,
-  FaShare,
+  FaExclamationCircle,
 } from "react-icons/fa";
 import { LuTableOfContents } from "react-icons/lu";
 import { FaArrowTrendDown, FaArrowTrendUp } from "react-icons/fa6";
 import "./Article.css";
 import "./scrollbar.css";
 import SimilarArticles from "../../../components/articleComponents/SimilarArticles";
-import ArticleComments from "../../../components/articleComponents/ArticleComments";
-import { BiDownvote, BiUpvote } from "react-icons/bi";
 import CommentPopup from "@/components/articleComponents/CommentPopup";
+import { toast } from "react-toastify";
+import { BiUpvote } from "react-icons/bi";
 
 const Article = () => {
   const [article, setArticle] = useState(null);
@@ -32,7 +26,7 @@ const Article = () => {
   const [error, setError] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [utterance, setUtterance] = useState(null);
-  const [voiceGender, setVoiceGender] = useState("female");
+  const [voiceGender, setVoiceGender] = useState('female');
   const { id } = useParams();
   const [toc, setToc] = useState([]);
   const [isTocOpen, setIsTocOpen] = useState(false);
@@ -41,6 +35,66 @@ const Article = () => {
   const [likeCount, setLikeCount] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isCommentOpen, setIsCommentOpen] = useState(false);
+  const [isLikeLoading, setIsLikeLoading] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchArticle = async () => {
+      try {
+        setLoading(true);
+        const response = await customFetch.get(`articles/${id}`);
+        const articleData = response.data.article;
+        setArticle(articleData);
+        setSimilarArticles(response.data.similarArticles);
+        setLikeCount(articleData.likes?.length || 0);
+        
+        // Check if the current user has liked the article
+        const currentUser = JSON.parse(localStorage.getItem("user"));
+        if (currentUser && articleData.likes) {
+          setIsLiked(articleData.likes.includes(currentUser._id));
+        }
+        
+        setError(null);
+      } catch (err) {
+        setError("Failed to load article. Please try again later.");
+        console.error("Error fetching article:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticle();
+  }, [id]);
+
+  const handleLike = async () => {
+    const currentUser = JSON.parse(localStorage.getItem("user"));
+    if (!currentUser) {
+      toast.error("Please login to like this article!");
+      navigate("/auth/sign-up");
+      return;
+    }
+
+    if (isLikeLoading) return;
+
+    setIsLikeLoading(true);
+    try {
+      const response = await customFetch.patch(`articles/${id}/like`);
+      const updatedArticle = response.data.article;
+      
+      setIsLiked(!isLiked);
+      setLikeCount(updatedArticle.likes.length);
+      
+      setArticle(prev => ({
+        ...prev,
+        likes: updatedArticle.likes
+      }));
+    } catch (error) {
+      console.error("Error liking article:", error);
+      toast.error("Failed to like article. Please try again.");
+    } finally {
+      setIsLikeLoading(false);
+    }
+  };
 
   const handleScroll = () => {
     const totalHeight =
@@ -53,34 +107,6 @@ const Article = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  useEffect(() => {
-    const fetchArticle = async () => {
-      try {
-        setLoading(true);
-        const response = await customFetch.get(`articles/${id}`);
-        setArticle(response.data.article);
-        setSimilarArticles(response.data.similarArticles);
-        setLikeCount(response.data.article.likes.length);
-        // Check if the current user has liked the article
-        const currentUser = JSON.parse(localStorage.getItem("user"));
-        if (
-          currentUser &&
-          response.data.article.likes.includes(currentUser.userId)
-        ) {
-          setIsLiked(true);
-        }
-        setError(null);
-      } catch (err) {
-        setError("Failed to load article. Please try again later.");
-        console.error("Error fetching article:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchArticle();
-  }, [id]);
 
   useEffect(() => {
     const headings = Array.from(
@@ -215,17 +241,6 @@ const Article = () => {
     setIsTocOpen(!isTocOpen);
   };
 
-  const handleLike = async () => {
-    try {
-      const response = await customFetch.patch(`articles/${id}/like`);
-      setArticle(response.data.article);
-      setLikeCount(response.data.article.likes.length);
-      setIsLiked(!isLiked);
-    } catch (error) {
-      console.error("Error liking article:", error);
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -354,7 +369,7 @@ const Article = () => {
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-gray-900">
-                          {article?.authorName || "Anonymous"}
+                          {article?.author?.name || article?.authorName || "Anonymous"}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-[var(--grey--800)]">
@@ -380,11 +395,13 @@ const Article = () => {
                   <div className="flex items-center gap-4">
                     {/* Upvote Button */}
                     <div
-                      className="meta-item upvote-button"
+                      className={`meta-item upvote-button ${isLikeLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                       onClick={handleLike}
                     >
-                      <div className="flex items-center justify-center gap-2 w-8 h-8 rounded-full border border-gray-300 hover:border-gray-400 transition-colors cursor-pointer">
-                        {isLiked ? (
+                      <div className="flex items-center justify-center gap-2 w-8 h-8 rounded-full border border-gray-300 hover:border-gray-400 transition-colors">
+                        {isLikeLoading ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[var(--primary)]"></div>
+                        ) : isLiked ? (
                           <BiUpvote className="meta-icon liked text-[var(--ternery)]" />
                         ) : (
                           <BiUpvote className="meta-icon text-[var(--primary)]" />
@@ -401,7 +418,7 @@ const Article = () => {
                       className="flex items-center gap-2 text-[var(--grey--800)] hover:text-gray-700"
                     >
                       <FaRegCommentAlt className="w-5 h-5" />
-                      <span>150</span>
+                      <span>{article.totalComments || 0}</span>
                     </button>
 
                     {/* Listen Button Group */}
