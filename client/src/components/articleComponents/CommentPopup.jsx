@@ -7,7 +7,7 @@ const CommentPopup = ({ isOpen, onClose, articleId }) => {
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black/50 z-[70] transition-opacity duration-300  ${
+        className={`fixed inset-0 bg-black/50 z-[70] transition-opacity duration-300 custom-scrollbar  ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={onClose}
@@ -15,7 +15,7 @@ const CommentPopup = ({ isOpen, onClose, articleId }) => {
 
       {/* Slide-out panel */}
       <div
-        className={`fixed top-0 left-0 w-full sm:w-[450px] h-screen bg-white z-[80] transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 w-full sm:w-[450px] h-screen bg-white z-[80] transform transition-transform duration-300 ease-in-out custom-scrollbar ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -33,8 +33,8 @@ const CommentPopup = ({ isOpen, onClose, articleId }) => {
           </div>
 
           {/* Comments content */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-4">
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <div className="px-4">
               <ArticleComments articleId={articleId} />
             </div>
           </div>

@@ -7,6 +7,7 @@ import { FaThumbsUp } from "react-icons/fa";
 import DeleteModal from "../shared/DeleteModal";
 import PostActions from "../shared/PostActions";
 import UserAvatar from "../shared/UserAvatar";
+import { Link } from "react-router-dom";
 
 const ArticleCommentReply = ({ reply, commentId, onReplyUpdate }) => {
   const { user } = useUser();
@@ -106,7 +107,7 @@ const ArticleCommentReply = ({ reply, commentId, onReplyUpdate }) => {
                   setIsEditing(false);
                   setEditContent(reply.content);
                 }}
-                className="btn-3 !py-1 text-sm"
+                className="btn-red !py-1 text-sm"
               >
                 Cancel
               </button>
@@ -118,9 +119,12 @@ const ArticleCommentReply = ({ reply, commentId, onReplyUpdate }) => {
         ) : (
           <p className="text-sm mt-1">
             {reply.replyTo && reply.replyTo._id !== reply.commentId && (
-              <span className="text-primary font-medium">
+              <Link
+                to={`/about/user/${reply.replyTo._id}`}
+                className="font-medium text-[var(--ternery)] hover:underline"
+              >
                 @{reply.replyTo.name}{" "}
-              </span>
+              </Link>
             )}
             {reply.content}
           </p>

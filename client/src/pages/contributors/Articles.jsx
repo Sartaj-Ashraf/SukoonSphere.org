@@ -1,20 +1,9 @@
 import { useState, useEffect, useRef, useMemo, memo } from "react";
 import JoditEditor from "jodit-react";
 import customFetch from "@/utils/customFetch";
-import {
-  useParams,
-  useOutletContext,
-  useSearchParams,
-  Link,
-} from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  FaTimes,
-  FaSpinner,
-  FaPlus,
-  FaTimesCircle,
-  FaImage,
-} from "react-icons/fa";
+import { FaTimes, FaPlus, FaTimesCircle, FaImage } from "react-icons/fa";
 import DeleteModal from "@/components/shared/DeleteModal";
 import ArticleGallery from "@/components/ArticleGallery";
 import ArticleCard from "../../components/ArticleCard";
@@ -282,7 +271,7 @@ const Articles = () => {
                 </div>
               </div>
 
-              <div className="flex-1 p-6 overflow-y-auto">
+              <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
                 <form onSubmit={handleSubmit} className="h-full flex flex-col">
                   <div className="grid grid-cols-2 gap-6">
                     <div className="col-span-2">
